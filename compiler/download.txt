@@ -1,0 +1,2 @@
+download the fteqcc compiler from:
+https://www.fteqcc.org/

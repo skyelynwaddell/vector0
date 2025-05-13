@@ -1,0 +1,14 @@
+#pragma target fte_6614
+#define QWSSQC
+#define SERVER
+#pragma flag enable assumeint
+#pragma flag enable subscope
+#pragma flag enable fastarrays
+#pragma flag enable lo
+#pragma progs_dat "../qwprogs.dat"
+#includelist
+	fteextensions.qc
+	defs.qc
+	sv_defs.qc
+	sv_main.qc
+#endlist

@@ -1,0 +1,14 @@
+#pragma target fte_6614
+#define CSQC
+#define CLIENT
+#pragma flag enable assumeint
+#pragma flag enable subscope
+#pragma flag enable fastarrays
+#pragma flag enable lo
+#pragma progs_dat "../csprogs.dat"
+#includelist
+	fteextensions.qc
+	defs.qc
+	cl_defs.qc
+	cl_main.qc
+#endlist
