@@ -2,24 +2,21 @@
 https://www.fteqw.org/ <br>
 https://github.com/fte-team/fteqw
 
-## Getting Started
-Drag Quake Game Files into `gamedata` folder. <br>
-The quake game files folder should contain `glquake.exe`. <br>
-Extract fteqw_win64.zip into gamedata, or get the newest/proper version for your system from `fteqw.org`.
-
 ## Install ericwtools
 https://github.com/ericwa/ericw-tools<br>
 These include tools for lighting, turning .map files into .bsp and other useful utilities/tools for map compiling. <br>
 Extract these files into a folder somewhere, trenchbroom will need access to these files. <br>
 
-
 ## Mapping
 Download trenchbroom:
 https://trenchbroom.github.io/ <br>
-After installing trenchbroom and opening it, click `New Map...`
 
-Select `Quake` from the games list, and click `Open preferences...` <br>
-Another list of games will show up in preferences, go down to `Quake`.
+Drag the folder `qengine` from `/tbdata` into `TRENCHBROOM_INSTALL_PATH/games/`
+
+After installing trenchbroom and adding the qengine to the games folder, open the app and click `New Map...`
+
+Select `qengine` from the games list, and click `Open preferences...` <br>
+Another list of games will show up in preferences, go down to `qengine`.
 
 There will be 4 paths you will have to fill in
 
@@ -28,7 +25,7 @@ There will be 4 paths you will have to fill in
 - vis : Points to `ericwtools/vis.exe`
 - light : Points to `ericwtools/light.exe`
 
-Click Apply/Ok, and now select:
+Click Apply/Ok, and now select (if not already selected):
 `Map Format = Valve`
 
 The map is setup for use.
@@ -38,7 +35,7 @@ In Trenchbroom with your map open, click:
 `Run, Compile Map...`
 
 Create a new profile called `BSP Compile`, and add the following settings:
-![alt text](repo_assets/image.png)
+![alt text](help/map_compile_settings.png)
 
 ### Compile Settings from the above image to copy from
 ```js
