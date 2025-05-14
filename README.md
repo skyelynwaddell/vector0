@@ -1,6 +1,17 @@
-# qengine - fteqw
+# ![Map Compile Settings](tbdata/qengine/icon.png) qengine
+3D Game Engine using FTEQW and the Quake Engine source code. <br>
 https://www.fteqw.org/ <br>
-https://github.com/fte-team/fteqw
+https://github.com/fte-team/fteqw <br>
+https://github.com/shpuld/sui-qc <br>
+
+For setup and getting started using qengine, follow the tasks below in order.
+
+### Table of Contents
+- [QuakeC Manual](help/qcmanual.txt)
+- [Install ericwtools](#install-ericwtools)
+- [Mapping](#mapping)
+- [Compiling Maps](#compiling-maps)
+- [Compiling the Game](#compiling-the-game)
 
 ## Install ericwtools
 https://github.com/ericwa/ericw-tools<br>
@@ -13,7 +24,7 @@ https://trenchbroom.github.io/ <br>
 
 Drag the folder `qengine` from `/tbdata` into `TRENCHBROOM_INSTALL_PATH/games/`
 
-After installing trenchbroom and adding the qengine to the games folder, open the app and click `New Map...`
+After installing trenchbroom and adding `qengine` to the games folder, open the app and click `New Map...`
 
 Select `qengine` from the games list, and click `Open preferences...` <br>
 Another list of games will show up in preferences, go down to `qengine`.
@@ -35,7 +46,7 @@ In Trenchbroom with your map open, click:
 `Run, Compile Map...`
 
 Create a new profile called `BSP Compile`, and add the following settings:
-![alt text](help/map_compile_settings.png)
+![Map Compile Settings](help/map_compile_settings.png)
 
 ### Compile Settings from the above image to copy from
 ```js
@@ -62,3 +73,16 @@ Target Directory Path: ${GAME_DIR_PATH}/maps/
 Source File Path: ${WORK_DIR_PATH}/${MAP_BASE_NAME}.lit
 Target Directory Path: ${GAME_DIR_PATH}/maps/
 ```
+
+## Compiling the Game
+To compile the game you will need FTEQCC, it is included in the `compiler` folder, or can be downloaded from: <br> 
+https://www.fteqcc.org/
+
+If manually downloaded, add the files to the `compiler` folder.
+
+You can simply run the fteqcc64.exe from the terminal in the /gamedata/src folder to compile the game. <br>
+For example run from /gamedata/src folder: `../../compiler/fteqcc64.exe` <br>
+
+Alternatively, I've included a `build.bat` file in the /src folder. <br>
+Simply navigate to the /src folder and run: `./build.bat` <br>
+(Your fteqcc compiler must be in the `compiler` folder for the .bat program to work)
