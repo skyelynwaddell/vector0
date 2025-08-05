@@ -1,17 +1,17 @@
----- vis / ericw-tools v0.18 ----
-fastvis = true
-running with 4 threads
+---- vis / ericw-tools v0.18.1 ----
+running with 12 threads
 testlevel = 4
-LoadBSPFile: 'test.bsp'
+LoadBSPFile: 'test2.bsp'
 BSP is version 29
-     6 leafs
-     0 portals
+    11 leafs
+    26 portals
 Calculating Base Vis:
-
+0....1....2....3....4....5....6....7....8....9....
 Calculating Full Vis:
-average leafs visible: 1
+0....1....2....3....4....5....6....7....8....9....
+average leafs visible: 8
 c_noclip: 0
-c_chains: 0
-visdatasize:6  compressed from 6
-Writing test.bsp as BSP version 29
+c_chains: 290
+visdatasize:23  compressed from 22
+Writing test2.bsp as BSP version 29
   0.1 seconds elapsed

@@ -1,5 +1,5 @@
----- qbsp / ericw-tools v0.18 ----
-Input file: test.map
+---- qbsp / ericw-tools v0.18.1 ----
+Input file: test-compile.map
 Output file: test.bsp
 
 ---- LoadMapFile ----
@@ -7,10 +7,10 @@ Output file: test.bsp
            60 faces
            10 brushes
             2 entities
-            2 unique texnames
-            8 texinfo
+            3 unique texnames
+           11 texinfo
 
-Opened WAD: textures.wad
+*** WARNING 01: No valid WAD filenames in worldmodel
 Processing hull 0...
 ---- Brush_LoadEntity ----
            10 brushes
@@ -64,22 +64,25 @@ Processing hull 1...
 *** WARNING 19: No entities in empty space -- no filling performed (hull 1)
 Processing hull 2...
 *** WARNING 19: No entities in empty space -- no filling performed (hull 2)
+*** WARNING 16: Texture checkers not found
+*** WARNING 16: Texture icon not found
+*** WARNING 16: Texture sky25_64 not found
 ---- WriteBSPFile ----
 Wrote test.bsp
            39 planes              780
            49 vertexes            588
            23 nodes               552
-            8 texinfo             320
+           10 texinfo             400
            51 faces              1020
            96 clipnodes           768
             7 leafs               196
            51 marksurfaces        102
           228 surfedges           912
           115 edges               460
-            2 textures          10972
+            3 textures             16
               lightdata             0
               visdata               0
-              entdata             199
+              entdata             303
 
-0.070 seconds elapsed
-Peak memory usage: 448970 (438.4k)
+0.004 seconds elapsed
+Peak memory usage: 472282 (461.2k)

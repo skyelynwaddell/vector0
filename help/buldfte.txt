@@ -1,0 +1,1 @@
+make FTE_TARGET=SDL3 makelibs -j8 && make FTE_CONFIG=vector FTE_TARGET=SDL3 m-rel -j8

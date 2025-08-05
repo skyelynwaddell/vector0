@@ -673,6 +673,10 @@ void() sui_clear_input =
 	_sui_kb_move_dir = '0 0 0';
 };
 
+void(float scan) DebugInput = {
+    //print(sprintf("Input scan code: %d, keybind: %s\n", scan, getkeybind(scan)));
+}
+
 vector(float scan) sui_input_dir =
 {
 	string cmd = getkeybind(scan);
@@ -685,12 +689,14 @@ vector(float scan) sui_input_dir =
 	if (cmd == "+moveright" || cmd == "+lookright" || scan == K_RIGHTARROW || scan == K_GP_DPAD_RIGHT)
 		return '1 0 0';
 	
+	DebugInput(scan);
 	return '0 0 0';
 }
 
 float(float scan) sui_input_is_confirm =
 {
 	string cmd = getkeybind(scan);
+	DebugInput(scan);
 	if (cmd == "+attack" || scan == K_ENTER || scan == K_GP_A)
 		return TRUE;
 	return FALSE;
@@ -699,6 +705,7 @@ float(float scan) sui_input_is_confirm =
 float(float scan) sui_input_is_back =
 {
 	string cmd = getkeybind(scan);
+	DebugInput(scan);
 	if (cmd == "togglemenu" || scan == K_ESCAPE || scan == K_BACKSPACE || scan == K_GP_B)
 		return TRUE;
 	return FALSE;

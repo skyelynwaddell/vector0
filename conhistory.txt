@@ -1,2 +1,65 @@
-map test2
-map test2
+vid_reload
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+/mod_gltf_privatematerials 0
+vid_reload
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+/mod_gltf_privatematerials 0
+vid_reload
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+setcustomskin_printnames 1
+/mod_gltf_privatematerials 0
+vid_reload
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+listen 16
+connet localhost
+listen 8
+/listen 8
+connect localhost
+connect 127.0.0.1
+connect 0.0.0.0
+connect 127.0.0.1
+connect 127.0.0.1:49713
+connect localhost:49713
+load
+lang
+server
+serverinfo
+sv_port
+sv_port
+crosshair 2
+crosshair 1
+crosshair 3
+crosshair 4
+crosshair 5
+crosshair 6
+crosshair 7
+crosshair 8
+crosshair 9
+crosshair 10
+crosshair 11
+crosshair 12
+crosshair 13
+crosshair 14
+crosshair 15
+crosshair 16
+crosshair 17
+crosshair 18
+crosshair 19
+crosshair 20
+crosshair 21
+crosshair 22
+crosshair 23
+crosshair 24
+crosshair 25
+crosshair 26
+crosshair 27
+crosshair 28
+crosshair 29
+crosshair 20
+crosshair 30
+crosshair 31
+crosshair 32
+crosshair 33
+crosshair 34
+crosshair 16

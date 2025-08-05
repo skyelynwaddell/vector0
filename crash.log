@@ -1,0 +1,91 @@
+Time: 2025-08-02 20:16:13
+Ver: 1.07
+Revision: git-6707-dc2ce2102
+Binary: 2025-07-19
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7ee23b09eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7ee23b04527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7ee23b0288ff]
+/home/skye/github/qengine/fteqw-sv(+0x2098f6)[0x5c4001b178f6]
+/home/skye/github/qengine/fteqw-sv(+0x133500)[0x5c4001a41500]
+/home/skye/github/qengine/fteqw-sv(+0x1337bd)[0x5c4001a417bd]
+/home/skye/github/qengine/fteqw-sv(+0x71015)[0x5c400197f015]
+/home/skye/github/qengine/fteqw-sv(+0x13734f)[0x5c4001a4534f]
+
+Time: 2025-08-02 20:16:16
+Ver: 1.07
+Revision: git-6707-dc2ce2102
+Binary: 2025-07-19
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7477c1a9eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7477c1a4527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7477c1a288ff]
+/home/skye/github/qengine/fteqw-sv(+0x2098f6)[0x5c80a8fd88f6]
+/home/skye/github/qengine/fteqw-sv(+0x133500)[0x5c80a8f02500]
+/home/skye/github/qengine/fteqw-sv(+0x1337bd)[0x5c80a8f027bd]
+/home/skye/github/qengine/fteqw-sv(+0x71015)[0x5c80a8e40015]
+/home/skye/github/qengine/fteqw-sv(+0x13734f)[0x5c80a8f0634f]
+
+Time: 2025-08-03 17:45:40
+Ver: 1.07
+Revision: git-6707-dc2ce2102
+Binary: 2025-07-19
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7ad684a9eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7ad684a4527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7ad684a288ff]
+/home/skye/github/qengine/fteqw-sv(+0x2098f6)[0x5f50e53368f6]
+/home/skye/github/qengine/fteqw-sv(+0x133500)[0x5f50e5260500]
+/home/skye/github/qengine/fteqw-sv(+0x1337bd)[0x5f50e52607bd]
+/home/skye/github/qengine/fteqw-sv(+0x71015)[0x5f50e519e015]
+/home/skye/github/qengine/fteqw-sv(+0x13734f)[0x5f50e526434f]
+
+Time: 2025-08-03 17:45:45
+Ver: 1.07
+Revision: git-6707-dc2ce2102
+Binary: 2025-07-19
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x729d00a9eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x729d00a4527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x729d00a288ff]
+/home/skye/github/qengine/fteqw-sv.db(+0x2098f6)[0x56e2223ed8f6]
+/home/skye/github/qengine/fteqw-sv.db(+0x133500)[0x56e222317500]
+/home/skye/github/qengine/fteqw-sv.db(+0x1337bd)[0x56e2223177bd]
+/home/skye/github/qengine/fteqw-sv.db(+0x71015)[0x56e222255015]
+/home/skye/github/qengine/fteqw-sv.db(+0x13734f)[0x56e22231b34f]
+
+Time: 2025-08-03 17:45:46
+Ver: 1.07
+Revision: git-6707-dc2ce2102
+Binary: 2025-07-19
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x77585fe9eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x77585fe4527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x77585fe288ff]
+/home/skye/github/qengine/fteqw-sv.db(+0x2098f6)[0x5b25e482b8f6]
+/home/skye/github/qengine/fteqw-sv.db(+0x133500)[0x5b25e4755500]
+/home/skye/github/qengine/fteqw-sv.db(+0x1337bd)[0x5b25e47557bd]
+/home/skye/github/qengine/fteqw-sv.db(+0x71015)[0x5b25e4693015]
+/home/skye/github/qengine/fteqw-sv.db(+0x13734f)[0x5b25e475934f]
+
+Time: 2025-08-03 17:45:47
+Ver: 1.07
+Revision: git-6707-dc2ce2102
+Binary: 2025-07-19
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x70bc34c9eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x70bc34c4527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x70bc34c288ff]
+/home/skye/github/qengine/fteqw-sv(+0x2098f6)[0x55d8602368f6]
+/home/skye/github/qengine/fteqw-sv(+0x133500)[0x55d860160500]
+/home/skye/github/qengine/fteqw-sv(+0x1337bd)[0x55d8601607bd]
+/home/skye/github/qengine/fteqw-sv(+0x71015)[0x55d86009e015]
+/home/skye/github/qengine/fteqw-sv(+0x13734f)[0x55d86016434f]
+
+Time: 2025-08-04 07:33:11
+Ver: 1.07
+Revision: git-6707-dc2ce2102
+Binary: 2025-07-19
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c)[0x7a4eb3e9eb2c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e)[0x7a4eb3e4527e]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0xdf)[0x7a4eb3e288ff]
+/home/skye/github/qengine/fteqw-sv(+0x2098f6)[0x5a8d039b58f6]
+/home/skye/github/qengine/fteqw-sv(+0x133500)[0x5a8d038df500]
+/home/skye/github/qengine/fteqw-sv(+0x1337bd)[0x5a8d038df7bd]
+/home/skye/github/qengine/fteqw-sv(+0x71015)[0x5a8d0381d015]
+/home/skye/github/qengine/fteqw-sv(+0x13734f)[0x5a8d038e334f]
+

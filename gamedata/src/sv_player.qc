@@ -3,6 +3,10 @@
 //	Player.qc - Various stuff done for the player, including per-frame functions like PlayerPreThink and PlayerPostThink, also client specific stuff like PutClientInServer etc.
 //
 
+/*
+PlayerJump
+Invokes the jump action for the player.
+*/
 void() PlayerJump =
 {
 	if (!(self.flags & FL_ONGROUND))
@@ -16,6 +20,11 @@ void() PlayerJump =
 	self.button2 = 0;
 };
 
+
+/*
+CheckImpulses
+Checks the player's impulses and executes actions based on them.
+*/
 void() CheckImpulses =
 {
 	switch (self.impulse)
@@ -25,6 +34,11 @@ void() CheckImpulses =
 	self.impulse = 0;
 };
 
+
+/*
+get_spawn_point
+Returns the spawn point for the player.
+*/
 vector() get_spawn_point =
 {
 	entity spawnpoint = world;
@@ -33,6 +47,24 @@ vector() get_spawn_point =
 	return spawnpoint.origin + '0 0 1';
 };
 
+
+/*
+Player_HandleJump
+Handles the player's jump action based on button input.
+*/
+void() Player_HandleJump = 
+{
+	if(self.button2)
+		PlayerJump();
+	else
+		self.flags = self.flags | FL_JUMPRELEASED;
+}
+
+
+/*
+PlayerPreThink
+Pre-Update function for the player.
+*/
 void() PlayerPreThink =
 {	
 	CheckImpulses();
@@ -41,30 +73,43 @@ void() PlayerPreThink =
 	{
 		
 	}
-	if(self.button2)
-	{
-		PlayerJump();
-	}
-	else
-	{
-		self.flags = self.flags | FL_JUMPRELEASED;
-	}
+	
 };
 
+
+/*
+PlayerPostThink
+Post-Update function for the player.
+*/
 void() PlayerPostThink =
 {
+	if(self.flags & FL_ONGROUND)
+    self.velocity *= 0.9;
 };
 
+
+/*
+ClientKill
+Called when a client is disconnected from server
+*/
 void() ClientKill =
 {
 };
 
-//called when a client connects to the server
+/*
+ClientConnect
+Called when a client connects to the server
+*/
 void() ClientConnect =
 {
-	// print("Client connect\n");
+	print("Client connect\n");
 };
 
+
+/*
+PlayerSpawn
+Spawns the player entity with default parameters.
+*/
 void() PlayerSpawn =
 {
 	self.classname = "player";
@@ -76,6 +121,7 @@ void() PlayerSpawn =
 	self.fixangle = TRUE;
 	setsize(self, [-16, -16, 0], [16, 16, 56]);
 	self.view_ofs = [0, 0, 48];
+
 };
 
 void() PutClientInServer =

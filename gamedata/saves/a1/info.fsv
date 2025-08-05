@@ -1,0 +1,99 @@
+25000
+hellooo_world__________________________2025-08-04_19:40:13
+1
+Player
+{
+	parm0 0x0 //0
+	parm1 0x0 //0
+	parm2 0x0 //0
+	parm3 0x0 //0
+	parm4 0x0 //0
+	parm5 0x0 //0
+	parm6 0x0 //0
+	parm7 0x0 //0
+	parm8 0x0 //0
+	parm9 0x0 //0
+	parm10 0x0 //0
+	parm11 0x0 //0
+	parm12 0x0 //0
+	parm13 0x0 //0
+	parm14 0x0 //0
+	parm15 0x0 //0
+	parm16 0x0 //0
+	parm17 0x0 //0
+	parm18 0x0 //0
+	parm19 0x0 //0
+	parm20 0x0 //0
+	parm21 0x0 //0
+	parm22 0x0 //0
+	parm23 0x0 //0
+	parm24 0x0 //0
+	parm25 0x0 //0
+	parm26 0x0 //0
+	parm27 0x0 //0
+	parm28 0x0 //0
+	parm29 0x0 //0
+	parm30 0x0 //0
+	parm31 0x0 //0
+	parm32 0x0 //0
+	parm33 0x0 //0
+	parm34 0x0 //0
+	parm35 0x0 //0
+	parm36 0x0 //0
+	parm37 0x0 //0
+	parm38 0x0 //0
+	parm39 0x0 //0
+	parm40 0x0 //0
+	parm41 0x0 //0
+	parm42 0x0 //0
+	parm43 0x0 //0
+	parm44 0x0 //0
+	parm45 0x0 //0
+	parm46 0x0 //0
+	parm47 0x0 //0
+	parm48 0x0 //0
+	parm49 0x0 //0
+	parm50 0x0 //0
+	parm51 0x0 //0
+	parm52 0x0 //0
+	parm53 0x0 //0
+	parm54 0x0 //0
+	parm55 0x0 //0
+	parm56 0x0 //0
+	parm57 0x0 //0
+	parm58 0x0 //0
+	parm59 0x0 //0
+	parm60 0x0 //0
+	parm61 0x0 //0
+	parm62 0x0 //0
+	parm63 0x0 //0
+	parm_string ""
+}
+\maxclients\1\maxspectators\8\hostname\unnamed\minpitch\-90\maxpitch\90\pm_airstep\1\coop\0\mapname\test2\skill\1\map\test2
+
+{
+skill			"1"
+deathmatch		""
+coop			"0"
+teamplay		""
+nomonsters		"0"
+gamecfg			"0"
+scratch1		"0"
+scratch2		"0"
+scratch3		"0"
+scratch4		"0"
+savedgamecfg		"0"
+saved1			"0"
+saved2			"0"
+saved3			"0"
+saved4			"0"
+temp1			"0"
+noexit			"0"
+pr_maxedicts		"131072"
+progs			""
+set nextserver		""
+}
+{
+}
+test2
+0
