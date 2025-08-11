@@ -1,3 +1,12 @@
+.float new_x;
+.float new_y;
+.float new_z;
+
+noref void CSQC_Init(float apiver, string enginename, float enginever)
+{
+	PrecacheEverything();
+};
+
 void CSQC_Ent_Remove()
 {
 	remove(self);
@@ -7,51 +16,58 @@ void CSQC_Shutdown()
 {
 };
 
-noref void CSQC_Init(float apiver, string enginename, float enginever)
-{
-	PrecacheEverything();
-};
-
 noref void CSQC_WorldLoaded() =
 {
-	CPlayerSpawn();
 
 };
 
-float new_x;
-float new_y;
-float new_z;
-
-int timer;
 noref void CSQC_Ent_Update(float isnew)
 {
 	float enttype = readbyte();
 	float flags;
 	switch (enttype)
 	{
-	case 5:
+	case ENTITY_PLAYER:
 		flags = readbyte();
+
+		self.angles_x = readcoord();
+		self.angles_y = readcoord();
+		self.angles_z = readcoord();
+
+		if (isnew) // first time we see this entity INIT
+		{
+			CPlayerSpawn();
+			setmodel(self, "models/testplayer.iqm");
+		}
+
 		if (flags & SENDFLAGS_ORIGIN)
 		{
-				new_x = readcoord();
-				new_y = readcoord();
-				new_z = readcoord();
+			self.new_x = readcoord();
+			self.new_y = readcoord();
+			self.new_z = readcoord();
 		}
 		if (flags & SENDFLAGS_CURRENTWEAPON)
 		{
-			viewmodel.current_viewmodel = readbyte();
-			viewmodel.ChangeViewModel(viewmodel.current_viewmodel);
+			self.viewmodel.current_viewmodel = readbyte();
+			self.viewmodel.ChangeViewModel(self.viewmodel.current_viewmodel);
 		}
 
 		if (flags & SENDFLAGS_RELOAD)
-			viewmodel.SetFrame(viewmodels[viewmodel.current_viewmodel].anim_reload); 
+			self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
 
 		if (flags & SENDFLAGS_SHOOT)
-			viewmodel.SetFrame(viewmodels[viewmodel.current_viewmodel].anim_shoot);
+			self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
+
+		if (flags & SENDFLAGS_MODELINDEX)
+		{
+			int i = readshort();
+			setmodelindex(self, i);
+			self.drawmask = 1;
+		}
+
 	break;
-	default:
-		error("Unknown entity type! oh noes! panic!");
-	};
+	default: error("Unknown entity type! oh noes! panic!");
+	}
 };
 
 // CALLED EVERY CLIENT RENDER FRAME
@@ -63,7 +79,7 @@ void CSQC_UpdateView(float width, float height, float menushown)
 	g_height = height;
 
 	//animate the view model
-	viewmodel.Animate(frametime);
+	self.viewmodel.Animate(frametime);
 	
 	// disable default crosshair and hud
 	setproperty(VF_DRAWENGINESBAR, 0);	
@@ -78,14 +94,14 @@ void CSQC_UpdateView(float width, float height, float menushown)
 
 	//autoadd entities received from servers for drawing	
 	addentities(MASK_ENGINE | MASK_VIEWMODEL);
-	
+
 	//does what you think it does
 	renderscene();
 	draw_gui();
 
-	self.origin_x = lerp(self.origin_x, new_x, NET_LERP);
-	self.origin_y = lerp(self.origin_y, new_y, NET_LERP);
-	self.origin_z = lerp(self.origin_z, new_z, NET_LERP);
+	self.origin_x = lerp(self.origin_x, self.new_x, NET_LERP);
+	self.origin_y = lerp(self.origin_y, self.new_y, NET_LERP);
+	self.origin_z = lerp(self.origin_z, self.new_z, NET_LERP);
 	setorigin(self, self.origin);
 };
 
@@ -110,41 +126,40 @@ float CSQC_InputEvent(float evtype, float scanx, float chary, float devid)
 		switch (scanx)
 		{
 			case K_LEFTARROW:
-			viewmodel.angles[0] -= 1;
+				self.viewmodel.angles[0] -= 1;
 			break;
 			case K_RIGHTARROW:
-			viewmodel.angles[0] += 1;
+				self.viewmodel.angles[0] += 1;
 			break;
 			case K_UPARROW:
-			viewmodel.angles[1] -= 1;
+				self.viewmodel.angles[1] -= 1;
 			break;
 			case K_DOWNARROW:
-			viewmodel.angles[1] += 1;
+				self.viewmodel.angles[1] += 1;
 			break;
 			case K_DEL:
-			viewmodel.angles[2] -= 1;
+				self.viewmodel.angles[2] -= 1;
 			break;
 			case K_END:
-			viewmodel.angles[2] += 1;
+				self.viewmodel.angles[2] += 1;
 			break;
-
 			case K_MWHEELDOWN:
-				viewmodel.origin[2] -= 1;
+				self.viewmodel.origin[2] -= 1;
 			break;
 			case K_MWHEELUP:
-				viewmodel.origin[2] += 1;
+				self.viewmodel.origin[2] += 1;
 			break;
 			case K_PGDN:
-				viewmodel.origin[0] -= 1;
+				self.viewmodel.origin[0] -= 1;
 			break;
 			case K_PGUP:
-				viewmodel.origin[0] += 1;
+				self.viewmodel.origin[0] += 1;
 			break;
 			case K_ENTER:
-				viewmodel.origin[1] -= 1;
+				self.viewmodel.origin[1] -= 1;
 			break;
 			case K_BACKSPACE:
-				viewmodel.origin[1] += 1;
+				self.viewmodel.origin[1] += 1;
 			break;
 			default:break;			
 		}

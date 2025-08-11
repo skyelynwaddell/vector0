@@ -1,145 +1,19 @@
-vid_reload
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-/mod_gltf_privatematerials 0
-vid_reload
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-/mod_gltf_privatematerials 0
-vid_reload
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-setcustomskin_printnames 1
-/mod_gltf_privatematerials 0
-vid_reload
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-listen 16
-connet localhost
-listen 8
-/listen 8
 connect localhost
-connect 127.0.0.1
-connect 0.0.0.0
-connect 127.0.0.1
-connect 127.0.0.1:49713
-connect localhost:49713
-load
-lang
-server
-serverinfo
-sv_port
-sv_port
-crosshair 2
-crosshair 1
-crosshair 3
-crosshair 4
-crosshair 5
-crosshair 6
-crosshair 7
-crosshair 8
-crosshair 9
-crosshair 10
-crosshair 11
-crosshair 12
-crosshair 13
-crosshair 14
-crosshair 15
-crosshair 16
-crosshair 17
-crosshair 18
-crosshair 19
-crosshair 20
-crosshair 21
-crosshair 22
-crosshair 23
-crosshair 24
-crosshair 25
-crosshair 26
-crosshair 27
-crosshair 28
-crosshair 29
-crosshair 20
-crosshair 30
-crosshair 31
-crosshair 32
-crosshair 33
-crosshair 34
-crosshair 16
-status
+sv_playerslots 10
+sv_maxclients 10
+maxclients 10
 deathmatch 1
-connect 127.0.0.1
-connect 127.0.0.1:49713
-connect 10.04.190.76:49713
-connect 10.04.190.76:49713
-connect 127.0.0.1:49713
-connect 127.0.0.1:49713
-connect 127.0.0.1:49713
-connect 127.0.0.1:49713
-connect 127.0.0.1:49713
-connect 127.0.0.1:49713
-sv_Addport isthisworking 49713
-connect 10.04.190.76:49713
-connect 10.04.190.76:49713
-connect 10.04.190.76:49713
-connect 10.0.0.52:49713
-connect 10.0.0.52:49713
-spectator 0
-spectator 1
-spectator 0
-connect 10.0.0.52:49713
-menu_restart off
-serverinfo
-maxclients 2
-sv_maxclients 2
-sv_playerslots 2
-deathmath `1
-deathmath 1
+map test2
+sv_playerslots 10
+sv_maxclients 10
+maxclients 10
+deathmatch 1
+map test2
+sv_playerslots 10
+sv_maxclients 10
+maxclients 10
 deathmatch 1
 map test2
 connect localhost
-menu_restart off
-scr_conscale
-scr_conscale 1
-scr_conscale
-scr_conscale 1.0
-
-scr_conscale 3
-scr_conscale
-scr_conscale_x 1.25
-scr_conscale_x
-scr_conscale = 2
-
-scr_conscale
-scr_conscale = 3
-scr_conscale = 2
-scr_conscale = 3
-scr_conscale
-con_textsize
-con_textsize 10
-con_textsize 8
-con_textsize_x 
-con_textsize 6
-con_textsize 7
-con_textsize 8
-con_textsize 9
-con_textsize 10
-con_textsize 12
-con_textsize 8
-exec default.cfg 
-vid_restart
-con_textsize 9
-con_textsize 6
-con_textsize 7
-con_textsize 8
-reload
-/reload
-/exec config.cfg
-yo what are you doing
-/exec config.cfg
-vid_conautoscale 1.5
-vid_conautoscale 1.5
-vid_conautoscale 10
-vid_conscale 10
-vid_conautoscale 10
-vid_baseheight 10
-r_font_linear 1
-r_font_linear 0
-/Reload
+map test2
+map test2

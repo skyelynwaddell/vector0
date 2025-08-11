@@ -13,7 +13,7 @@ class CViewModel {
 };
 
 const float VIEWMODEL_FPS = 24.0;
-CViewModel viewmodel;
+.CViewModel viewmodel;
 sViewModel viewmodels[36];
 
 /*
@@ -37,7 +37,7 @@ void CViewModel::ChangeViewModel(int to)
     setsize(this, m.scale, m.scale);
 
     this.SetModelIndex(getmodelindex(m.model_index));
-    this.SetFrame(viewmodels[current_viewmodel].anim_idle);
+    this.SetFrame(m.anim_idle);
 
     this.forceshader = shaderforname(
         strcat("custommaterials/", m.material_name),
@@ -56,7 +56,6 @@ void CViewModel::ChangeViewModel(int to)
         string replace_cmd = strcat("replace \"", m.skins[i], "\" \"", full_material, "\"\n");
         setcustomskin(viewmodel, __NULL__, replace_cmd);
     }
-
 };
 
 
@@ -115,28 +114,18 @@ void CViewModel::Animate(float ft)
 
     switch(this.frame)
     {
-        case IDLE:
-            current_anim_length = m.anim_idle_length;
-        break;
-
-        case SHOOT:
-            current_anim_length = m.anim_shoot_length;
-        break;
-
-        case RELOAD:
-            current_anim_length = m.anim_reload_length;
-        break;
+        case IDLE:   current_anim_length = m.anim_idle_length;   break;
+        case SHOOT:  current_anim_length = m.anim_shoot_length;  break;
+        case RELOAD: current_anim_length = m.anim_reload_length; break;
         
-        default: 
-            current_anim_length = 0;
-        break;
+        default: current_anim_length = 0; break;
     }
 
     this.frame1time += ft;
 
     if (this.frame1time >= current_anim_length / VIEWMODEL_FPS)
     {
-        this.SetFrame(viewmodels[current_viewmodel].anim_idle);
+        this.SetFrame(m.anim_idle);
         m.anim_finished = TRUE;
         return;
     }
@@ -175,6 +164,6 @@ Called when a level loads to spawn in the View Model Entity
 */
 void SpawnViewModel()
 {
-	viewmodel = spawn(CViewModel);
-	viewmodel.owner = self;
+	self.viewmodel = spawn(CViewModel);
+	self.viewmodel.owner = self;
 };

@@ -2,15 +2,15 @@
 //
 //	Player.qc - Various stuff done for the player, including per-frame functions like PlayerPreThink and PlayerPostThink, also client specific stuff like PutClientInServer etc.
 //
-int is_busy;
-int reload_pressed_last;
-int shoot_pressed_last;
+.int reload_pressed_last;
+.int shoot_pressed_last;
 
 enum PLAYER_STATE {
 	FREE,
 	SHOOTING,
 	RELOADING,
 };
+.PLAYER_STATE state;
 
 /*
 PlayerJump
@@ -40,12 +40,10 @@ void CheckImpulses()
 	{
 		case 10:
 			ChangeWeapon(WEAPON_NONE);
-			self.SendFlags |= SENDFLAGS_CURRENTWEAPON;
 		break;
 
 		case 1:
 			ChangeWeapon(WEAPON_PISTOL);
-			self.SendFlags |= SENDFLAGS_CURRENTWEAPON;
 		break;
 
 	default: break;
@@ -81,73 +79,72 @@ void Player_HandleJump()
 
 void Reload()
 {
-	if (is_busy != FREE) return;
-	is_busy = RELOADING;
-	sv_reloading = true;
-	weapons[current_weapon].timer = weapons[current_weapon].reload_time;
+	if (self.state != FREE) return;
+	self.state = RELOADING;
+	self.sv_reloading = true;
+	self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].reload_time;
 	self.SendFlags |= SENDFLAGS_RELOAD;
 }
 
 void HandleReload()
 {
-	if (sv_shooting) return;
-	if (sv_reloading) return;
+	if (self.sv_shooting) return;
+	if (self.sv_reloading) return;
 
 	int reload_pressed_now = self.button4;
 
-	if (!sv_reloading && reload_pressed_now && !reload_pressed_last)
+	if (!self.sv_reloading && reload_pressed_now && !self.reload_pressed_last)
         Reload();
 
-    reload_pressed_last = reload_pressed_now;
+    self.reload_pressed_last = reload_pressed_now;
 }
 
 void ReloadCooldown()
 {
-	if (sv_reloading == false) return;
+	if (self.sv_reloading == false) return;
 
-	weapons[current_weapon].timer -= frametime;
-	if (weapons[current_weapon].timer <= 0.1) 
+	self.weapons[self.current_weapon].timer -= frametime;
+	if (self.weapons[self.current_weapon].timer <= 0.1) 
 	{
-		sv_reloading = false;
-		is_busy = FREE;
+		self.sv_reloading = false;
+		self.state = FREE;
 	}
 }
 
 void Shoot()
 {
-	if (is_busy != FREE) return;	
-	is_busy = RELOADING;
+	if (self.state != FREE) return;	
+	self.state = RELOADING;
 
-	sv_shooting = true;
-	weapons[current_weapon].timer = weapons[current_weapon].fire_rate;
+	self.sv_shooting = true;
+	self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].fire_rate;
 	self.SendFlags |= SENDFLAGS_SHOOT;
 }
 
 void HandleShoot()
 {
-	if (sv_shooting) return;
-	if (sv_reloading) return;
+	if (self.sv_shooting) return;
+	if (self.sv_reloading) return;
 
 	int shoot_pressed_now = self.button0;
 
-	if (!sv_shooting && shoot_pressed_now && !shoot_pressed_last)
+	if (!self.sv_shooting && shoot_pressed_now && !self.shoot_pressed_last)
         Shoot();
 
-    shoot_pressed_last = shoot_pressed_now;
+    self.shoot_pressed_last = shoot_pressed_now;
 }
 
 void ShootCooldown()
 {
-	if (sv_shooting == false) return;
+	if (self.sv_shooting == false) return;
 
-	weapons[current_weapon].timer -= frametime;
-	if (weapons[current_weapon].timer <= 0.1) 
+	self.weapons[self.current_weapon].timer -= frametime;
+	if (self.weapons[self.current_weapon].timer <= 0.1) 
 	{
-		sv_shooting = false;
-		is_busy = FREE;
+		self.sv_shooting = false;
+		self.state = FREE;
 	}
 }
-
 
 /*
 PlayerPreThink
@@ -157,16 +154,17 @@ void PlayerPreThink()
 {	
 	if (VectorLength(self.velocity) > 0.1)
 		self.SendFlags |= SENDFLAGS_ORIGIN;
+	
+	self.SendFlags |= SENDFLAGS_ANGLES;
 
 	CheckImpulses();
 	makevectors(self.v_angle);
-	
+
 	HandleShoot();
-	ShootCooldown();
-
 	HandleReload();
-	ReloadCooldown();
 
+	ShootCooldown();
+	ReloadCooldown();
 };
 
 
@@ -189,6 +187,7 @@ void ClientKill()
 {
 };
 
+
 /*
 ClientConnect
 Called when a client connects to the server
@@ -196,18 +195,25 @@ Called when a client connects to the server
 void ClientConnect()
 {
 	print("Client connect\n");
-	last_time = 0;
-	sv_shooting = 0;
-	sv_reloading = 0;
-	reload_pressed_last = 0;
-	shoot_pressed_last = 0;
+	self.last_time = 0;
+	self.sv_shooting = 0;
+	self.sv_reloading = 0;
+	self.reload_pressed_last = 0;
+	self.shoot_pressed_last = 0;
 };
 
 
 float MySendEntity(entity playerent, float changedflags)
 {
-	WriteByte(MSG_ENTITY, 5);
+	WriteByte(MSG_ENTITY, ENTITY_PLAYER);
 	WriteByte(MSG_ENTITY, changedflags);
+
+	if (changedflags & SENDFLAGS_ANGLES)
+	{
+		WriteCoord(MSG_ENTITY, self.angles_x);
+		WriteCoord(MSG_ENTITY, self.angles_y);
+		WriteCoord(MSG_ENTITY, self.angles_z);
+	}
 
 	if (changedflags & SENDFLAGS_ORIGIN)
 	{
@@ -217,7 +223,10 @@ float MySendEntity(entity playerent, float changedflags)
 	}
 
 	if (changedflags & SENDFLAGS_CURRENTWEAPON)
-		WriteByte(MSG_ENTITY, current_weapon);
+		WriteByte(MSG_ENTITY, self.current_weapon);
+
+	if (changedflags & SENDFLAGS_MODELINDEX)
+		WriteShort(MSG_ENTITY, self.modelindex);
 
 	return true;
 };
@@ -230,15 +239,19 @@ void PlayerSpawn()
 {
 	self.classname = "player";
 	self.solid = SOLID_SLIDEBOX;
+	self.health = 100;
+	precache_model("models/testplayer.iqm");
 	setmodel(self, "models/testplayer.iqm");
 	self.movetype = MOVETYPE_WALK;
-	self.health = 100;
 	setorigin(self, get_spawn_point());
-	self.fixangle = TRUE;
+	//self.fixangle = TRUE;
 	setsize(self, [-16, -16, 0], [16, 16, 56]);
 	self.view_ofs = [0, 0, 48];
 	self.SendEntity = MySendEntity;
-	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_CURRENTWEAPON;
+	WeaponsInit();
+
+
+	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX;
 };
 
 void PutClientInServer()
@@ -275,8 +288,6 @@ void SV_ParseClientCommand(string command_string)
 {
 	tokenize(command_string);
 	string cmd = argv(0);
-
-	print("Parsed command: ", cmd, "\n");
 
 	switch (cmd)
 	{

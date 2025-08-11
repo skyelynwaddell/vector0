@@ -14,8 +14,7 @@ void StartFrame()
 
 void worldspawn()
 {	
-	WeaponsInit();
-	sv_reloading = false;
+	
 };
 
 void SpectatorConnect()

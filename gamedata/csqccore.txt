@@ -7,20 +7,29 @@ progs 0 {
 "crc" "22390"
 }
 stacktrace {
-<NO STACK>
+//0 csprogs.dat
+	"0:CSQC_Ent_Update" //cl_main.qc
+	{
+		"isnew"	"1"
+		"enttype"	"1"
+		"flags"	"255"
+		"i"	"0"
+		ofs5211 0 // 0.000000
+		ofs5212 2 // 0.000000
+	}
 }
 globals 0 {
-"self" "2"
+"self" "0"
 "other" "0"
 "world" "0"
-"time" "1.501073"
-"cltime" "0.302574"
+"time" "1.500844"
+"cltime" "0.302054"
 "frametime" "0"
 "player_localentnum" "1"
 "player_localnum" "0"
 "maxclients" "1"
-"clientcommandframe" "357"
-"servercommandframe" "356"
+"clientcommandframe" "354"
+"servercommandframe" "353"
 "mapname" "test2"
 "intermission" "0"
 "v_forward" "0 0 0"
@@ -38,12 +47,12 @@ globals 0 {
 "trace_inwater" "0"
 "input_timelength" "0.001000"
 "input_angles" "0 0 0"
-"input_movevalues" "0 -350 0"
+"input_movevalues" "0 0 0"
 "input_buttons" "0"
 "input_impulse" "0"
 "physics_mode" "2"
 "drawfont" "31"
-"cursor_pos" "318.471 191.362 0"
+"cursor_pos" "327.934 200.048 0"
 "g_width" "0"
 "g_height" "0"
 "campos" "0 0 0"
@@ -248,7 +257,7 @@ globals 0 {
 "_sui_clip_area_maxs" "0 0 0"
 "_holding_click" "0"
 "_cursor_click" "0 0 0"
-"_cursor_position" "318.471 191.362 0"
+"_cursor_position" "327.934 200.048 0"
 "_cursor_relative_click" "0 0 0"
 "_cursor_relative_hover" "0 0 0"
 "_action_elements[0].pos" "0 0 0"
@@ -1369,7 +1378,7 @@ globals 0 {
 "_sui_binding_command" ""
 "_sui_binding_command_name" ""
 "_input_buffer[0].char" "0"
-"_input_buffer[0].scan" "97"
+"_input_buffer[0].scan" "0"
 "_input_buffer[1].char" "0"
 "_input_buffer[1].scan" "0"
 "_input_buffer[2].char" "0"
@@ -1497,7 +1506,7 @@ globals 0 {
 "_input_buffer[63].char" "0"
 "_input_buffer[63].scan" "0"
 "_input_index" "0"
-"_input_length" "1"
+"_input_length" "0"
 "_scan_listens[0]" "0"
 "_scan_listens[1]" "0"
 "_scan_listens[2]" "0"
@@ -1569,7 +1578,6 @@ globals 0 {
 "_sui_list_last" "0"
 "_sui_list_pos" "0"
 "_sui_list_index" "0"
-"viewmodel" "1"
 "viewmodels[0].model_path" ""
 "viewmodels[0].model_index" "0"
 "viewmodels[0].anim_idle" "0"
@@ -1594,7 +1602,7 @@ globals 0 {
 "viewmodels[0].skins[6]" ""
 "viewmodels[0].skins[7]" ""
 "viewmodels[1].model_path" "models/arms_newpistol/arms_newpistol_baked.glb"
-"viewmodels[1].model_index" "1358"
+"viewmodels[1].model_index" "1374"
 "viewmodels[1].anim_idle" "0"
 "viewmodels[1].anim_shoot" "3"
 "viewmodels[1].anim_reload" "1"
@@ -2398,7 +2406,6 @@ globals 0 {
 "viewmodels[35].skins[5]" ""
 "viewmodels[35].skins[6]" ""
 "viewmodels[35].skins[7]" ""
-"timer" "0"
 }
 entity 0{
 "modelindex" "1"
@@ -2413,16 +2420,16 @@ entity 0{
 "dimension_solid" "255"
 "dimension_hit" "255"
 "drawflags" "96"
+"viewmodel" "1"
 }
 entity 1{
-"modelindex" "-2"
+"modelindex" "-3"
 "absmin" "-161.721 9.75935 -168.44"
 "absmax" "300.248 158.161 -78.0693"
 "origin" "71 56 -101"
 "angles" "-1 -222 358"
 "classname" "CViewModel"
 "model" "models/arms_newpistol/arms_newpistol_baked.glb"
-"frame" "3"
 "effects" "4096"
 "mins" "-231.721 -45.2406 -66.4401"
 "maxs" "228.248 101.161 21.9307"
@@ -2445,6 +2452,7 @@ entity 1{
 "CViewModel::__mChangeViewModel" "0:CViewModel::ChangeViewModel"
 }
 entity 2{
+"angles" "0 0 0"
 "dimension_solid" "255"
 "dimension_hit" "255"
 "drawflags" "96"

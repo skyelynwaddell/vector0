@@ -23,17 +23,17 @@ void draw_gui()
 	string origin_str;
 	string angles_str;
 
-	origin_str = ftos(viewmodel.origin.x);
+	origin_str = ftos(self.viewmodel.origin.x);
 	origin_str = strcat(origin_str, ", ");
-	origin_str = strcat(origin_str, ftos(viewmodel.origin.y));
+	origin_str = strcat(origin_str, ftos(self.viewmodel.origin.y));
 	origin_str = strcat(origin_str, ", ");
-	origin_str = strcat(origin_str, ftos(viewmodel.origin.z));
+	origin_str = strcat(origin_str, ftos(self.viewmodel.origin.z));
 
-	angles_str = ftos(viewmodel.angles.x);
+	angles_str = ftos(self.viewmodel.angles.x);
 	angles_str = strcat(angles_str, ", ");
-	angles_str = strcat(angles_str, ftos(viewmodel.angles.y));
+	angles_str = strcat(angles_str, ftos(self.viewmodel.angles.y));
 	angles_str = strcat(angles_str, ", ");
-	angles_str = strcat(angles_str, ftos(viewmodel.angles.z));
+	angles_str = strcat(angles_str, ftos(self.viewmodel.angles.z));
 
 	vector pos = [10, 10, 0];
 	vector size = '10 10 0';
