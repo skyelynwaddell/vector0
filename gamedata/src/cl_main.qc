@@ -1,31 +1,61 @@
-
-void() CSQC_Ent_Remove =
+void CSQC_Ent_Remove()
 {
 	remove(self);
 };
 
-void() CSQC_Shutdown =
+void CSQC_Shutdown()
 {
 };
 
-noref void(float apiver, string enginename, float enginever) CSQC_Init =
+noref void CSQC_Init(float apiver, string enginename, float enginever)
 {
-	drawfont = loadfont("", "Courier Prime Code", "12,16,24,32,64,72,128,256,512", -1, 0, 0);
-	precache_everything();
+	PrecacheEverything();
 };
 
-noref void() CSQC_WorldLoaded =
+noref void CSQC_WorldLoaded() =
 {
 	CPlayerSpawn();
+
 };
 
-noref void(float isnew) CSQC_Ent_Update =
+float new_x;
+float new_y;
+float new_z;
+
+int timer;
+noref void CSQC_Ent_Update(float isnew)
 {
-	// printf("csqc ent update %f\n", isnew);
+	float enttype = readbyte();
+	float flags;
+	switch (enttype)
+	{
+	case 5:
+		flags = readbyte();
+		if (flags & SENDFLAGS_ORIGIN)
+		{
+				new_x = readcoord();
+				new_y = readcoord();
+				new_z = readcoord();
+		}
+		if (flags & SENDFLAGS_CURRENTWEAPON)
+		{
+			viewmodel.current_viewmodel = readbyte();
+			viewmodel.ChangeViewModel(viewmodel.current_viewmodel);
+		}
+
+		if (flags & SENDFLAGS_RELOAD)
+			viewmodel.SetFrame(viewmodels[viewmodel.current_viewmodel].anim_reload); 
+
+		if (flags & SENDFLAGS_SHOOT)
+			viewmodel.SetFrame(viewmodels[viewmodel.current_viewmodel].anim_shoot);
+	break;
+	default:
+		error("Unknown entity type! oh noes! panic!");
+	};
 };
 
 // CALLED EVERY CLIENT RENDER FRAME
-void(float width, float height, float menushown) CSQC_UpdateView =
+void CSQC_UpdateView(float width, float height, float menushown)
 {
 	//clear and update our global screen resolution vars
 	clearscene();
@@ -37,11 +67,14 @@ void(float width, float height, float menushown) CSQC_UpdateView =
 	
 	// disable default crosshair and hud
 	setproperty(VF_DRAWENGINESBAR, 0);	
-	localcmd("crosshair 16\n");
 	setproperty(VF_DRAWCROSSHAIR, 1);
 
 	campos = getproperty(VF_ORIGIN);
 	camang = getproperty(VF_ANGLES);
+
+	entity csqcplayer = findfloat(world, entnum, player_localentnum);
+	vector your_view_ofs = [0,0,getstatf(STAT_VIEWHEIGHT)];
+	setviewprop(VF_ORIGIN, csqcplayer.origin + your_view_ofs);
 
 	//autoadd entities received from servers for drawing	
 	addentities(MASK_ENGINE | MASK_VIEWMODEL);
@@ -49,12 +82,18 @@ void(float width, float height, float menushown) CSQC_UpdateView =
 	//does what you think it does
 	renderscene();
 	draw_gui();
+
+	self.origin_x = lerp(self.origin_x, new_x, NET_LERP);
+	self.origin_y = lerp(self.origin_y, new_y, NET_LERP);
+	self.origin_z = lerp(self.origin_z, new_z, NET_LERP);
+	setorigin(self, self.origin);
 };
 
-float(string cmd) CSQC_ConsoleCommand =
+float CSQC_ConsoleCommand(string cmd)
 {
 	tokenize(cmd);
-	switch(argv(0))
+	string command = argv(0);
+	switch(command)
 	{
 		default:
 			return FALSE;
@@ -62,7 +101,7 @@ float(string cmd) CSQC_ConsoleCommand =
 	return TRUE;
 };
 
-float(float evtype, float scanx, float chary, float devid) CSQC_InputEvent =
+float CSQC_InputEvent(float evtype, float scanx, float chary, float devid)
 {
 	sui_input_event(evtype, scanx, chary, devid);
 	switch(evtype)
@@ -124,10 +163,12 @@ float(float evtype, float scanx, float chary, float devid) CSQC_InputEvent =
 };
 
 
-void() CSQC_Parse_Event =
+void CSQC_Parse_Event()
 {
 	float first = readbyte();
 	switch(first) {
+		case 1: 
+		break;
 		default:
 			printf("No action for byte %f\n", first);
 			break;
@@ -135,7 +176,7 @@ void() CSQC_Parse_Event =
 };
 
 
-float(string key, string val) find_player_id =
+float find_player_id(string key, string val)
 {
 	for (int currentindex = 0; currentindex < maxclients; currentindex++)
 	{
@@ -144,7 +185,7 @@ float(string key, string val) find_player_id =
 	return -1;
 }
 
-void(string printmsg, float printlvl) CSQC_Parse_Print =
+void CSQC_Parse_Print(string printmsg, float printlvl)
 {
 	print(printmsg);
 };

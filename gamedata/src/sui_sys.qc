@@ -41,27 +41,27 @@ const float SUI_ALIGN_START = 0;
 const float SUI_ALIGN_CENTER = 1;
 const float SUI_ALIGN_END = 2;
 
-void() sui_reset_align =
+void sui_reset_align()
 {
 	_frames[_frame_index].align = [SUI_ALIGN_START, SUI_ALIGN_START];
 };
 
-void(float align) sui_set_x_align =
+void sui_set_x_align(float align)
 {
 	_frames[_frame_index].align.x = align;
 };
 
-void(float align) sui_set_y_align =
+void sui_set_y_align(float align)
 {
 	_frames[_frame_index].align.y = align;
 };
 
-void(vector align) sui_set_align =
+void sui_set_align(vector align)
 {
 	_frames[_frame_index].align = align;
 };
 
-void(__inout vector point) sui_transform_point =
+void sui_transform_point(__inout vector point)
 {
 	int idx = _frame_index;
 	switch (_frames[idx].align.x) 
@@ -80,7 +80,7 @@ void(__inout vector point) sui_transform_point =
 	}
 };
 
-void(__inout vector point, vector size) sui_transform_box =
+void sui_transform_box(__inout vector point, vector size)
 {
 	int idx = _frame_index;
 	switch (_frames[idx].align.x) 
@@ -111,12 +111,12 @@ void(__inout vector point, vector size) sui_transform_box =
 	}
 };
 
-vector() sui_current_frame_pos = 
+vector sui_current_frame_pos() 
 { 
 	return _frames[_frame_index].pos;
 };
 
-vector() sui_current_frame_size =
+vector sui_current_frame_size()
 {
 	 return _frames[_frame_index].size;
 };
@@ -124,7 +124,7 @@ vector() sui_current_frame_size =
 float _sui_is_clipping;
 vector _sui_clip_area_mins;
 vector _sui_clip_area_maxs; 
-void() sui_clip_to_frame =
+void sui_clip_to_frame() 
 {
 	vector pos = _frames[_frame_index].pos;
 	vector size = _frames[_frame_index].size;
@@ -134,18 +134,18 @@ void() sui_clip_to_frame =
 	drawsetcliparea(pos.x, pos.y, size.x, size.y);
 };
 
-void() sui_reset_clip =
+void sui_reset_clip()
 {
 	_sui_is_clipping = FALSE;
 	drawresetcliparea();
 };
 
-float() sui_is_clipping =
+float sui_is_clipping()
 {
 	return _sui_is_clipping;
 };
 
-void(vector pos, vector size) sui_push_frame =
+void sui_push_frame(vector pos, vector size)
 {
 	sui_transform_box(pos, size);
 	
@@ -161,7 +161,7 @@ void(vector pos, vector size) sui_push_frame =
 	_frames[_frame_index].align = [SUI_ALIGN_START, SUI_ALIGN_START]; // TODO allow customizing this
 };
 
-void() sui_pop_frame =
+void sui_pop_frame()
 {
 	if (_frame_index > 0) _frame_index -= 1;
 };
@@ -200,7 +200,7 @@ float _cursor_mouse_activate_accum;
 
 
 // TODO better naming
-float(vector point, vector min, vector max) is_2dpoint_in_bounds =
+float is_2dpoint_in_bounds(vector point, vector min, vector max)
 {
 	if (point_x <= min_x || point_y <= min_y) return FALSE;
 	if (point_x > max_x || point_y > max_y) return FALSE;
@@ -208,12 +208,12 @@ float(vector point, vector min, vector max) is_2dpoint_in_bounds =
 };
 
 // TODO better naming
-float(vector point, vector pos, vector size) is_2dpoint_in_bbox =
+float is_2dpoint_in_bbox(vector point, vector pos, vector size) 
 {
 	return is_2dpoint_in_bounds(point, pos, pos + size);
 };
 
-void() _action_element_count_sanity =
+void _action_element_count_sanity() 
 {
 	if (_action_elements_index > MAX_ACTION_ELEMENTS)
 	{
@@ -237,7 +237,7 @@ float _last_clicked_action_count;
 
 
 // Resets things you might want to persist normally
-void() sui_reset_actions =
+void sui_reset_actions()
 {
 	_hover_action_count = 0;
 	_click_action_count = 0;
@@ -248,26 +248,26 @@ void() sui_reset_actions =
 };
 
 // Per frame reset?
-void() sui_reset_click =
+void sui_reset_click()
 {
 	_hold_action_count = 0;
 	_click_action_count = 0;
 	_holding_click = FALSE;
 };
 
-float() sui_click_held = { return _holding_click; };
+float sui_click_held() = { return _holding_click; };
 
 
 // click: on mouse1 button down AND button op, once
 
 // Returns true if id was the topmost click (what usually is cared about the most)
-float(string id) sui_is_clicked =
+float sui_is_clicked(string id)
 {
 	return _click_action_count > 0 && _click_actions[0] == id;
 };
 
 // Returns the index of the clicked id, -1 if wasn't hit at all. 0 is topmost
-float(string id) sui_click_index =
+float sui_click_index(string id)
 {
 	for (int i = 0; i < _click_action_count; i++)
 	{
@@ -279,12 +279,12 @@ float(string id) sui_click_index =
 
 // hover: mouse is on top of the action element id
 
-float(string id) sui_is_hovered =
+float sui_is_hovered(string id)
 {
 	return _hover_action_count > 0 && _hover_actions[0] == id;
 };
 
-float(string id) sui_hover_index =
+float sui_hover_index(string id)
 {
 	for (int i = 0; i < _hover_action_count; i++)
 	{
@@ -296,12 +296,12 @@ float(string id) sui_hover_index =
 
 // hold: mouse button was clicked on top of this id and is held down, but not necessarily over this id anymore
 
-float(string id) sui_is_held =
+float sui_is_held(string id)
 {
 	return _hold_action_count > 0 && _hold_actions[0] == id;
 };
 
-float(string id) sui_hold_index =
+float sui_hold_index(string id)
 {
 	for (int i = 0; i < _hold_action_count; i++)
 	{
@@ -313,12 +313,12 @@ float(string id) sui_hold_index =
 
 // last clicked: is this the last action element that was clicked, good for focusing on input boxes for example
 
-float(string id) sui_is_last_clicked =
+float sui_is_last_clicked(string id)
 {
 	return _last_clicked_action_count > 0 && _last_clicked_actions[0] == id;
 };
 
-float(string id) sui_last_clicked_index =
+float sui_last_clicked_index(string id)
 {
 	for (int i = 0; i < _last_clicked_action_count; i++)
 	{
@@ -330,12 +330,12 @@ float(string id) sui_last_clicked_index =
 
 // release: a thing was held, but now it was released, once
 
-float(string id) sui_is_released =
+float sui_is_released(string id)
 {
 	return _release_action_count > 0 && _release_actions[0] == id;
 };
 
-float(string id) sui_release_index =
+float sui_release_index(string id)
 {
 	for (int i = 0; i < _release_action_count; i++)
 	{
@@ -345,7 +345,7 @@ float(string id) sui_release_index =
 };
 
 
-float(float num) mouse_action_sanity =
+float mouse_action_sanity(float num)
 {
 	if (num >= MAX_MOUSE_ACTIONS)
 	{
@@ -355,13 +355,13 @@ float(float num) mouse_action_sanity =
 	return FALSE;
 };
 
-void() activate_mouse_cursor =
+void activate_mouse_cursor()
 {
 	_cursor_is_mouse_active = TRUE;
 	_cursor_mouse_activate_accum = 0;
 };
 
-void() deactivate_mouse_cursor =
+void deactivate_mouse_cursor()
 {
 	_cursor_is_mouse_active = FALSE;
 	_cursor_mouse_activate_accum = 0;
@@ -369,7 +369,7 @@ void() deactivate_mouse_cursor =
 
 // mouse move, mostly just update hovers
 
-void(vector pos, float is_mouse = TRUE) _sui_mouse_move =
+void _sui_mouse_move(vector pos, float is_mouse = TRUE)
 {
 	vector old_pos = _cursor_position;
 	_cursor_position = pos;
@@ -406,7 +406,7 @@ void(vector pos, float is_mouse = TRUE) _sui_mouse_move =
 
 // JERK ALERT: hard to pass input params for it without them just being the globals
 // ... so it just straight up uses the globals... optimization
-float(float is_mouse = TRUE) _sui_mouse1_down =
+float _sui_mouse1_down(float is_mouse = TRUE)
 {
 	if (is_mouse)
 		activate_mouse_cursor();
@@ -430,7 +430,7 @@ float(float is_mouse = TRUE) _sui_mouse1_down =
 	return FALSE;
 };
 
-float(float is_mouse = TRUE) _sui_mouse1_up =
+float _sui_mouse1_up(float is_mouse = TRUE)
 {
 	if (is_mouse)
 		activate_mouse_cursor();
@@ -487,17 +487,17 @@ const float KB_DIR_DOWN = 2;
 const float KB_DIR_LEFT = 4;
 const float KB_DIR_RIGHT = 8;
 
-void(float kb_dir) sui_hijack_kb_nav =
+void sui_hijack_kb_nav(float kb_dir)
 {
 	_sui_hijacked_dirs |= kb_dir;
 }
 
-void(string id) sui_set_default_kb_focus =
+void sui_set_default_kb_focus(string id)
 {
 	_sui_default_kb_focus = id;
 }
 
-float(vector dir) kb_dir_from_vec =
+float kb_dir_from_vec(vector dir) 
 {
 	if (vlen(dir) < 0.2) return 0;
 
@@ -510,7 +510,7 @@ float(vector dir) kb_dir_from_vec =
 	return KB_DIR_UP;
 }
 
-void() _retarget_kb_cursor =
+void _retarget_kb_cursor()
 {
 	if (_action_elements_index == 0) return;
 
@@ -532,7 +532,7 @@ void() _retarget_kb_cursor =
 	_sui_mouse_move(default_pos, FALSE);
 }
 
-void(vector dir) _cursor_kb_move =
+void _cursor_kb_move(vector dir)
 {
 	deactivate_mouse_cursor();
 	_sui_kb_move_dir = dir;
@@ -594,7 +594,7 @@ void(vector dir) _cursor_kb_move =
 	}
 }
 
-void(vector pos, vector size, string id, void(float index, vector click_ratios) action, float is_kb_nav_disabled = FALSE) sui_action_element =
+void sui_action_element(vector pos, vector size, string id, void(float index, vector click_ratios) action, float is_kb_nav_disabled = FALSE)
 {
 	if (!_sui_draw_initialized) 
 	{
@@ -649,7 +649,7 @@ float _input_length;
 
 
 // probably good to use it like while (sui_get_input(char, scan)) { ... };
-float(__inout float char, __inout float scan) sui_get_input =
+float sui_get_input(__inout float char, __inout float scan)
 {
 	if (_input_index >= _input_length) return FALSE;
 	
@@ -661,23 +661,24 @@ float(__inout float char, __inout float scan) sui_get_input =
 };
 
 // if 2 controls want to read the same input for some reason..
-void() sui_reread_input =
+void sui_reread_input()
 {
 	_input_index = 0;
 };
 
-void() sui_clear_input =
+void sui_clear_input()
 {
 	_input_length = 0;
 	_input_index = 0;
 	_sui_kb_move_dir = '0 0 0';
 };
 
-void(float scan) DebugInput = {
+void DebugInput(float scan)
+{
     //print(sprintf("Input scan code: %d, keybind: %s\n", scan, getkeybind(scan)));
 }
 
-vector(float scan) sui_input_dir =
+vector sui_input_dir(float scan)
 {
 	string cmd = getkeybind(scan);
 	if (cmd == "+forward" || cmd == "+lookup" || scan == K_UPARROW || scan == K_GP_DPAD_UP)
@@ -693,7 +694,7 @@ vector(float scan) sui_input_dir =
 	return '0 0 0';
 }
 
-float(float scan) sui_input_is_confirm =
+float sui_input_is_confirm(float scan)
 {
 	string cmd = getkeybind(scan);
 	DebugInput(scan);
@@ -702,7 +703,7 @@ float(float scan) sui_input_is_confirm =
 	return FALSE;
 }
 
-float(float scan) sui_input_is_back =
+float sui_input_is_back(float scan)
 {
 	string cmd = getkeybind(scan);
 	DebugInput(scan);
@@ -712,7 +713,7 @@ float(float scan) sui_input_is_back =
 }
 
 
-float(float char, float scan) _sui_add_input =
+float _sui_add_input(float char, float scan)
 {
 	// TODO check if input was listened, return FALSE if not
 	if (_input_length >= MAX_INPUTS)
@@ -733,7 +734,7 @@ float _scan_listens[MAX_INPUTS];
 float _scan_listen_count;
 
 // Listen to a certain keycode if it was pressed, this way sui know it was requested
-float(float keycode) sui_listen_scan =
+float sui_listen_scan(float keycode) 
 {
 	_scan_listens[_scan_listen_count] = keycode;
 	_scan_listen_count += 1;
@@ -745,7 +746,7 @@ float(float keycode) sui_listen_scan =
 	return FALSE;
 };
 
-float(string command) sui_listen_command =
+float sui_listen_command(string command)
 {
 	float num_binds = tokenize(findkeysforcommand(command));
 	for (int i = 0; i < num_binds; i++)
@@ -762,7 +763,7 @@ float(string command) sui_listen_command =
 	return FALSE;
 };
 
-float() sui_listen_up = 
+float sui_listen_up() 
 {
 	return sui_listen_scan(K_UPARROW)
 		|| sui_listen_scan(K_GP_DPAD_UP)
@@ -770,7 +771,7 @@ float() sui_listen_up =
 		|| sui_listen_command("+forward");
 }
 
-float() sui_listen_down = 
+float sui_listen_down()
 {
 	return sui_listen_scan(K_DOWNARROW)
 		|| sui_listen_scan(K_GP_DPAD_DOWN)
@@ -778,7 +779,7 @@ float() sui_listen_down =
 		|| sui_listen_command("+back");
 }
 
-float() sui_listen_left = 
+float sui_listen_left()
 {
 	return sui_listen_scan(K_LEFTARROW)
 		|| sui_listen_scan(K_GP_DPAD_LEFT)
@@ -786,7 +787,7 @@ float() sui_listen_left =
 		|| sui_listen_command("+moveleft");
 }
 
-float() sui_listen_right = 
+float sui_listen_right()
 {
 	return sui_listen_scan(K_RIGHTARROW)
 		|| sui_listen_scan(K_GP_DPAD_RIGHT)
@@ -794,7 +795,7 @@ float() sui_listen_right =
 		|| sui_listen_command("+moveright");
 }
 
-float() sui_listen_confirm =
+float sui_listen_confirm()
 {
 	return sui_listen_scan(K_ENTER)
 		|| sui_listen_scan(K_GP_A)
@@ -802,14 +803,14 @@ float() sui_listen_confirm =
 		|| sui_listen_command("+jump");
 }
 
-float() sui_listen_back =
+float sui_listen_back() 
 {
 	return sui_listen_scan(K_ESCAPE)
 		|| sui_listen_scan(K_GP_B)
 		|| sui_listen_command("togglemenu");
 }
 
-void() sui_menu_nav =
+void sui_menu_nav() 
 {
 	if (sui_listen_up()) _cursor_kb_move('0 -1 0');
 	if (sui_listen_down()) _cursor_kb_move('0 1 0');
@@ -817,17 +818,17 @@ void() sui_menu_nav =
 	if (sui_listen_right()) _cursor_kb_move('1 0 0');
 }
 
-float(float scanx, float chary) sui_block_all =
+float sui_block_all(float scanx, float chary)
 {
 	return TRUE;
 }
 
-float(float scanx, float chary) sui_block_none =
+float sui_block_none(float scanx, float chary)
 {
 	return FALSE;
 }
 
-float(float scanx, float chary) sui_block_menu_navigation =
+float sui_block_menu_navigation(float scanx, float chary)
 {
 	vector movedirs = sui_input_dir(scanx);
 	if (movedirs != '0 0 0') return TRUE;
@@ -836,7 +837,7 @@ float(float scanx, float chary) sui_block_menu_navigation =
 	return FALSE;
 }
 
-float(float scanx, float chary) sui_block_listened =
+float sui_block_listened(float scanx, float chary)
 {
 	for (int i = 0; i < _scan_listen_count; i++)
 	{
@@ -849,12 +850,12 @@ float(float scanx, float chary) sui_block_listened =
 }
 
 // all text that was input between last and current frame
-string() sui_listen_text_input =
+string sui_listen_text_input()
 {
 	return "";
 };
 
-void(float char, float scan, __inout string text, __inout float cursor) sui_handle_text_input =
+void sui_handle_text_input(float char, float scan, __inout string text, __inout float cursor)
 {
 	float maxlen = 128;
 	
@@ -904,7 +905,7 @@ void(float char, float scan, __inout string text, __inout float cursor) sui_hand
 	}
 };
 
-void(float maxlen, __inout string text, __inout float cursor) sui_cap_input_length =
+void sui_cap_input_length(float maxlen, __inout string text, __inout float cursor)
 {
 	if (strlen(text) > maxlen)
 	{
@@ -913,7 +914,7 @@ void(float maxlen, __inout string text, __inout float cursor) sui_cap_input_leng
 	}
 };
 
-void(string command) _sui_unbind =
+void _sui_unbind(string command)
 {
 	tokenize(findkeysforcommand(command));
 	string keyname = keynumtostring(stof(argv(0)));
@@ -922,7 +923,7 @@ void(string command) _sui_unbind =
 	localcmd(sprintf("unbind %s\n", altkeyname));
 };
 
-void(float scan, string command) _sui_do_keybind =
+void _sui_do_keybind(float scan, string command)
 {
 	if (scan == K_ESCAPE) 
 	{
@@ -944,7 +945,7 @@ void(float scan, string command) _sui_do_keybind =
 	_sui_binding_command_name = "";
 };
 
-void(string command, string command_name) sui_start_bind =
+void sui_start_bind(string command, string command_name)
 {
 	_sui_binding_command = command;
 	_sui_binding_command_name = command_name;
@@ -958,7 +959,7 @@ var float(float scanx, float chary) sui_block_input_fn = sui_block_listened;
 //	 return value tells you if sui used the event or not, in case you want to
 //	 not let engine handle it if it was used.
 // Sets all the internal sui action stuff, call it in CSQC_InputEvent
-float(float evtype, float scanx, float chary, float devid) sui_input_event =
+float sui_input_event(float evtype, float scanx, float chary, float devid)
 {
 	float mouse_hit = FALSE;
 	switch (evtype)
@@ -1014,7 +1015,7 @@ float(float evtype, float scanx, float chary, float devid) sui_input_event =
 // void() sui_pre_draw 
 // Resets state for sui actions so that no trouble happens. 
 // Call it before your menu code per frame in your draw/updateview.
-void(float width, float height) sui_begin =
+void sui_begin(float width, float height)
 {
 	_scan_listen_count = 0;
 	_sui_hijacked_dirs = 0;
@@ -1025,12 +1026,12 @@ void(float width, float height) sui_begin =
 	sui_push_frame([0, 0], [width, height]);
 }
 
-void() sui_draw_bind_overlay;
-void() sui_debug_draw_action_elements;
+void sui_draw_bind_overlay();
+void sui_debug_draw_action_elements(); 
 
 // void() sui_end
 // Call after your menu code per frame in your draw/updateview.
-void() sui_end =
+void sui_end()
 {
 	// Todo: move overlay drawing elsewhere:
 	sui_draw_bind_overlay();
@@ -1053,21 +1054,21 @@ void() sui_end =
 
 // Different draw components:
 
-void(vector pos, vector size, vector color, float alpha, float flags) sui_fill =
+void sui_fill(vector pos, vector size, vector color, float alpha, float flags)
 {
 	sui_transform_box(pos, size);
 	
 	drawfill(pos, size, color, alpha, flags);
 };
 
-void(vector pos, vector size, string pic, vector color, float alpha, float flags) sui_pic =
+void sui_pic(vector pos, vector size, string pic, vector color, float alpha, float flags)
 {
 	sui_transform_box(pos, size);
 	
 	drawpic(pos, pic, size, color, alpha, flags);
 };
 
-void(vector pos, vector size, float width, vector color, float alpha, float flags) sui_border_box =
+void sui_border_box(vector pos, vector size, float width, vector color, float alpha, float flags)
 {
 	sui_transform_box(pos, size);
 	
@@ -1082,18 +1083,18 @@ void(vector pos, vector size, float width, vector color, float alpha, float flag
 };
 
 
-void(vector pos, vector size, string text, vector color, float alpha, float flags) sui_text =
+void sui_text(vector pos, vector size, string text, vector color, float alpha, float flags)
 {
 	sui_transform_box(pos, [stringwidth(text, 1, size), size_y]);
 	
 	drawstring(pos, text, size, color, alpha, flags);
 };
 
-void(float index, vector click_ratios) sui_noop = {};
+void sui_noop(float index, vector click_ratios) = {};
 
-void(float value) sui_slider_noop = {};
+void sui_slider_noop(float value) = {};
 
-float(string id, vector pos, vector size, vector minmaxsteps, float value, void(float value) action) sui_slidercontrol =
+float sui_slidercontrol(string id, vector pos, vector size, vector minmaxsteps, float value, void(float value) action)
 {
 	sui_action_element(pos, size, id, sui_noop);
 	float newvalue = value;
@@ -1132,7 +1133,7 @@ float(string id, vector pos, vector size, vector minmaxsteps, float value, void(
 	return newvalue;
 };
 
-void(string id, vector pos, vector size, __inout string text, __inout float cursor) sui_text_input =
+void sui_text_input(string id, vector pos, vector size, __inout string text, __inout float cursor)
 {
 	sui_action_element(pos, size, id, sui_noop);
 	if (sui_is_clicked(id)) cursor = strlen(text);
@@ -1145,7 +1146,7 @@ void(string id, vector pos, vector size, __inout string text, __inout float curs
 };
 
 
-void(string id, vector size, vector contentsize, __inout vector offset, vector scrollbar_widths) sui_scrollbar =
+void sui_scrollbar(string id, vector size, vector contentsize, __inout vector offset, vector scrollbar_widths)
 {
 	vector maxoffset = contentsize - size;
 	maxoffset_x = max(0, maxoffset_x);
@@ -1182,7 +1183,7 @@ void(string id, vector size, vector contentsize, __inout vector offset, vector s
 	sui_pop_frame();
 };
 
-void(string id, vector pos, vector size, vector contentsize, __inout vector offset, vector scrollbar_widths, float scroll_step = 22) sui_scroll_view_begin =
+void sui_scroll_view_begin(string id, vector pos, vector size, vector contentsize, __inout vector offset, vector scrollbar_widths, float scroll_step = 22)
 {
 	// make space for scrollbars
 	sui_push_frame(pos, size - [scrollbar_widths_y, scrollbar_widths_x]);
@@ -1234,7 +1235,7 @@ void(string id, vector pos, vector size, vector contentsize, __inout vector offs
 	sui_push_frame(-1 * offset, contentsize);
 };
 
-void() sui_scroll_view_end =
+void sui_scroll_view_end()
 {
 	sui_pop_frame();
 	sui_reset_clip();
@@ -1246,7 +1247,7 @@ float _sui_list_first;
 float _sui_list_last;
 float _sui_list_pos;
 int _sui_list_index;
-void(string id, vector pos, vector size, vector itemsize, float numitems, __inout vector offset, vector scrollbar_widths) sui_list_view_begin =
+void sui_list_view_begin(string id, vector pos, vector size, vector itemsize, float numitems, __inout vector offset, vector scrollbar_widths)
 {
 	vector contentsize = [itemsize_x, itemsize_y * numitems];
 	sui_scroll_view_begin(id, pos, size, contentsize, offset, scrollbar_widths, itemsize.y);
@@ -1259,7 +1260,7 @@ void(string id, vector pos, vector size, vector itemsize, float numitems, __inou
 	_sui_list_index = _sui_list_first;
 };
 
-float(__inout vector pos) sui_list_item =
+float sui_list_item(__inout vector pos)
 {
 	if (_sui_list_index >= _sui_list_last) return -1;
 	pos = _sui_list_index * [0, _sui_list_item_height];
@@ -1267,12 +1268,12 @@ float(__inout vector pos) sui_list_item =
 	return _sui_list_index - 1;
 };
 
-void() sui_list_view_end =
+void sui_list_view_end()
 {
 	sui_scroll_view_end();
 };
 
-string(string id, vector pos, vector size, string name, string command) sui_binder =
+string sui_binder(string id, vector pos, vector size, string name, string command)
 {
 	sui_action_element(pos, size, id, sui_noop);
 	if (sui_is_released(id))
@@ -1287,7 +1288,7 @@ string(string id, vector pos, vector size, string name, string command) sui_bind
 	return keyname;
 };
 
-void() sui_draw_bind_overlay =
+void sui_draw_bind_overlay()
 {
 	if (_sui_binding_command != "")
 	{
@@ -1301,7 +1302,7 @@ void() sui_draw_bind_overlay =
 	}
 };
 
-void() sui_debug_draw_action_elements =
+void sui_debug_draw_action_elements() 
 {
 	while (_frame_index > 1)
 		sui_pop_frame();
@@ -1317,6 +1318,5 @@ void() sui_debug_draw_action_elements =
 		sui_pop_frame();
 	}
 }
-
 
 // -------------------- END OF SUI SYSTEM STUFF --------------------

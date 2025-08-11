@@ -1,8 +1,11 @@
 ../qwprogs.dat
+defs.qc
 sv_defs.qc
-sh_customdefs.qc
+globals.qc
 sv_customdefs.qc
+sv_skyelib.qc
 sv_combat.qc
+sv_weapons.qc
 sv_enemies.qc
 sv_triggers.qc
 sv_player.qc

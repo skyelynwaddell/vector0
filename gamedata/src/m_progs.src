@@ -1,5 +1,7 @@
 ../menu.dat
 m_defs.qc
+globals.qc
+sh_customdefs.qc
 sui_sys.qc
 m_menu.qc
 m_main.qc

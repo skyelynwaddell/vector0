@@ -2,52 +2,52 @@
 
 const float FL_JUMPRELEASED = 4096;
 
-void() sub_remove =
+void sub_remove()
 {
 	remove(self);
 };
 
-void() sub_noop = {};
+void sub_noop() {};
 
-void(float event) BeginEvent =
+void BeginEvent(float event)
 {
 	WriteByte(MSG_MULTICAST, SVC_CGAMEPACKET);
 	WriteByte(MSG_MULTICAST, event);
 };
 
-void(vector vec) MulticastVector =
+void MulticastVector(vector vec)
 {
 	WriteCoord(MSG_MULTICAST, vec_x);
 	WriteCoord(MSG_MULTICAST, vec_y);
 	WriteCoord(MSG_MULTICAST, vec_z);
 };
 
-void(float val) MulticastByte =
+void MulticastByte(float val)
 {
 	WriteByte(MSG_MULTICAST, val);
 };
 
-void(float val) MulticastShort =
+void MulticastShort(float val)
 {
 	WriteShort(MSG_MULTICAST, val);
 };
 
-void(float val) MulticastFloat =
+void MulticastFloat(float val)
 {
 	WriteFloat(MSG_MULTICAST, val);
 };
 
-void(entity e) MulticastEnt =
+void MulticastEnt(entity e)
 {
 	WriteEntity(MSG_MULTICAST, e);
 };
 
-void(string s) MulticastString =
+void MulticastString(string s)
 {
 	WriteString(MSG_MULTICAST, s);
 };
 
-void() light =
+void light()
 {
 	remove(self);
 };
@@ -57,7 +57,7 @@ entity player_chain_head;
 .entity player_chain_prev;
 
 // Put an entity as the first of the linked list
-void(entity adding) player_chain_add =
+void player_chain_add(entity adding)
 {
 	if (adding.player_chain_prev || adding.player_chain_next || (adding == player_chain_head && !adding.player_chain_next)) 
 	{
@@ -70,7 +70,7 @@ void(entity adding) player_chain_add =
 };
 
 // Remove entity from linked list
-void(entity removing) player_chain_remove =
+void player_chain_remove(entity removing)
 {
 	if (removing == player_chain_head)
 	{

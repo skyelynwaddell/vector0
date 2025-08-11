@@ -1440,7 +1440,7 @@ float(entity e, float nowreadonly) entityprotection = #0:entityprotection; /*
 entity(entity from, optional entity to) copyentity = #400; /* Part of DP_QC_COPYENTITY
 		Copies all fields from one entity to another. */
 
-void(entity ent, float colours) setcolors = #401; /*
+void setcolors(entity ent, float colours) = #401; /*
 		Changes a player's colours. The bits 0-3 are the lower/trouser colour, bits 4-7 are the upper/shirt colours. */
 
 entity(.string field, string match, optional .entity chainfield) findchain = #402; /* Part of DP_QC_FINDCHAIN*/

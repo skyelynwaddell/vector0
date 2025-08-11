@@ -1,7 +1,11 @@
 ../csprogs.dat
 cl_defs.qc
+defs.qc
+globals.qc
+anims.qc
 sh_customdefs.qc
 cl_customdefs.qc
+cl_skyelib.qc
 sui_sys.qc
 cl_menu.qc
 cl_viewmodel.qc

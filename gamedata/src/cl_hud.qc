@@ -1,4 +1,4 @@
-void() draw_gui = 
+void draw_gui() 
 {
     sui_begin(g_width, g_height);
 
@@ -36,12 +36,11 @@ void() draw_gui =
 	angles_str = strcat(angles_str, ftos(viewmodel.angles.z));
 
 	vector pos = [10, 10, 0];
-	vector size = '8 8 0';
+	vector size = '10 10 0';
 
-	sui_text(pos, size, strcat("Origin: ", origin_str), '1 1 1', 1.0, 0);
+	drawstring(pos, strcat("Origin: ", origin_str), size, '1 1 1', 1.0, 0);
 	pos.y += size.y + 2;
 	sui_text(pos, size, strcat("Angles: ", angles_str), '1 1 1', 1.0, 0);
-
 
 	sui_end();
 };

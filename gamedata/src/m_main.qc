@@ -3,18 +3,19 @@ float menu_active;
 
 float splash_time;
 
-void() m_init =
+void m_init()
 {
+	PrecacheEverything();
 	splash_time = time + 2.5;
 	registercommand("togglemenu2");
-	// drawfont = loadfont("", "Courier Prime Code", "12,16,24,32,48,64,72,128,256,512", -1, 0, 0);
+	
 	setcursormode(TRUE,"gfx/xhair", [16, 16], cvar("vid_conautoscale"));
 	current_menu = MENU_MAIN;
 };
 
-vector() randomofs = { return [random() - 0.5, random() - 0.5] * 2; };
+vector randomofs() { return [random() - 0.5, random() - 0.5] * 2; };
 
-void(vector screensize) m_draw =
+void m_draw(vector screensize)
 {
 //	clearscene();
 
@@ -60,19 +61,19 @@ void(vector screensize) m_draw =
 	sui_end();
 };
 
-void() m_close =
+void m_close()
 {
 	setkeydest(0);
 	menu_active = FALSE;
 };
 
-void() m_open =
+void m_open()
 {
 	setkeydest(2);
 	menu_active = TRUE;
 };
 
-float(float evtype, float scanx, float chary, float devid) Menu_InputEvent =
+float Menu_InputEvent(float evtype, float scanx, float chary, float devid)
 {
 	float used = sui_input_event(evtype, scanx, chary, devid);
 	
@@ -99,7 +100,7 @@ float(float evtype, float scanx, float chary, float devid) Menu_InputEvent =
 	return FALSE;
 };
 
-float(string cmd) m_consolecommand =
+float m_consolecommand(string cmd)
 {
 	tokenize(cmd);
 	switch (argv(0))
@@ -110,12 +111,12 @@ float(string cmd) m_consolecommand =
 	return FALSE;
 };
 
-void(float wantmode) m_toggle =
+void m_toggle(float wantmode)
 {
 	if (menu_active) m_close();
 	else m_open();
 };
 
-void() m_shutdown =
+void m_shutdown()
 {
 };

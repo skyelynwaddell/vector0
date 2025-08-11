@@ -1,5 +1,5 @@
 25000
-hellooo_world__________________________2025-08-04_16:33:03
+hellooo_world__________________________2025-08-06_09:13:54
 1
 Player
 {
@@ -69,11 +69,11 @@ Player
 	parm63 0x0 //0
 	parm_string ""
 }
-\maxclients\10\maxspectators\8\hostname\unnamed\minpitch\-90\maxpitch\90\pm_airstep\1\coop\0\mapname\test2\skill\1\map\test2\deathmatch\1\sv_port_tcp\12032
+\maxclients\1\maxspectators\8\hostname\unnamed\minpitch\-90\maxpitch\90\pm_airstep\1\coop\0\mapname\test2\skill\1\map\test2
 
 {
 skill			"1"
-deathmatch		"1"
+deathmatch		""
 coop			"0"
 teamplay		""
 nomonsters		"0"

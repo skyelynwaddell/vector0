@@ -1,0 +1,4 @@
+--langdef=quakec
+--langmap=quakec:.qc
+--regex-quakec=/^[ \t]*([A-Za-z_][A-Za-z0-9_]*)[ \t]*\(/ \1/f,function/
+--regex-quakec=/^[ \t]*([A-Za-z_][A-Za-z0-9_]*)[ \t]*=[^=]/\1/v,variable/

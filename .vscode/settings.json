@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "*.qc": "c",
+        "tags": "cpp",
+        "vector": "cpp",
+        "string": "cpp",
+        "cstdlib": "cpp",
+        "random": "cpp",
+        "string_view": "c",
+        "typeinfo": "c",
+        "cmath": "c"
+    },
+
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.errorSquiggles": "disabled",
+    "quakec.language": "qcc"
+}

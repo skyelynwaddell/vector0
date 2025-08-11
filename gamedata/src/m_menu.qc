@@ -1,12 +1,13 @@
-vector MENU_BG            = '0.07 0.00 0.12';   // deep purple (still dark, but brighter than before)
-vector MENU_BG_DARK       = '0.04 0.00 0.08';   // darker tone for contrast
-vector MENU_BORDER        = '0.6 0.0 1.0';      // bright violet-magenta (matches your ring)
-vector MENU_BUTTON        = '0.3 0.0 0.5';      // strong purple button color
-vector MENU_BUTTON_BORDER = '0.75 0.0 1.0';     // vivid pink-purple border
+vector MENU_BG            = '0.14 0.08 0.20';   // softer lavender background
+vector MENU_BG_DARK       = '0.10 0.05 0.16';   // deeper but not blackish
+vector MENU_BORDER        = '0.65 0.45 0.90';   // lighter lavender border
+vector MENU_BUTTON        = '0.45 0.30 0.70';   // muted violet button
+vector MENU_BUTTON_BORDER = '0.75 0.55 0.95';   // pastel violet-pink border
 vector MENU_TEXT_1        = '1 1 1';            // white text
-vector MENU_TEXT_2        = '0.9 0.75 1.0';     // soft light purple/lavender
-vector MENU_HIGHLIGHT     = '1 0.6 1';          // magenta glow effect for highlights
-vector MENU_DARKEN        = '0.15 0.0 0.25';    // light purple-black overlay
+vector MENU_TEXT_2        = '0.95 0.88 1.0';    // very soft lavender
+vector MENU_HIGHLIGHT     = '0.95 0.70 1.0';    // gentle magenta-pink glow
+vector MENU_DARKEN        = '0.25 0.15 0.35';   // mild overlay
+
 
 vector MENU_TEXT_SMALL = '8 8 0';
 vector MENU_TEXT_MEDIUM = '16 16 0';
@@ -14,7 +15,7 @@ vector MENU_TEXT_LARGE = '24 24 0';
 
 float menu_in_game;
 
-void() input_tester =
+void input_tester()
 {
 	float char = 0;
 	float scan = 0;
@@ -26,7 +27,7 @@ void() input_tester =
 	if (printme != "") printf("INPUT: %s\n", printme); 
 };
 
-void(string id, vector pos, vector size, float maxlen, __inout string text, __inout float cursor) text_input_control =
+void text_input_control(string id, vector pos, vector size, float maxlen, __inout string text, __inout float cursor)
 {
 	vector textsize = [size_y - 4, size_y - 4];
 	sui_push_frame(pos, size);
@@ -63,17 +64,20 @@ void(string id, vector pos, vector size, float maxlen, __inout string text, __in
 	sui_pop_frame();
 };
 
-float(string id, vector pos, vector size, string text) my_button =
+float my_button(string id, vector pos, vector size, string text, optional int show_background)
 {
 	sui_push_frame(pos, size);
 	vector basecolor = sui_is_hovered(id) ? MENU_BUTTON + MENU_HIGHLIGHT * 0.25 : MENU_BUTTON; 
 	basecolor = sui_is_held(id) ? MENU_BUTTON - MENU_DARKEN * 0.1 : basecolor;
 	vector text_color = sui_is_hovered(id) ? MENU_TEXT_2 : MENU_TEXT_1;
-	//sui_fill([0, 0], size, basecolor, 0.6, 0);
-	//sui_border_box([0, 0], size, 1, MENU_BUTTON_BORDER, 0.4, 0);
+	if (show_background == true)
+	{
+		sui_fill([0, 0], size, basecolor, 0.6, 0);
+		sui_border_box([0, 0], size, 1, MENU_BUTTON_BORDER, 0.4, 0);
+	}
 	
 	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_CENTER]);
-	sui_text([0, 0], MENU_TEXT_SMALL, text, text_color, 1, 0);	
+	sui_text([0, 0], [12,12,12], text, text_color, 1, 0);	
 	sui_action_element([0, 0], size, id, sui_noop);
 	sui_pop_frame();
 	
@@ -81,7 +85,7 @@ float(string id, vector pos, vector size, string text) my_button =
 };
 
 
-void(string id, vector pos, vector size, vector minmaxsteps, __inout float value) my_slider =
+void my_slider(string id, vector pos, vector size, vector minmaxsteps, __inout float value)
 {
 	sui_push_frame(pos, size);
 	
@@ -97,7 +101,7 @@ void(string id, vector pos, vector size, vector minmaxsteps, __inout float value
 	sui_pop_frame();
 };
 
-void(vector pos, vector size, vector minmaxsteps, string cvar_s, string name, string format) cvar_slider =
+void cvar_slider(vector pos, vector size, vector minmaxsteps, string cvar_s, string name, string format)
 {
 	float current = cvar(cvar_s);
 	float old = current;
@@ -134,7 +138,7 @@ name_command bindlist[] =
 	{ "Jump0", "+jump" },
 };
 
-void(string id, vector pos, vector size, string name, string command) bind_button =
+void bind_button(string id, vector pos, vector size, string name, string command)
 {
 	sui_push_frame(pos, size);
 	sui_set_align([SUI_ALIGN_START, SUI_ALIGN_CENTER]);
@@ -148,7 +152,7 @@ void(string id, vector pos, vector size, string name, string command) bind_butto
 };
 
 
-void(string id, vector pos, vector size, __inout vector scrollofs) bind_list =
+void bind_list(string id, vector pos, vector size, __inout vector scrollofs)
 {
 	sui_fill(pos, size, MENU_BG_DARK, 0.75, 0);
 	sui_list_view_begin(strcat(id, "scrl"), pos, size, [size_x - 6, 24], bindlist.length, scrollofs, [0, 6]);
@@ -170,7 +174,7 @@ const float MENU_HELP = 3;
 const float MENU_INGAME = 4;
 
 vector binds_scroll;
-void() settings_menu =
+void settings_menu()
 {
 	vector pos = [0, 0];
 	vector size = [360, 280];
@@ -180,15 +184,13 @@ void() settings_menu =
 	sui_fill([0, 0], size, MENU_BG, 0.75, 0);
 	sui_border_box([0, 0], size, 2, MENU_BORDER, 0.3, 0);
 	
-	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_START]);
-	sui_text([0, 4], MENU_TEXT_MEDIUM, "Settings", MENU_TEXT_1, 1, 0);
-
-	
 	sui_set_align([SUI_ALIGN_START, SUI_ALIGN_START]);
-	
+
 	float xpos = 8;
 	float ypos = 32;
 	float width = size_x * 0.5 - 8 * 2;
+
+	sui_text([xpos, 10], MENU_TEXT_MEDIUM, "Settings", MENU_TEXT_1, 1, 0);
 
 	cvar_slider([xpos, ypos], [width, 32], [0, 1], "volume", "Volume", "%.2f");
 	ypos += 32 + 4;
@@ -197,9 +199,9 @@ void() settings_menu =
 	
 	sui_text([xpos, ypos], MENU_TEXT_SMALL, "Video", MENU_TEXT_1, 1, 0);
 	ypos += 16;
-	my_button("fs_btn", [xpos, ypos], [width, 20], "Fullscreen") ? localcmd("vid_fullscreen 2; vid_restart\n") : 0;
+	my_button("fs_btn", [xpos, ypos], [width, 20], "Fullscreen", true) ? localcmd("vid_fullscreen 2; vid_restart\n") : 0;
 	ypos += 24;
-	my_button("wn_btn", [xpos, ypos], [width, 20], "Windowed") ? localcmd("vid_fullscreen 0; vid_width 1024; vid_height 768; vid_restart\n") : 0;
+	my_button("wn_btn", [xpos, ypos], [width, 20], "Windowed", true) ? localcmd("vid_fullscreen 0; vid_width 1024; vid_height 768; vid_restart\n") : 0;
 	ypos += 24;
 	sui_text([xpos, ypos], MENU_TEXT_SMALL, "Window can be resized.", MENU_TEXT_1, 0.8, 0);
 	ypos += 16;
@@ -227,9 +229,9 @@ void() settings_menu =
 	}
 
 	if (menu_in_game == TRUE)
-		my_button("stg_back", [8, -8], [80, 20], "Back") ? current_menu = MENU_INGAME : 0;
+		my_button("stg_back", [8, -8], [80, 20], "Back", true) ? current_menu = MENU_INGAME : 0;
 	else
-		my_button("stg_back", [8, -8], [80, 20], "Back") ? current_menu = MENU_MAIN : 0;
+		my_button("stg_back", [8, -8], [80, 20], "Back", true) ? current_menu = MENU_MAIN : 0;
 
 
 	sui_set_default_kb_focus("volume");
@@ -237,7 +239,7 @@ void() settings_menu =
 	sui_pop_frame();
 };
 
-void() help_menu =
+void help_menu()
 {
 	vector pos = [0, 0];
 	vector size = [360, 280];
@@ -247,14 +249,14 @@ void() help_menu =
 	sui_fill([0, 0], size, MENU_BG, 0.75, 0);
 	sui_border_box([0, 0], size, 2, MENU_BORDER, 0.3, 0);
 	
-	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_START]);
-	sui_text([0, 4], MENU_TEXT_MEDIUM, "Help", MENU_TEXT_1, 1, 0);
 	
-	float xpos = 0;
+	float xpos = 8;
 	float ypos = 32;
+
+	sui_text([xpos, 10], MENU_TEXT_MEDIUM, "Help", MENU_TEXT_1, 1, 0);
 	sui_text([xpos, ypos], MENU_TEXT_SMALL, "Bunch of Help and About", MENU_TEXT_1, 1, 0);
 	
-	sui_set_align([SUI_ALIGN_END, SUI_ALIGN_END]);
+	sui_set_align([SUI_ALIGN_START, SUI_ALIGN_END]);
 
 	if (sui_listen_back())
 	{
@@ -265,14 +267,14 @@ void() help_menu =
 	}
 
 	if (menu_in_game == TRUE)
-		my_button("stg_back", [8, -8], [80, 20], "Back") ? current_menu = MENU_INGAME : 0;
+		my_button("stg_back", [8, -8], [80, 20], "Back", true) ? current_menu = MENU_INGAME : 0;
 	else
-		my_button("stg_back", [8, -8], [80, 20], "Back") ? current_menu = MENU_MAIN : 0;
+		my_button("stg_back", [8, -8], [80, 20], "Back", true) ? current_menu = MENU_MAIN : 0;
 
 	sui_pop_frame();	
 };
 
-void() main_menu =
+void main_menu()
 {
 	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_START]);
 	sui_text([0, 64], MENU_TEXT_LARGE, "vector0", [1, 1, 1], 1, 0);
@@ -303,7 +305,7 @@ void() main_menu =
 		current_menu = MENU_SETTINGS;
 	ypos += spacing;
 
-	if (my_button("mm_savegame", [0, ypos], bsize, "Save Game"))
+	if (my_button("mm_multiplayer", [0, ypos], bsize, "Multiplayer"))
 		current_menu = MENU_SETTINGS;
 	ypos += spacing;
 
@@ -323,7 +325,7 @@ void() main_menu =
 };
 
 
-void() ingame_menu =
+void ingame_menu()
 {
 	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_START]);
 	sui_text([0, 64], MENU_TEXT_LARGE, "vector0", [1, 1, 1], 1, 0);
@@ -333,8 +335,8 @@ void() ingame_menu =
 	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_END]);
 	sui_push_frame(pos, size);
 	
-	sui_fill([0, 0], size, MENU_BG, 0.3, 0);
-	sui_border_box([0, 0], size, 2, MENU_BORDER, 0.2, 0);
+	//sui_fill([0, 0], size, MENU_BG, 0.3, 0);
+	//sui_border_box([0, 0], size, 2, MENU_BORDER, 0.2, 0);
 	
 	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_START]);
 
@@ -370,7 +372,7 @@ void() ingame_menu =
 };
 
 
-void(vector size) root_menu =
+void root_menu(vector size)
 {
 	sui_set_align([SUI_ALIGN_CENTER, SUI_ALIGN_CENTER]);
 	sui_fill([0, 0], size, '0 0 0', 0.5, 0);
