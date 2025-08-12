@@ -38,11 +38,11 @@ void CheckImpulses()
 {
 	switch (self.impulse)
 	{
-		case 10:
+		case VIEWMODEL_NONE:
 			ChangeWeapon(WEAPON_NONE);
 		break;
 
-		case 1:
+		case 1: // KEY #1
 			ChangeWeapon(WEAPON_PISTOL);
 		break;
 
@@ -79,12 +79,46 @@ void Player_HandleJump()
 
 void Reload()
 {
-	if (self.state != FREE) return;
-	self.state = RELOADING;
-	self.sv_reloading = true;
-	self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].reload_time;
-	self.SendFlags |= SENDFLAGS_RELOAD;
+    if (self.state != FREE) return;
+
+    // Access weapon directly from self
+    if (self.weapons[self.current_weapon].clip_size <= 0)
+        return;
+
+    int ammo_type = self.weapons[self.current_weapon].ammo_type;
+
+    // Find matching ammo pool
+    int pool_index = -1;
+    for (int i = 0; i < 36; i++)
+    {
+        if (self.ammo_pools[i].ammo_type == ammo_type)
+        {
+            pool_index = i;
+            break;
+        }
+    }
+    if (pool_index == -1) return;
+
+    int needed = self.weapons[self.current_weapon].clip_size -
+                 self.weapons[self.current_weapon].ammo_count;
+    if (needed <= 0) return;
+
+    int to_load = needed;
+    if (self.ammo_pools[pool_index].amount < needed)
+        to_load = self.ammo_pools[pool_index].amount;
+
+    if (to_load <= 0) return;
+
+    // Apply reload
+    self.weapons[self.current_weapon].ammo_count += to_load;
+    self.ammo_pools[pool_index].amount -= to_load;
+
+    self.state = RELOADING;
+    self.sv_reloading = true;
+    self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].reload_time;
+    self.SendFlags |= SENDFLAGS_RELOAD;
 }
+
 
 void HandleReload()
 {
@@ -114,7 +148,15 @@ void ReloadCooldown()
 void Shoot()
 {
 	if (self.state != FREE) return;	
-	self.state = RELOADING;
+
+	if (self.weapons[self.current_weapon].ammo_count <= 0)
+	{
+		Reload();
+		return;
+	}
+
+	self.state = SHOOTING;
+	self.weapons[self.current_weapon].ammo_count -= 1;
 
 	self.sv_shooting = true;
 	self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].fire_rate;
@@ -152,6 +194,7 @@ Pre-Update function for the player.
 */
 void PlayerPreThink()
 {	
+	
 	if (VectorLength(self.velocity) > 0.1)
 		self.SendFlags |= SENDFLAGS_ORIGIN;
 	
@@ -205,9 +248,14 @@ void ClientConnect()
 
 float MySendEntity(entity playerent, float changedflags)
 {
+	int isme = self == playerent;
+	//if (isme == false) { changedflags &= ~SENDFLAGS_SHOOT; } // how to avoid a state
+
+	// Header & Message Type
 	WriteByte(MSG_ENTITY, ENTITY_PLAYER);
 	WriteByte(MSG_ENTITY, changedflags);
 
+	// Angles
 	if (changedflags & SENDFLAGS_ANGLES)
 	{
 		WriteCoord(MSG_ENTITY, self.angles_x);
@@ -215,6 +263,7 @@ float MySendEntity(entity playerent, float changedflags)
 		WriteCoord(MSG_ENTITY, self.angles_z);
 	}
 
+	// Origin
 	if (changedflags & SENDFLAGS_ORIGIN)
 	{
 		WriteCoord(MSG_ENTITY, self.origin_x);
@@ -222,9 +271,49 @@ float MySendEntity(entity playerent, float changedflags)
 		WriteCoord(MSG_ENTITY, self.origin_z);
 	}
 
-	if (changedflags & SENDFLAGS_CURRENTWEAPON)
-		WriteByte(MSG_ENTITY, self.current_weapon);
+	// Player Health & Armor
+	if (changedflags & SENDFLAGS_STATS)
+	{
+		if (isme)
+		{
+			WriteByte(MSG_ENTITY, self.health);
+			WriteByte(MSG_ENTITY, self.max_health);
+			WriteByte(MSG_ENTITY, self.armorvalue);
+		}
+	}
 
+	// Current Weapon
+	if (changedflags & SENDFLAGS_CURRENTWEAPON) 
+	{
+		if (isme)
+		{
+			WriteByte(MSG_ENTITY, self.current_weapon);
+			WriteByte(MSG_ENTITY, WeaponsGetTotalAmmoPool()); // Total ammo in this weapon pool
+			WriteByte(MSG_ENTITY, self.weapons[self.current_weapon].ammo_count); // how much ammo we got in the clip
+		}
+	}
+
+	// Shoot
+	if (changedflags & SENDFLAGS_SHOOT)
+	{
+		if (isme)
+		{
+			WriteByte(MSG_ENTITY, WeaponsGetTotalAmmoPool()); // Total ammo in this weapon pool
+			WriteByte(MSG_ENTITY, self.weapons[self.current_weapon].ammo_count); // how much ammo we got in the clip
+		}
+	}
+
+	// Reload
+	if (changedflags & SENDFLAGS_RELOAD)
+	{
+		if (isme)
+		{
+			WriteByte(MSG_ENTITY, WeaponsGetTotalAmmoPool()); // Total ammo in this weapon pool
+			WriteByte(MSG_ENTITY, self.weapons[self.current_weapon].ammo_count); // how much ammo we got in the clip
+		}
+	}
+
+	// Model Index (Current Model's Animation)
 	if (changedflags & SENDFLAGS_MODELINDEX)
 		WriteShort(MSG_ENTITY, self.modelindex);
 
@@ -240,6 +329,7 @@ void PlayerSpawn()
 	self.classname = "player";
 	self.solid = SOLID_SLIDEBOX;
 	self.health = 100;
+	self.armorvalue = 0;
 	precache_model("models/testplayer.iqm");
 	setmodel(self, "models/testplayer.iqm");
 	self.movetype = MOVETYPE_WALK;
@@ -251,7 +341,7 @@ void PlayerSpawn()
 	WeaponsInit();
 
 
-	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX;
+	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX | SENDFLAGS_STATS;
 };
 
 void PutClientInServer()

@@ -12,6 +12,12 @@ int btnp(int BUTTON)
 
 /* Player cl_Globals */
 int cl_reloading;
+int total_ammo;
+int ammo_count;
+int health;
+int max_health;
+int armor;
+int cl_viewmodel;
 
 #define MAX_SKINS 8
 typedef struct sViewModel {

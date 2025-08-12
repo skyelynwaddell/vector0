@@ -1,35 +1,26 @@
 general {
 "maxprogs" "64"
-"numentities" "3"
+"numentities" "4"
 }
 progs 0 {
 "filename" "csprogs.dat"
 "crc" "22390"
 }
 stacktrace {
-//0 csprogs.dat
-	"0:CSQC_Ent_Update" //cl_main.qc
-	{
-		"isnew"	"1"
-		"enttype"	"1"
-		"flags"	"255"
-		"i"	"0"
-		ofs5211 0 // 0.000000
-		ofs5212 2 // 0.000000
-	}
+<NO STACK>
 }
 globals 0 {
-"self" "0"
+"self" "3"
 "other" "0"
 "world" "0"
-"time" "1.500844"
-"cltime" "0.302054"
+"time" "1.500859"
+"cltime" "0.301717"
 "frametime" "0"
 "player_localentnum" "1"
 "player_localnum" "0"
 "maxclients" "1"
-"clientcommandframe" "354"
-"servercommandframe" "353"
+"clientcommandframe" "383"
+"servercommandframe" "382"
 "mapname" "test2"
 "intermission" "0"
 "v_forward" "0 0 0"
@@ -52,7 +43,7 @@ globals 0 {
 "input_impulse" "0"
 "physics_mode" "2"
 "drawfont" "31"
-"cursor_pos" "327.934 200.048 0"
+"cursor_pos" "0 0 0"
 "g_width" "0"
 "g_height" "0"
 "campos" "0 0 0"
@@ -257,7 +248,7 @@ globals 0 {
 "_sui_clip_area_maxs" "0 0 0"
 "_holding_click" "0"
 "_cursor_click" "0 0 0"
-"_cursor_position" "327.934 200.048 0"
+"_cursor_position" "0 0 0"
 "_cursor_relative_click" "0 0 0"
 "_cursor_relative_hover" "0 0 0"
 "_action_elements[0].pos" "0 0 0"
@@ -1285,7 +1276,7 @@ globals 0 {
 "_action_elements[255].id" ""
 "_action_elements[255].kb_nav_disabled" "0"
 "_action_elements_index" "0"
-"_cursor_is_mouse_active" "1"
+"_cursor_is_mouse_active" "0"
 "_cursor_mouse_activate_accum" "0"
 "_hover_actions[0]" ""
 "_hover_actions[1]" ""
@@ -2420,9 +2411,25 @@ entity 0{
 "dimension_solid" "255"
 "dimension_hit" "255"
 "drawflags" "96"
-"viewmodel" "1"
 }
 entity 1{
+"modelindex" "3102"
+"absmin" "-17 -17 -1"
+"absmax" "24.2553 17 49"
+"angles" "0 0 0"
+"model" "models/testplayer.iqm"
+"mins" "-16 -16 -1.90735e-06"
+"maxs" "23.2553 16 48"
+"size" "39.2553 32 48"
+"dimension_solid" "255"
+"dimension_hit" "255"
+"drawflags" "96"
+"entnum" "1"
+"drawmask" "1"
+"predraw" "0:PlayerPredraw"
+"viewmodel" "2"
+}
+entity 2{
 "modelindex" "-3"
 "absmin" "-161.721 9.75935 -168.44"
 "absmax" "300.248 158.161 -78.0693"
@@ -2430,15 +2437,17 @@ entity 1{
 "angles" "-1 -222 358"
 "classname" "CViewModel"
 "model" "models/arms_newpistol/arms_newpistol_baked.glb"
+"frame" "3"
 "effects" "4096"
 "mins" "-231.721 -45.2406 -66.4401"
 "maxs" "228.248 101.161 21.9307"
 "size" "459.969 146.402 88.3708"
+"owner" "1"
 "dimension_solid" "255"
 "dimension_hit" "255"
 "drawflags" "96"
 "renderflags" "5"
-"forceshader" "42"
+"forceshader" "43"
 "drawmask" "2"
 "::integer[0]" "1"
 "CViewModel::__mcurrent_viewmodel" "1"
@@ -2451,10 +2460,9 @@ entity 1{
 "::function[3]" "0:CViewModel::ChangeViewModel"
 "CViewModel::__mChangeViewModel" "0:CViewModel::ChangeViewModel"
 }
-entity 2{
-"angles" "0 0 0"
+entity 3{
 "dimension_solid" "255"
 "dimension_hit" "255"
 "drawflags" "96"
-"entnum" "1"
+"entnum" "2"
 }

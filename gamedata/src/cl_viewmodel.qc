@@ -36,7 +36,7 @@ void CViewModel::ChangeViewModel(int to)
     this.angles = m.angles;
     setsize(this, m.scale, m.scale);
 
-    this.SetModelIndex(getmodelindex(m.model_index));
+    this.SetModelIndex(getmodelindex((string)m.model_index));
     this.SetFrame(m.anim_idle);
 
     this.forceshader = shaderforname(
@@ -70,7 +70,7 @@ void CViewModel::CViewModel()
     // === PISTOL VIEWMODEL ===
     m = &viewmodels[WEAPON_PISTOL];
     m.model_path = "models/arms_newpistol/arms_newpistol_baked.glb";
-    m.model_index = precache_model(m.model_path);
+    m.model_index = (__int32)precache_model(m.model_path);
     m.anim_idle = 0;
     m.anim_shoot = 3;
     m.anim_reload = 1;

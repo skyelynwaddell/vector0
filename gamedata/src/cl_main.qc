@@ -21,8 +21,30 @@ noref void CSQC_WorldLoaded() =
 
 };
 
+float PlayerPredraw()
+{
+	int isme = self.entnum == player_localentnum;
+
+	self.origin_x = lerp(self.origin_x, self.new_x, NET_LERP);
+	self.origin_y = lerp(self.origin_y, self.new_y, NET_LERP);
+	self.origin_z = lerp(self.origin_z, self.new_z, NET_LERP);
+	setorigin(self, self.origin);
+
+	if (isme)
+	{
+		self.viewmodel.Animate(frametime);
+
+	} else 
+	{
+		addentity(self);
+	}
+	return true;
+};
+
 noref void CSQC_Ent_Update(float isnew)
 {
+	int isme = self.entnum == player_localentnum;
+
 	float enttype = readbyte();
 	float flags;
 	switch (enttype)
@@ -30,34 +52,67 @@ noref void CSQC_Ent_Update(float isnew)
 	case ENTITY_PLAYER:
 		flags = readbyte();
 
+		self.predraw = PlayerPredraw;
 		self.angles_x = readcoord();
 		self.angles_y = readcoord();
 		self.angles_z = readcoord();
 
-		if (isnew) // first time we see this entity INIT
+		// Player Spawned
+		if (self && self.entnum != 0 && isnew) // first time we see this entity INIT
 		{
-			CPlayerSpawn();
+			if (isme) CPlayerSpawn();
 			setmodel(self, "models/testplayer.iqm");
 		}
 
+		// Origin
 		if (flags & SENDFLAGS_ORIGIN)
 		{
 			self.new_x = readcoord();
 			self.new_y = readcoord();
 			self.new_z = readcoord();
 		}
-		if (flags & SENDFLAGS_CURRENTWEAPON)
+
+		// Player Health & Armor
+		if (flags & SENDFLAGS_STATS)
 		{
-			self.viewmodel.current_viewmodel = readbyte();
-			self.viewmodel.ChangeViewModel(self.viewmodel.current_viewmodel);
+			if (isme)
+			{
+				health = readbyte();
+				max_health = readbyte();
+				armor = readbyte();
+			}
 		}
 
-		if (flags & SENDFLAGS_RELOAD)
+
+		// Current Weapon
+		if ((flags & SENDFLAGS_CURRENTWEAPON) && isme) 
+		{
+			int viewmodel_index = readbyte();
+			if (viewmodel_index == 0) viewmodel_index = VIEWMODEL_NONE;
+			self.viewmodel.current_viewmodel = viewmodel_index;
+			self.viewmodel.ChangeViewModel(viewmodel_index);
+			total_ammo = readbyte();
+			ammo_count = readbyte();
+			cl_viewmodel = viewmodel_index;
+		}
+
+		// Reload
+		if (flags & SENDFLAGS_RELOAD && isme)
+		{
 			self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
+			total_ammo = readbyte();
+			ammo_count = readbyte();
+		}
 
-		if (flags & SENDFLAGS_SHOOT)
+		// Shoot
+		if (flags & SENDFLAGS_SHOOT && isme)
+		{
 			self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
+			total_ammo = readbyte();
+			ammo_count = readbyte();
+		}
 
+		// Model Index (Current Model's Animation)
 		if (flags & SENDFLAGS_MODELINDEX)
 		{
 			int i = readshort();
@@ -77,9 +132,6 @@ void CSQC_UpdateView(float width, float height, float menushown)
 	clearscene();
 	g_width = width;
 	g_height = height;
-
-	//animate the view model
-	self.viewmodel.Animate(frametime);
 	
 	// disable default crosshair and hud
 	setproperty(VF_DRAWENGINESBAR, 0);	
@@ -98,11 +150,6 @@ void CSQC_UpdateView(float width, float height, float menushown)
 	//does what you think it does
 	renderscene();
 	draw_gui();
-
-	self.origin_x = lerp(self.origin_x, self.new_x, NET_LERP);
-	self.origin_y = lerp(self.origin_y, self.new_y, NET_LERP);
-	self.origin_z = lerp(self.origin_z, self.new_z, NET_LERP);
-	setorigin(self, self.origin);
 };
 
 float CSQC_ConsoleCommand(string cmd)

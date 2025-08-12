@@ -8,6 +8,7 @@ enum NET_ENTITY {
     ENTITY_PLAYER=1,
 };
 
+int VIEWMODEL_NONE = 10;
 enum WEAPON_TYPE {
     WEAPON_NONE,
     WEAPON_PISTOL,
@@ -21,6 +22,7 @@ enum SENDFLAGS {
     SENDFLAGS_RELOAD         = 8,
     SENDFLAGS_MODELINDEX     = 16,
     SENDFLAGS_ANGLES         = 32,
+    SENDFLAGS_STATS          = 64,
 };
 
 
