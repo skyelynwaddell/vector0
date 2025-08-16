@@ -5,6 +5,15 @@
 .float last_time;
 .int sv_reloading;
 .int sv_shooting;
+.int reload_pressed_last;
+.int shoot_pressed_last;
+
+enum PLAYER_STATE {
+	FREE,
+	SHOOTING,
+	RELOADING,
+};
+.PLAYER_STATE state;
 
 float delta(){ 
     if (self.last_time == 0) return;

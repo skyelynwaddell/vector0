@@ -12,12 +12,12 @@ int btnp(int BUTTON)
 
 /* Player cl_Globals */
 int cl_reloading;
+int cl_viewmodel;
 int total_ammo;
 int ammo_count;
 int health;
 int max_health;
 int armor;
-int cl_viewmodel;
 
 #define MAX_SKINS 8
 typedef struct sViewModel {
@@ -31,8 +31,8 @@ typedef struct sViewModel {
     int anim_reload_length;
     int anim_finished;
     int automatic;
-    string material_name;
-    string texture;
+    string material_names[MAX_SKINS];
+    string textures[MAX_SKINS];
     vector origin;
     vector angles;
     vector scale;

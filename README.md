@@ -18,6 +18,13 @@ https://github.com/ericwa/ericw-tools<br>
 These include tools for lighting, turning .map files into .bsp and other useful utilities/tools for map compiling. <br>
 Extract these files into a folder somewhere, trenchbroom will need access to these files. <br>
 
+## Exporting GLTF models from blender WITHOUT Gloss
+I use .glb for morph targets.
+Make sure the textures used are beside the .glb model file! (and blender is referencing the ones beside the .glb!!!), 
+Apply a Principled BSDF shader with all IOR levels at 0, Metallics at 0, and Roughness at 1.0.
+Get this shader!!!:
+https://github.com/fte-team/fteqw/blob/master/engine/shaders/glsl/defaultskin.glsl grab that, shove it in your $gamedir/glsl/ subdir, put #undef ORM right after the !!foo headery bit
+
 ## Mapping
 Download trenchbroom:
 https://trenchbroom.github.io/ <br>
@@ -55,7 +62,7 @@ File Path: ${WORK_DIR_PATH}/${MAP_BASE_NAME}-compile.map
 
 # Run Tool
 Tool Path: C:/dev/ericwtools/qbsp.exe
-Parameters: ${MAP_BASE_NAME}-compile.map ${MAP_BASE_NAME}.bsp
+Parameters: -notex ${MAP_BASE_NAME}-compile.map ${MAP_BASE_NAME}.bsp
 
 # Run Tool
 Tool Path: C:/dev/ericwtools/vis.exe
@@ -63,15 +70,7 @@ Parameters: ${MAP_BASE_NAME}.bsp
 
 # Run Tool
 Tool Path: C:/dev/ericwtools/light.exe
-Parameters: -lit ${MAP_BASE_NAME}.bsp
-
-# Copy Files
-Source File Path: ${WORK_DIR_PATH}/${MAP_BASE_NAME}.bsp
-Target Directory Path: ${GAME_DIR_PATH}/maps/
-
-# Copy Files
-Source File Path: ${WORK_DIR_PATH}/${MAP_BASE_NAME}.lit
-Target Directory Path: ${GAME_DIR_PATH}/maps/
+Parameters: -lit -bounce 2 ${MAP_BASE_NAME}.bsp
 ```
 
 ## Compiling the Game

@@ -2,15 +2,7 @@
 //
 //	Player.qc - Various stuff done for the player, including per-frame functions like PlayerPreThink and PlayerPostThink, also client specific stuff like PutClientInServer etc.
 //
-.int reload_pressed_last;
-.int shoot_pressed_last;
 
-enum PLAYER_STATE {
-	FREE,
-	SHOOTING,
-	RELOADING,
-};
-.PLAYER_STATE state;
 
 /*
 PlayerJump
@@ -46,6 +38,18 @@ void CheckImpulses()
 			ChangeWeapon(WEAPON_PISTOL);
 		break;
 
+		case 2: // KEY #2
+			ChangeWeapon(WEAPON_PUMP);
+		break;
+
+		case 3: // KEY #3
+			ChangeWeapon(WEAPON_REVOLVER);
+		break;
+
+		case 4: // KEY #4
+			ChangeWeapon(WEAPON_SMG);
+		break;
+
 	default: break;
 	}
 	self.impulse = 0;
@@ -77,6 +81,11 @@ void Player_HandleJump()
 		self.flags = self.flags | FL_JUMPRELEASED;
 }
 
+
+/*
+Reload
+Call to invoke the reload function
+*/
 void Reload()
 {
     if (self.state != FREE) return;
@@ -109,10 +118,6 @@ void Reload()
 
     if (to_load <= 0) return;
 
-    // Apply reload
-    self.weapons[self.current_weapon].ammo_count += to_load;
-    self.ammo_pools[pool_index].amount -= to_load;
-
     self.state = RELOADING;
     self.sv_reloading = true;
     self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].reload_time;
@@ -120,6 +125,10 @@ void Reload()
 }
 
 
+/*
+HandleReload
+
+*/
 void HandleReload()
 {
 	if (self.sv_shooting) return;
@@ -133,6 +142,10 @@ void HandleReload()
     self.reload_pressed_last = reload_pressed_now;
 }
 
+
+/*
+ReloadCooldown
+*/
 void ReloadCooldown()
 {
 	if (self.sv_reloading == false) return;
@@ -140,8 +153,35 @@ void ReloadCooldown()
 	self.weapons[self.current_weapon].timer -= frametime;
 	if (self.weapons[self.current_weapon].timer <= 0.1) 
 	{
+		int ammo_type = self.weapons[self.current_weapon].ammo_type;
+
+		// Find matching ammo pool
+		int pool_index = -1;
+		for (int i = 0; i < 36; i++)
+		{
+			if (self.ammo_pools[i].ammo_type == ammo_type)
+			{
+				pool_index = i;
+				break;
+			}
+		}
+		if (pool_index == -1) return;
+
+		int needed = self.weapons[self.current_weapon].clip_size -
+					self.weapons[self.current_weapon].ammo_count;
+		if (needed <= 0) return;
+
+		int to_load = needed;
+		if (self.ammo_pools[pool_index].amount < needed)
+			to_load = self.ammo_pools[pool_index].amount;
+
+		if (to_load <= 0) return;
 		self.sv_reloading = false;
+    	self.weapons[self.current_weapon].ammo_count += to_load;
+    	self.ammo_pools[pool_index].amount -= to_load;
+
 		self.state = FREE;
+		self.SendFlags |= SENDFLAGS_CURRENTWEAPON;
 	}
 }
 
@@ -165,16 +205,25 @@ void Shoot()
 
 void HandleShoot()
 {
-	if (self.sv_shooting) return;
-	if (self.sv_reloading) return;
+    int is_auto = self.weapons[self.current_weapon].automatic;
+    if (self.sv_shooting) return;
+    if (self.sv_reloading) return;
 
-	int shoot_pressed_now = self.button0;
+    int shoot_pressed_now = self.button0;
 
-	if (!self.sv_shooting && shoot_pressed_now && !self.shoot_pressed_last)
-        Shoot();
+    if (is_auto) {
+        // Auto weapons fire whenever the button is held
+        if (shoot_pressed_now)
+            Shoot();
+    } else {
+        // Semi-auto weapons fire only on press edge
+        if (shoot_pressed_now && !self.shoot_pressed_last)
+            Shoot();
+    }
 
     self.shoot_pressed_last = shoot_pressed_now;
 }
+
 
 void ShootCooldown()
 {
@@ -237,7 +286,6 @@ Called when a client connects to the server
 */
 void ClientConnect()
 {
-	print("Client connect\n");
 	self.last_time = 0;
 	self.sv_shooting = 0;
 	self.sv_reloading = 0;
@@ -326,21 +374,20 @@ Spawns the player entity with default parameters.
 */
 void PlayerSpawn()
 {
-	self.classname = "player";
+	self.classname = "Player";
 	self.solid = SOLID_SLIDEBOX;
 	self.health = 100;
 	self.armorvalue = 0;
-	precache_model("models/testplayer.iqm");
-	setmodel(self, "models/testplayer.iqm");
+	precache_model("models/pump/pump.glb");
+	precache_model("models/monster_shotgunner/monster_shotgunner_nowep.glb");
+	setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
 	self.movetype = MOVETYPE_WALK;
 	setorigin(self, get_spawn_point());
-	//self.fixangle = TRUE;
+	self.fixangle = TRUE;
 	setsize(self, [-16, -16, 0], [16, 16, 56]);
 	self.view_ofs = [0, 0, 48];
 	self.SendEntity = MySendEntity;
 	WeaponsInit();
-
-
 	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX | SENDFLAGS_STATS;
 };
 
@@ -381,6 +428,9 @@ void SV_ParseClientCommand(string command_string)
 
 	switch (cmd)
 	{
+		case "mp":
+			print("foo");
+		break;
 		// case "reload":
 		// 	print("foooooo");
 		// break;

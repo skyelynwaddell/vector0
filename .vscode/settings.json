@@ -9,7 +9,8 @@
         "random": "cpp",
         "string_view": "c",
         "typeinfo": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "functional": "c"
     },
 
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",

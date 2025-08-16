@@ -47,27 +47,80 @@ void draw_gui()
 	sui_text(pos, textsize, ammo_str, '1 1 1', 1.0, 0);
 	}
 
-	// string origin_str;
-	// string angles_str;
+	if (self.viewmodel.debug_mode == true)
+	{
+		string origin_str;
+		string angles_str;
 
-	// origin_str = ftos(self.viewmodel.origin.x);
-	// origin_str = strcat(origin_str, ", ");
-	// origin_str = strcat(origin_str, ftos(self.viewmodel.origin.y));
-	// origin_str = strcat(origin_str, ", ");
-	// origin_str = strcat(origin_str, ftos(self.viewmodel.origin.z));
+		origin_str = ftos(self.viewmodel.origin.x);
+		origin_str = strcat(origin_str, ", ");
+		origin_str = strcat(origin_str, ftos(self.viewmodel.origin.y));
+		origin_str = strcat(origin_str, ", ");
+		origin_str = strcat(origin_str, ftos(self.viewmodel.origin.z));
 
-	// angles_str = ftos(self.viewmodel.angles.x);
-	// angles_str = strcat(angles_str, ", ");
-	// angles_str = strcat(angles_str, ftos(self.viewmodel.angles.y));
-	// angles_str = strcat(angles_str, ", ");
-	// angles_str = strcat(angles_str, ftos(self.viewmodel.angles.z));
+		angles_str = ftos(self.viewmodel.angles.x);
+		angles_str = strcat(angles_str, ", ");
+		angles_str = strcat(angles_str, ftos(self.viewmodel.angles.y));
+		angles_str = strcat(angles_str, ", ");
+		angles_str = strcat(angles_str, ftos(self.viewmodel.angles.z));
 
-	// vector pos = [10, 10, 0];
-	// vector size = '10 10 0';
+		pos = [10, 10, 0];
+		vector size = '10 10 0';
 
-	// drawstring(pos, strcat("Origin: ", origin_str), size, '1 1 1', 1.0, 0);
-	// pos.y += size.y + 2;
-	// sui_text(pos, size, strcat("Angles: ", angles_str), '1 1 1', 1.0, 0);
+		drawstring(pos, strcat("Origin: ", origin_str), size, '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+		sui_text(pos, size, strcat("Angles: ", angles_str), '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+		sui_text(pos, size, strcat("LEFT/RIGHT: Angle X"), '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+		sui_text(pos, size, strcat("UP/DOWN: Angle Y"), '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+		sui_text(pos, size, strcat("DEL/END: Angle Z"), '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+		sui_text(pos, size, strcat("PGDN/PGUP: Origin X"), '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+		sui_text(pos, size, strcat("MWHEELDOWN/SPACE: Origin Y"), '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+		sui_text(pos, size, strcat("ENTER/BACKSPACE: Origin Z"), '1 1 1', 1.0, 0);
+		pos.y += size.y + 2;
+	}
 
 	sui_end();
 };
+
+			// case K_LEFTARROW:
+			// 	self.viewmodel.angles[0] -= 1;
+			// break;
+			// case K_RIGHTARROW:
+			// 	self.viewmodel.angles[0] += 1;
+			// break;
+			// case K_UPARROW:
+			// 	self.viewmodel.angles[1] -= 1;
+			// break;
+			// case K_DOWNARROW:
+			// 	self.viewmodel.angles[1] += 1;
+			// break;
+			// case K_DEL:
+			// 	self.viewmodel.angles[2] -= 1;
+			// break;
+			// case K_END:
+			// 	self.viewmodel.angles[2] += 1;
+			// break;
+			// case K_MWHEELDOWN:
+			// 	self.viewmodel.origin[2] -= 1;
+			// break;
+			// case K_SPACE:
+			// 	self.viewmodel.origin[2] += 1;
+			// break;
+			// case K_PGDN:
+			// 	self.viewmodel.origin[0] -= 1;
+			// break;
+			// case K_PGUP:
+			// 	self.viewmodel.origin[0] += 1;
+			// break;
+			// case K_ENTER:
+			// 	self.viewmodel.origin[1] -= 1;
+			// break;
+			// case K_BACKSPACE:
+			// 	self.viewmodel.origin[1] += 1;
+			// break;

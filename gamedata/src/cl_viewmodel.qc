@@ -1,15 +1,15 @@
-/*
-VIEWMODEL
-Holds all the types of View Models in the game
-*/
-
 class CViewModel {
     void CViewModel();
     int current_viewmodel;
+    float bob_time;
+    vector bob_offset;
+    float bob_factor;
+    int debug_mode;
     virtual void Animate(float ft);
     virtual void SetFrame(int to);
     virtual void SetModelIndex(int to);
     virtual void ChangeViewModel(int to);
+    virtual void UpdateBobbing(entity player, float ft);
 };
 
 const float VIEWMODEL_FPS = 24.0;
@@ -30,32 +30,13 @@ void CViewModel::ChangeViewModel(int to)
     }
 
     this.current_viewmodel = to;
-    sViewModel *m = &viewmodels[this.current_viewmodel];
 
+    sViewModel *m = &viewmodels[this.current_viewmodel];
     setorigin(this, m.origin);
     this.angles = m.angles;
     setsize(this, m.scale, m.scale);
-
     this.SetModelIndex(getmodelindex((string)m.model_index));
     this.SetFrame(m.anim_idle);
-
-    this.forceshader = shaderforname(
-        strcat("custommaterials/", m.material_name),
-        sprintf(
-            "{\nprogram defaultskin\n{\nmap textures/%s\n}\n}\n",
-            m.texture
-        )
-    );
-
-	// replace the default skins with our custom one
-    for (int i = 0; i < MAX_SKINS; i++)
-    {
-        if (m.skins[i] == __NULL__) break; // we reached the end of the skins array
-
-        string full_material = strcat("custommaterials/", m.material_name);
-        string replace_cmd = strcat("replace \"", m.skins[i], "\" \"", full_material, "\"\n");
-        setcustomskin(viewmodel, __NULL__, replace_cmd);
-    }
 };
 
 
@@ -69,26 +50,71 @@ void CViewModel::CViewModel()
 
     // === PISTOL VIEWMODEL ===
     m = &viewmodels[WEAPON_PISTOL];
-    m.model_path = "models/arms_newpistol/arms_newpistol_baked.glb";
+    m.model_path = "models/arms_newpistol/arms_newpistol.glb";
     m.model_index = (__int32)precache_model(m.model_path);
     m.anim_idle = 0;
-    m.anim_shoot = 3;
-    m.anim_reload = 1;
+    m.anim_shoot = 4;
+    m.anim_reload = 3;
     m.anim_idle_length = 20;
     m.anim_shoot_length = 4;
     m.anim_reload_length = 25;
     m.anim_finished = false;
     m.automatic = false;
-    m.origin = [71, 56, -101];
-    m.angles = [-1, -222, 358];
+    m.origin = [72, 29, -93];
+    m.angles = [-1, -218, 358];
     m.scale = [1, 1, 1];
-    m.material_name = "pistol_arms";
-    m.texture = "pistol_baked.png";
-    m.skins[0] = "Arms";
-    m.skins[1] = "Magazine";
-    m.skins[2] = "Pistol";
+
+    // === PUMP VIEWMODEL ===
+    m = &viewmodels[WEAPON_PUMP];
+    m.model_path = "models/arms_pump/arms_pump.glb";
+    m.model_index = (__int32)precache_model(m.model_path);
+    m.anim_idle = 2;
+    m.anim_shoot = 5;
+    m.anim_reload = 3;
+    m.anim_idle_length = 20;
+    m.anim_shoot_length = 15;
+    m.anim_reload_length = 35;
+    m.anim_finished = false;
+    m.automatic = true;
+    m.origin = [-35, -45, -108];
+    m.angles = [-4, -163, 358];
+    m.scale = [1, 1, 1];
+
+    // === REVOLVER VIEWMODEL ===
+    m = &viewmodels[WEAPON_REVOLVER];
+    m.model_path = "models/arms_revolver/arms_revolver.glb";
+    m.model_index = (__int32)precache_model(m.model_path);
+    m.anim_idle = 1;
+    m.anim_shoot = 4;
+    m.anim_reload = 2;
+    m.anim_idle_length = 20;
+    m.anim_shoot_length = 9;
+    m.anim_reload_length = 57;
+    m.anim_finished = false;
+    m.automatic = false;
+    m.origin = [-35, -8, -124];
+    m.angles = [3, -174, 358];
+    m.scale = [1, 1, 1];
+
+    // === SMG VIEWMODEL ===
+    m = &viewmodels[WEAPON_SMG];
+    m.model_path = "models/arms_smg/arms_smg.glb";
+    m.model_index = (__int32)precache_model(m.model_path);
+    m.anim_idle = 0;
+    m.anim_shoot = 2;
+    m.anim_reload = 1;
+    m.anim_idle_length = 20;
+    m.anim_shoot_length = 5;
+    m.anim_reload_length = 40;
+    m.anim_finished = false;
+    m.automatic = true;
+    m.origin = [-35, 0, -105];
+    m.angles = [3, -179, 358];
+    m.scale = [1, 1, 1];
 
     // Init Global Viewmodel
+    this.classname = "CViewModel";
+    this.debug_mode = false;
     this.ChangeViewModel(WEAPON_PISTOL);
     this.drawmask = MASK_VIEWMODEL;
     this.renderflags |= RF_VIEWMODEL | RF_DEPTHHACK;
@@ -157,6 +183,55 @@ void CViewModel::SetModelIndex(int to)
     setmodelindex(this, to);
 };
 
+const float VIEWBOB_FREQUENCY = 20.0; // sine speed
+const float VIEWBOB_AMPLITUDE = 3.0;  // max forward/back offset
+const float VIEWBOB_DECAY     = 0.05; // decay when stopping
+const float VIEWBOB_RAMP      = 0.05;  // ramp-in speed
+/*
+CViewModel::UpdateBobbing
+Smooth forward/back bob with ramp-in
+*/
+void CViewModel::UpdateBobbing(entity player, float ft)
+{   
+
+    if (self.oldvelocity[1] != 0) return;
+
+    // compute movement delta
+    vector delta = player.origin - player.oldorigin;
+    float moving = vlen(delta); // distance moved this frame
+
+    // ramp factor for smooth start/stop
+    if (moving > 0.05)
+        this.bob_factor = min(this.bob_factor + VIEWBOB_RAMP, 1.0);
+    else
+        this.bob_factor = max(this.bob_factor - VIEWBOB_RAMP, 0.0);
+
+    if (this.bob_factor <= 0.0)
+    {
+        // fully stopped, decay offset
+        this.bob_offset[0] = lerp(this.bob_offset[0], 0, VIEWBOB_DECAY);
+    }
+    else
+    {
+        // accumulate bob time based on movement
+        this.bob_time += ft * moving * 0.5;
+
+        // forward/back sine bob, scaled by ramp factor
+        float bobX = sin(this.bob_time * VIEWBOB_FREQUENCY) * VIEWBOB_AMPLITUDE * this.bob_factor;
+
+        this.bob_offset[0] = bobX;
+    }
+
+    // apply bob
+    this.origin = viewmodels[this.current_viewmodel].origin + this.bob_offset;
+
+    // remember last origin for next frame
+   // player.oldorigin = player.origin;
+}
+
+
+
+
 
 /*
 SpawnViewModel
@@ -167,3 +242,4 @@ void SpawnViewModel()
 	self.viewmodel = spawn(CViewModel);
 	self.viewmodel.owner = self;
 };
+

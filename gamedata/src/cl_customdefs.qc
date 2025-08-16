@@ -24,6 +24,9 @@ const float MENU_POSTGAME = 64;
 float in_input_box;
 float input_cursor;
 
+.vector oldvelocity;
+
+
 vector campos;
 vector camang;
 
