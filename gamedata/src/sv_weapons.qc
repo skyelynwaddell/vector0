@@ -48,6 +48,7 @@ int WeaponsGetTotalAmmoPool()
             break;
         }
     }
+    return 0;
 }
 
 

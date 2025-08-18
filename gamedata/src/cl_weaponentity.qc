@@ -1,46 +1,56 @@
 class WeaponEntity {
     void WeaponEntity();
-    virtual void WeaponThink();
+    int type;
+    virtual void ChangeWeapon(int to);
+    virtual float WeaponPredraw();
 };
 
 .WeaponEntity weapon_ent;
+string hand_bone = "weapon_bone"; // attach weapons to this bone name
 
-void WeaponEntity::WeaponThink()
+// Change weapon by WEAPON_TYPE
+void WeaponEntity::ChangeWeapon(int to_type)
 {
-    makevectors(self.owner.angles);
-    vector local_offset = [20, 0, 40];
+    self.type = to_type;
+    switch(self.type){
+        case WEAPON_PISTOL: setmodel(self, "models/9mm/9mm.glb"); break;
+        case WEAPON_PUMP: setmodel(self, "models/pump/pump.glb"); break;
+        case WEAPON_REVOLVER: setmodel(self, "models/magnum/magnum.glb"); break;
+        case WEAPON_SMG: setmodel(self, "models/smg/smg.glb"); break;
+    }
+};
 
-    self.origin.x = self.owner.origin.x + (v_forward.x * local_offset.x) + (v_right.x * local_offset.y) + (v_up.x * local_offset.z);
-    self.origin.y = self.owner.origin.y + (v_forward.y * local_offset.x) + (v_right.y * local_offset.y) + (v_up.y * local_offset.z);
-    self.origin.z = self.owner.origin.z + (v_forward.z * local_offset.x) + (v_right.z * local_offset.y) + (v_up.z * local_offset.z);
+float WeaponEntity::WeaponPredraw()
+{
+    // attach weapon to the hand bone
+    float bone_index = gettagindex(self.owner, hand_bone);
+    vector tagorigin = gettaginfo(self.owner, bone_index);
 
-    self.angles[1] = self.owner.angles[1];
-    //self.angles[1] = self.owner.angles[1];
+    self.origin[0] = tagorigin[0];
+    self.origin[1] = tagorigin[1];
+    self.origin[2] = tagorigin[2];
 
-    //printf("weapon origin %f %f %f \n", self.origin.x,  self.origin.y, self.origin.z);
-	//printf("player forward %f %f %f \n", v_forward.x,  v_forward.y, v_forward.z);
-    
-    //self.nextthink = time;
+    self.angles[0] = self.owner.oldangles[0];
+    self.angles[1] = self.owner.oldangles[1];
+    self.angles[2] = self.owner.oldangles[2];
+
+    return true;
 };
 
 void WeaponEntity::WeaponEntity()
 {
-    
     self.classname = "WeaponEntity";
+	self.ChangeWeapon(WEAPON_PISTOL);
     self.solid = SOLID_NOT;
-	setmodel(self, "models/pump/pump.glb");
-    self.scale = 0.5;
     self.movetype = MOVETYPE_NOCLIP;
-    self.origin = [0,0,0];
-    self.angles = [0,0,0];
-    // self.think = self.WeaponThink;
-    self.nextthink = time;
     self.drawmask = 1;
-    self.predraw = self.WeaponThink;
+    self.predraw = self.WeaponPredraw;
+    
 };
 
 void WeaponEntitySpawn()
 {
     self.weapon_ent = spawn(WeaponEntity);
     self.weapon_ent.owner = self;
+    setattachment(self.weapon_ent, self, hand_bone);
 };

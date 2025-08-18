@@ -1,35 +1,26 @@
 general {
 "maxprogs" "64"
-"numentities" "1"
+"numentities" "4"
 }
 progs 0 {
 "filename" "csprogs.dat"
 "crc" "22390"
 }
 stacktrace {
-//0 csprogs.dat
-	"0:HandleInputs" //cl_player.qc
-	{
-		"ft"	"0"
-		"csqcplayer" "entity 0"
-	}
-	"0:CSQC_Input_Frame" //cl_player.qc
-	{
-		"ft"	"0"
-	}
+<NO STACK>
 }
 globals 0 {
-"self" "0"
+"self" "3"
 "other" "0"
 "world" "0"
 "time" "0"
-"cltime" "0.022102"
+"cltime" "0.220307"
 "frametime" "0"
-"player_localentnum" "1"
-"player_localnum" "0"
-"maxclients" "1"
-"clientcommandframe" "102"
-"servercommandframe" "0"
+"player_localentnum" "2"
+"player_localnum" "1"
+"maxclients" "10"
+"clientcommandframe" "161"
+"servercommandframe" "160"
 "mapname" "test2"
 "intermission" "0"
 "v_forward" "0 0 0"
@@ -45,19 +36,19 @@ globals 0 {
 "trace_ent" "0"
 "trace_inopen" "0"
 "trace_inwater" "0"
-"input_timelength" "0.022000"
+"input_timelength" "0.080000"
 "input_angles" "0 0 0"
 "input_movevalues" "0 0 0"
-"input_buttons" "0"
+"input_buttons" "512"
 "input_impulse" "0"
 "physics_mode" "2"
 "drawfont" "31"
 "cursor_pos" "0 0 0"
 "g_width" "0"
 "g_height" "0"
+"previous_buttons" "512"
 "campos" "0 0 0"
 "camang" "0 0 0"
-"previous_buttons" "0"
 "cl_viewmodel" "0"
 "total_ammo" "0"
 "ammo_count" "0"
@@ -2930,4 +2921,58 @@ entity 0{
 "dimension_solid" "255"
 "dimension_hit" "255"
 "drawflags" "96"
+}
+entity 1{
+"modelindex" "512"
+"absmin" "-120.646 -4.48875 -23.8019"
+"absmax" "121.696 252.077 43.4425"
+"model" "models/monster_shotgunner/monster_shotgunner_nowep.glb"
+"frame" "11"
+"mins" "-119.646 -3.48875 -22.8019"
+"maxs" "120.696 251.077 42.4425"
+"size" "240.342 254.566 65.2444"
+"dimension_solid" "255"
+"dimension_hit" "255"
+"drawflags" "96"
+"entnum" "1"
+"drawmask" "1"
+"predraw" "0:PlayerPredraw"
+"oldangles" "0 0 0"
+"body_anim" "1"
+"anim_time" "5"
+"weapon_ent" "2"
+}
+entity 2{
+"modelindex" "2"
+"absmin" "-33.5395 -33.2398 -11.8943"
+"absmax" "33.5395 26.9187 119.33"
+"movetype" "8"
+"classname" "WeaponEntity"
+"model" "models/pump/pump.glb"
+"mins" "-32.5395 -32.2398 -10.8943"
+"maxs" "32.5395 25.9187 118.33"
+"size" "65.0789 58.1585 129.224"
+"owner" "1"
+"dimension_solid" "255"
+"dimension_hit" "255"
+"tag_entity" "1"
+"tag_index" "19"
+"drawflags" "96"
+"drawmask" "1"
+"predraw" "0:WeaponEntity::WeaponPredraw"
+"::integer[0]" "3"
+"CViewModel::__mcurrent_viewmodel" "3"
+"WeaponEntity::__mtype" "3"
+"::function[0]" "0:WeaponEntity::ChangeWeapon"
+"CViewModel::__mAnimate" "0:WeaponEntity::ChangeWeapon"
+"WeaponEntity::__mChangeWeapon" "0:WeaponEntity::ChangeWeapon"
+"::function[1]" "0:WeaponEntity::WeaponPredraw"
+"CViewModel::__mSetFrame" "0:WeaponEntity::WeaponPredraw"
+"WeaponEntity::__mWeaponPredraw" "0:WeaponEntity::WeaponPredraw"
+}
+entity 3{
+"dimension_solid" "255"
+"dimension_hit" "255"
+"drawflags" "96"
+"entnum" "256"
 }

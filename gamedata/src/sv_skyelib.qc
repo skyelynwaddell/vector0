@@ -1,6 +1,4 @@
 #define STAT_CURRENTWEAPON 33
-
-
 /* Player sv_Globals */
 .float last_time;
 .int sv_reloading;

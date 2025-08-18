@@ -6,6 +6,9 @@ void PrecacheEverything()
 	precache_model("models/monster_shotgunner/monster_shotgunner_nowep.glb");
 	precache_model("models/test.glb");
     precache_model("models/pump/pump.glb");
+    precache_model("models/9mm/9mm.glb");
+    precache_model("models/magnum/magnum.glb");
+    precache_model("models/smg/smg.glb");
 	drawfont = loadfont("", "gfx/Russo_One.ttf", "64", -1, 0, 0);
 	//drawfont = loadfont("", "gfx/1Dortmund-ExtraBold.otf", "64", -1, 0, 0);
 

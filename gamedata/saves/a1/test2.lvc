@@ -5,7 +5,7 @@ cvar skill "1"
 cvar deathmatch ""
 cvar coop "0"
 cvar teamplay ""
-time 2101.340966
+time 2401.346707
 map "test2"
 general {
 "maxprogs" "64"
@@ -19,7 +19,7 @@ globals 0 {
 "self" "0"
 "other" "0"
 "world" "0"
-"time" "2101.324951"
+"time" "2401.333496"
 "frametime" "0.013000"
 "newmis" "0"
 "force_retouch" "0"
@@ -45,9 +45,9 @@ globals 0 {
 "parm14" "0"
 "parm15" "0"
 "parm16" "0"
-"v_forward" "-0.15917 -0.954206 0.253289"
-"v_up" "0.0416749 0.249837 0.967391"
-"v_right" "-0.986371 0.164535 -0"
+"v_forward" "-0.0543298 -0.989707 -0.132395"
+"v_up" "-0.00725689 -0.132196 0.991197"
+"v_right" "-0.998497 0.0548123 -0"
 "trace_allsolid" "0"
 "trace_startsolid" "0"
 "trace_fraction" "0"
@@ -65,7 +65,7 @@ entity 0{
 "modelindex" "1"
 "absmin" "-272 -432 0"
 "absmax" "320 160 240"
-"lastruntime" "2101.324951"
+"lastruntime" "2401.333496"
 "movetype" "7"
 "solid" "4"
 "classname" "worldspawn"
@@ -82,14 +82,14 @@ entity 0{
 "message" "hellooo world"
 }
 entity 1{
-"modelindex" "2"
-"absmin" "-93.0219 36.4961 15.0312"
-"absmax" "-59.0219 70.4961 73.0312"
+"modelindex" "3"
+"absmin" "10.581 -83.1856 63.0312"
+"absmax" "44.581 -49.1856 121.031"
 "movetype" "3"
 "solid" "3"
-"origin" "-76.0219 53.4961 16.0312"
-"oldorigin" "-76.0219 53.4961 16.0312"
-"angles" "4.89075 -99.4702 0"
+"origin" "27.581 -66.1856 64.0312"
+"oldorigin" "27.581 -66.1856 64.0312"
+"angles" "-2.53601 -93.1421 0"
 "classname" "Player"
 "model" "models/monster_shotgunner/monster_shotgunner_nowep.glb"
 "mins" "-16 -16 0"
@@ -97,7 +97,7 @@ entity 1{
 "size" "32 32 56"
 "health" "100"
 "view_ofs" "0 0 48"
-"v_angle" "-14.6722 -99.4702 0"
+"v_angle" "7.60803 -93.1421 0"
 "netname" "Player"
 "flags" "512"
 "colormap" "1"
@@ -155,7 +155,7 @@ entity 1{
 "current_weapon" "2"
 }
 entity 2{
-"lastruntime" "2101.324951"
+"lastruntime" "2401.333496"
 "origin" "80 -64 40"
 "classname" "info_player_start"
 "dimension_solid" "255"
@@ -167,7 +167,7 @@ entity 2{
 "uniquespawnid" "1"
 }
 entity 3{
-"lastruntime" "2101.324951"
+"lastruntime" "2401.333496"
 "origin" "120 -120 24"
 "classname" "info_null"
 "targetname" "suntarget"
@@ -181,4 +181,5 @@ entity 3{
 }
 
 model 1 "maps/test2.bsp"
-model 2 "models/monster_shotgunner/monster_shotgunner_nowep.glb"
+model 2 "models/pump/pump.glb"
+model 3 "models/monster_shotgunner/monster_shotgunner_nowep.glb"

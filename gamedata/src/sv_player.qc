@@ -333,9 +333,9 @@ float MySendEntity(entity playerent, float changedflags)
 	// Current Weapon
 	if (changedflags & SENDFLAGS_CURRENTWEAPON) 
 	{
+		WriteByte(MSG_ENTITY, self.current_weapon);
 		if (isme)
 		{
-			WriteByte(MSG_ENTITY, self.current_weapon);
 			WriteByte(MSG_ENTITY, WeaponsGetTotalAmmoPool()); // Total ammo in this weapon pool
 			WriteByte(MSG_ENTITY, self.weapons[self.current_weapon].ammo_count); // how much ammo we got in the clip
 		}

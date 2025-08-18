@@ -1,8 +1,3 @@
-.float new_x;
-.float new_y;
-.float new_z;
-
-
 /*
 CSQC_Init
 Client Side Quake C Init Func
@@ -45,6 +40,7 @@ noref void CSQC_WorldLoaded() =
 };
 
 
+
 /*
 PlayerPredraw
 Called before Update event
@@ -62,39 +58,15 @@ float PlayerPredraw()
 	self.origin_z = lerp(self.origin_z, self.new_z, NET_LERP);
 	setorigin(self, self.origin);
 
-	self.frame1time += frametime;
-	self.frame2time += frametime;
-
 	if (isme)
 	{
 		self.viewmodel.Animate(frametime);
 	} 
 	else 
 	{
+		PlayerStateMachine();
+		addentity(self.weapon_ent);
 	}
-	addentity(self); // Add player model (only call for enemies [not me])
-	addentity(self.weapon_ent);
-
-	// Player skely stuffs :0
-
-	//Clear skeleton first
-	if (!self.skeletonindex) self.skeletonindex = skel_create(self.modelindex);
-    skel_build(self.skeletonindex, self, self.modelindex, 0, 0, 0, 1);
-
-	float hips = skel_find_bone(self.skeletonindex, "hips");
-	float hand = skel_find_bone(self.skeletonindex, "hand.R.002");
-	float thigh = skel_find_bone(self.skeletonindex, "thigh.L");
-	float foot = skel_find_bone(self.skeletonindex, "foot.R");
-
-    // --- Lower body: WALK ---
-    self.frame = 7;
-    skel_build(self.skeletonindex, self, self.modelindex, 1, thigh, 0, 1.0);
-
-    // --- Upper body: SHOOT ---
-    self.frame2 = 9;
-    skel_build(self.skeletonindex, self, self.modelindex, 1, hips, hand, 1.0);
-
-
 	return true;
 };
 
@@ -119,26 +91,28 @@ noref void CSQC_Ent_Update(float isnew)
 	case ENTITY_PLAYER:
 		flags = readbyte();
 
+		self.oldangles.x = readcoord();
+		self.oldangles.y = readcoord();
+		self.oldangles.z = readcoord();
 		self.predraw = PlayerPredraw;
-		//self.angles_x = readcoord();
-		float _x = readcoord();
-		self.angles_y = readcoord();
-		//self.angles_z = readcoord();
-		_x = readcoord();
 
 		// Player Spawned
 		if (self && self.entnum != 0 && isnew) // first time we see this entity INIT
 		{
+			setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
+			
 			if (isme) 
 			{
 				CPlayerSpawn();
+				self.bodyframe1time = 0;
+				self.legsframe1time = 0;
 			}
 			else
 			{
+				WeaponEntitySpawn();
 			}
+
 			self.frame = PLAYER_ANIM_IDLE;
-			WeaponEntitySpawn();
-			setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
 		}
 
 		// Origin
@@ -161,31 +135,55 @@ noref void CSQC_Ent_Update(float isnew)
 		}
 
 		// Current Weapon
-		if ((flags & SENDFLAGS_CURRENTWEAPON) && isme) 
+		if (flags & SENDFLAGS_CURRENTWEAPON)
 		{
 			int viewmodel_index = readbyte();
-			if (viewmodel_index == 0) viewmodel_index = VIEWMODEL_NONE;
-			self.viewmodel.current_viewmodel = viewmodel_index;
-			self.viewmodel.ChangeViewModel(viewmodel_index);
-			total_ammo = readbyte();
-			ammo_count = readbyte();
-			cl_viewmodel = viewmodel_index;
+			if (isme)
+			{
+				if (viewmodel_index == 0) viewmodel_index = VIEWMODEL_NONE;
+				self.viewmodel.current_viewmodel = viewmodel_index;
+				self.viewmodel.ChangeViewModel(viewmodel_index);
+				total_ammo = readbyte();
+				ammo_count = readbyte();
+				cl_viewmodel = viewmodel_index;
+			}
+			else
+			{
+				self.weapon_ent.ChangeWeapon(viewmodel_index);
+    			PlayerChangeAnim(PLAYER_TOP_ANIM_IDLE);
+			}
 		}
 
 		// Reload
-		if (flags & SENDFLAGS_RELOAD && isme)
+		if (flags & SENDFLAGS_RELOAD)
 		{
-			self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
-			total_ammo = readbyte();
-			ammo_count = readbyte();
+			if (isme)
+			{
+				self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
+				total_ammo = readbyte();
+				ammo_count = readbyte();
+			}
+			else
+			{
+				if (self.body_anim != PLAYER_TOP_ANIM_RELOAD)
+					PlayerChangeAnim(PLAYER_TOP_ANIM_RELOAD);
+			}
 		}
 
 		// Shoot
-		if (flags & SENDFLAGS_SHOOT && isme)
+		if (flags & SENDFLAGS_SHOOT)
 		{
-			self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
-			total_ammo = readbyte();
-			ammo_count = readbyte();
+			if (isme)
+			{
+				self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
+				total_ammo = readbyte();
+				ammo_count = readbyte();
+			}
+			else
+			{
+				if (self.body_anim != PLAYER_TOP_ANIM_SHOOT)
+					PlayerChangeAnim(PLAYER_TOP_ANIM_SHOOT);
+			}
 		}
 
 		// Model Index (Current Model's Animation)
