@@ -384,8 +384,8 @@ void PlayerSpawn()
 	self.movetype = MOVETYPE_WALK;
 	setorigin(self, get_spawn_point());
 	self.fixangle = TRUE;
-	setsize(self, [-16, -16, 0], [16, 16, 56]);
-	self.view_ofs = [0, 0, 48];
+	setsize(self, [-14, -14, 0], [14, 14, 72]);
+	self.view_ofs = [0, 0, 64];
 	self.SendEntity = MySendEntity;
 	WeaponsInit();
 	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX | SENDFLAGS_STATS;

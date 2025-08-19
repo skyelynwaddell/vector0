@@ -13,10 +13,12 @@ void WeaponEntity::ChangeWeapon(int to_type)
 {
     self.type = to_type;
     switch(self.type){
-        case WEAPON_PISTOL: setmodel(self, "models/9mm/9mm.glb"); break;
-        case WEAPON_PUMP: setmodel(self, "models/pump/pump.glb"); break;
-        case WEAPON_REVOLVER: setmodel(self, "models/magnum/magnum.glb"); break;
-        case WEAPON_SMG: setmodel(self, "models/smg/smg.glb"); break;
+        default:
+        case WEAPON_NONE:       setmodel(self,0);                           break;
+        case WEAPON_PISTOL:     setmodel(self, "models/9mm/9mm.glb");       break;
+        case WEAPON_PUMP:       setmodel(self, "models/pump/pump.glb");     break;
+        case WEAPON_REVOLVER:   setmodel(self, "models/magnum/magnum.glb"); break;
+        case WEAPON_SMG:        setmodel(self, "models/smg/smg.glb");       break;
     }
 };
 
@@ -45,7 +47,6 @@ void WeaponEntity::WeaponEntity()
     self.movetype = MOVETYPE_NOCLIP;
     self.drawmask = 1;
     self.predraw = self.WeaponPredraw;
-    
 };
 
 void WeaponEntitySpawn()
