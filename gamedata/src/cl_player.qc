@@ -128,7 +128,6 @@ Handles the anim states of the player and other network players
 */
 void PlayerStateMachine()
 {
-	addentity(self); // Add player model (only call for enemies [not me])
 
 	// Player skely stuffs :0
 	float head = skel_find_bone(self.skeletonindex, "head");
@@ -145,10 +144,12 @@ void PlayerStateMachine()
 	float addfrac    = t;       // fade in new animation
 
 	// Create skele if non existant
-	if (!self.skeletonindex) self.skeletonindex = skel_create(self.modelindex);
+	if (!self.skeletonindex) 
+	{
+		self.skeletonindex = skel_create(self.modelindex);
+		//skel_build(self.skeletonindex, self, self.modelindex, 0, 0, 0, 1);
+	}
 
-	//Clear skeleton first
-	skel_build(self.skeletonindex, self, self.modelindex, 0, 0, 0, 1);
 
 	// Calculate the velocity vector (in units per second)
 	const int MOVE_SPD = 320;
@@ -237,4 +238,6 @@ void PlayerStateMachine()
 	// ---------------------------------------
 
 	PlayerAnimPlayer();
+	addentity(self); // Add player model (only call for enemies [not me])
+
 };

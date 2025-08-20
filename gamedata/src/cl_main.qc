@@ -64,8 +64,8 @@ float PlayerPredraw()
 	} 
 	else 
 	{
-		PlayerStateMachine();
 		addentity(self.weapon_ent);
+		PlayerStateMachine();
 	}
 	return true;
 };
@@ -101,15 +101,15 @@ noref void CSQC_Ent_Update(float isnew)
 		{
 			setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
 			
-			if (isme) 
+			if (!isme)
+			{
+				WeaponEntitySpawn();
+			}
+			else
 			{
 				CPlayerSpawn();
 				self.bodyframe1time = 0;
 				self.legsframe1time = 0;
-			}
-			else
-			{
-				WeaponEntitySpawn();
 			}
 
 			self.frame = PLAYER_ANIM_IDLE;
