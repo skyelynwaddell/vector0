@@ -49,7 +49,6 @@ float input_cursor;
 .int anim_finished;
 .int anim_time;
 
-
 vector campos;
 vector camang;
 
@@ -60,9 +59,11 @@ int cl_reloading;
 int cl_viewmodel;
 int total_ammo;
 int ammo_count;
-int health;
-int max_health;
+float health;
+float max_health;
 int armor;
+
+const float VIEWHEIGHT_ELIMINATED = 3;
 
 enum WEAPON_BASE_TYPE {
     WEAPON_BASE_TYPE_NONE,
@@ -91,3 +92,20 @@ typedef struct sViewModel {
     string skins[MAX_SKINS];
 } sViewModel;
 
+entity(float entnums) num_for_ent = 
+{
+	entity finder = findfloat(world,entnum,entnums);
+	while(finder)
+	{
+		if(finder.entnum == entnums)
+		return finder;
+		finder = finder.chain;
+	}
+	return finder;
+}
+
+// --- STATS ---
+const float STAT_MAXHEALTH    = 32;   // self.max_health
+const float STAT_ARMORVALUE   = 33;   // self.armorvalue
+const float STAT_TOTALAMMO    = 34;   // self.total_ammo
+const float STAT_CURRENTAMMO  = 35;   // self.current_ammo

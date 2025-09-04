@@ -29,7 +29,6 @@ struct AMMO_POOL {
 // and a current weapon index
 .Weapon weapons[36];
 .AMMO_POOL ammo_pools[36];
-.int current_weapon;
 
 int ANIM_FPS = 24; // animation speed (should match blender)
 
@@ -49,6 +48,11 @@ int WeaponsGetTotalAmmoPool()
         }
     }
     return 0;
+}
+
+int WeaponGetCurrentAmmo()
+{
+    return self.weapons[self.current_weapon].ammo_count;
 }
 
 

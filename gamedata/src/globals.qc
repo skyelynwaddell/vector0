@@ -70,6 +70,7 @@ enum SENDFLAGS {
     SENDFLAGS_MODELINDEX     = 16,
     SENDFLAGS_ANGLES         = 32,
     SENDFLAGS_STATS          = 64,
+    SENDFLAGS_HIT            = 128,
 };
 
 

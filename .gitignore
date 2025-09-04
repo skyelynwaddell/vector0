@@ -7,12 +7,46 @@
 *.hex
 #*.db
 #fteqw64
+surf_utopia.bsp
+cstrike.wad
+cs_dust.wad
+halflife.wad
+sdhlt.wad
+surf_utopia.wad
+de_stormbk.*
+de_stormdn.*
+de_stormft.*
+de_stormlf.*
+de_stormrt.*
+de_stormup.*
+desbk.*
+desdn.*
+desertbk.*
+desertdn.*
+desertft.*
+desertlf.*
+desertup.*
+desertrt.*
+desft.*
+deslf.*
+desrt.*
+desup.*
+ss2gobk.*
+ss2godn.*
+ss2goft.*
+ss2golf.*
+ss2gort.*
+ss2goup.*
+de_dust2.*
+gamedata/screenshots/*
+gamedata/saves/*
 
 # Debug files
 *.dSYM/
 *.su
 *.idb
 *.pdb
+*.exe
 
 # Kernel Module Compile Results
 *.mod*

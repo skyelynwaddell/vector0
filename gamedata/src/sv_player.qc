@@ -3,6 +3,17 @@
 //	Player.qc - Various stuff done for the player, including per-frame functions like PlayerPreThink and PlayerPostThink, also client specific stuff like PutClientInServer etc.
 //
 
+/*
+PlayerSetAmmo
+Call this whenever the players weapon changes or fires
+to update the bullets in clip and ammo pool
+*/
+void PlayerSetAmmo()
+{
+	self.total_ammo = WeaponsGetTotalAmmoPool();
+	self.current_ammo = WeaponGetCurrentAmmo();
+};
+
 
 /*
 PlayerJump
@@ -57,10 +68,10 @@ void CheckImpulses()
 
 
 /*
-get_spawn_point
+GetSpawnPoint
 Returns the spawn point for the player.
 */
-vector get_spawn_point()
+vector GetSpawnPoint()
 {
 	entity spawnpoint = world;
 	spawnpoint = find(spawnpoint, classname, "info_player_start");
@@ -84,7 +95,7 @@ void Player_HandleJump()
 
 /*
 Reload
-Call to invoke the reload function
+Call to immediately invoke reloading on the players weapon
 */
 void Reload()
 {
@@ -127,7 +138,7 @@ void Reload()
 
 /*
 HandleReload
-
+Handles the player's reloading action based on button input.
 */
 void HandleReload()
 {
@@ -145,6 +156,8 @@ void HandleReload()
 
 /*
 ReloadCooldown
+Called after reloading to compensate for the reload
+animation duration of the model
 */
 void ReloadCooldown()
 {
@@ -179,12 +192,36 @@ void ReloadCooldown()
 		self.sv_reloading = false;
     	self.weapons[self.current_weapon].ammo_count += to_load;
     	self.ammo_pools[pool_index].amount -= to_load;
+		PlayerSetAmmo();
 
 		self.state = FREE;
 		self.SendFlags |= SENDFLAGS_CURRENTWEAPON;
 	}
 }
 
+
+/*
+Raycast
+Creates a traceline into the world from player pos
+Returns true/false if traceline intersects with an ENTITY
+Target is: trace_ent
+shooter is: self
+*/
+int Raycast()
+{ 
+	int raycast_dist = 128;
+	makevectors(self.angles);
+	traceline(self.origin, self.origin + v_forward * raycast_dist, 0, self);
+
+	if (trace_ent) return true;
+	return false;
+}
+
+
+/*
+Shoot
+Immediately invokes using the players current weapon
+*/
 void Shoot()
 {
 	if (self.state != FREE) return;	
@@ -197,12 +234,24 @@ void Shoot()
 
 	self.state = SHOOTING;
 	self.weapons[self.current_weapon].ammo_count -= 1;
-
 	self.sv_shooting = true;
 	self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].fire_rate;
 	self.SendFlags |= SENDFLAGS_SHOOT;
+	PlayerSetAmmo();
+
+	if (Raycast()) {
+		trace_ent.health -= 10;
+		if (trace_ent.health < 1) trace_ent.health = -1;
+
+		trace_ent.SendFlags |= SENDFLAGS_HIT;
+	}
 }
 
+
+/*
+HandleShoot
+Handles the player's shooting action based on button input.
+*/
 void HandleShoot()
 {
     int is_auto = self.weapons[self.current_weapon].automatic;
@@ -216,7 +265,7 @@ void HandleShoot()
         if (shoot_pressed_now)
             Shoot();
     } else {
-        // Semi-auto weapons fire only on press edge
+        // Semi-auto weapons fire only on each press
         if (shoot_pressed_now && !self.shoot_pressed_last)
             Shoot();
     }
@@ -225,6 +274,12 @@ void HandleShoot()
 }
 
 
+/*
+ShootCooldown
+Called after shooting a bullet to provide some
+cooldown time inbetween shots according to the 
+shooting animation of the weapon
+*/
 void ShootCooldown()
 {
 	if (self.sv_shooting == false) return;
@@ -236,6 +291,7 @@ void ShootCooldown()
 		self.state = FREE;
 	}
 }
+
 
 /*
 PlayerPreThink
@@ -267,7 +323,7 @@ Post-Update function for the player.
 void PlayerPostThink()
 {
 	if(self.flags & FL_ONGROUND)
-    self.velocity *= 0.9;
+    	self.velocity *= 0.9;
 };
 
 
@@ -291,27 +347,31 @@ void ClientConnect()
 	self.sv_reloading = 0;
 	self.reload_pressed_last = 0;
 	self.shoot_pressed_last = 0;
+	self.button0 = 0;
 };
 
 
+/*
+Called every TICK 
+Sends player data from SERVER to CLIENT side QC
+*/
 float MySendEntity(entity playerent, float changedflags)
 {
 	int isme = self == playerent;
-	//if (isme == false) { changedflags &= ~SENDFLAGS_SHOOT; } // how to avoid a state
+	int istarget = trace_ent && trace_ent == playerent;
+	//if (self.isme == false) { changedflags &= ~SENDFLAGS_SHOOT; } // how to avoid a state
 
 	// Header & Message Type
 	WriteByte(MSG_ENTITY, ENTITY_PLAYER);
+	WriteByte(MSG_ENTITY, isme);
 	WriteByte(MSG_ENTITY, changedflags);
 
 	// Angles
-	if (changedflags & SENDFLAGS_ANGLES)
-	{
-		WriteCoord(MSG_ENTITY, self.angles_x);
-		WriteCoord(MSG_ENTITY, self.angles_y);
-		WriteCoord(MSG_ENTITY, self.angles_z);
-	}
+	WriteCoord(MSG_ENTITY, self.angles_x);
+	WriteCoord(MSG_ENTITY, self.angles_y);
+	WriteCoord(MSG_ENTITY, self.angles_z);
 
-	// Origin
+	//Origin
 	if (changedflags & SENDFLAGS_ORIGIN)
 	{
 		WriteCoord(MSG_ENTITY, self.origin_x);
@@ -319,54 +379,22 @@ float MySendEntity(entity playerent, float changedflags)
 		WriteCoord(MSG_ENTITY, self.origin_z);
 	}
 
-	// Player Health & Armor
-	if (changedflags & SENDFLAGS_STATS)
-	{
-		if (isme)
-		{
-			WriteByte(MSG_ENTITY, self.health);
-			WriteByte(MSG_ENTITY, self.max_health);
-			WriteByte(MSG_ENTITY, self.armorvalue);
-		}
-	}
-
 	// Current Weapon
 	if (changedflags & SENDFLAGS_CURRENTWEAPON) 
-	{
 		WriteByte(MSG_ENTITY, self.current_weapon);
-		if (isme)
-		{
-			WriteByte(MSG_ENTITY, WeaponsGetTotalAmmoPool()); // Total ammo in this weapon pool
-			WriteByte(MSG_ENTITY, self.weapons[self.current_weapon].ammo_count); // how much ammo we got in the clip
-		}
-	}
-
-	// Shoot
-	if (changedflags & SENDFLAGS_SHOOT)
-	{
-		if (isme)
-		{
-			WriteByte(MSG_ENTITY, WeaponsGetTotalAmmoPool()); // Total ammo in this weapon pool
-			WriteByte(MSG_ENTITY, self.weapons[self.current_weapon].ammo_count); // how much ammo we got in the clip
-		}
-	}
-
-	// Reload
-	if (changedflags & SENDFLAGS_RELOAD)
-	{
-		if (isme)
-		{
-			WriteByte(MSG_ENTITY, WeaponsGetTotalAmmoPool()); // Total ammo in this weapon pool
-			WriteByte(MSG_ENTITY, self.weapons[self.current_weapon].ammo_count); // how much ammo we got in the clip
-		}
-	}
+		
+	// Hit
+	if (changedflags & SENDFLAGS_HIT) 
+		WriteByte(MSG_ENTITY, istarget);
 
 	// Model Index (Current Model's Animation)
 	if (changedflags & SENDFLAGS_MODELINDEX)
 		WriteShort(MSG_ENTITY, self.modelindex);
 
+	playerent.SendFlags = 0;
 	return true;
 };
+
 
 /*
 PlayerSpawn
@@ -375,28 +403,43 @@ Spawns the player entity with default parameters.
 void PlayerSpawn()
 {
 	self.classname = "Player";
+	self.netname = "Player Name";
 	self.solid = SOLID_SLIDEBOX;
 	self.health = 100;
 	self.armorvalue = 0;
+	self.movetype = MOVETYPE_WALK;
+	self.fixangle = TRUE;
+	self.view_ofs = [0, 0, 64];
+	
 	precache_model("models/pump/pump.glb");
 	precache_model("models/monster_shotgunner/monster_shotgunner_nowep.glb");
 	setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
-	self.movetype = MOVETYPE_WALK;
-	setorigin(self, get_spawn_point());
-	self.fixangle = TRUE;
+	setorigin(self, GetSpawnPoint());
 	setsize(self, [-14, -14, 0], [14, 14, 72]);
-	self.view_ofs = [0, 0, 64];
-	self.SendEntity = MySendEntity;
 	WeaponsInit();
-	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX | SENDFLAGS_STATS;
+	PlayerSetAmmo();
+
+	self.SendEntity = MySendEntity;
+	self.SendFlags = 0;
+	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX;
 };
 
+
+/*
+PutClientInServer
+Called when a client connects to the server
+*/
 void PutClientInServer()
 {
 	player_chain_add(self);
 	PlayerSpawn();
 };
 
+
+/*
+ClientDisconnect
+Called when a client leaves the server
+*/
 void ClientDisconnect()
 {
 	bprint(PRINT_HIGH, self.netname);

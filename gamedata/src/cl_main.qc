@@ -48,6 +48,8 @@ Put Server Side Updates in here...
 */
 float PlayerPredraw()
 {
+	if (!self || self == world) return false;
+
 	int isme = self.entnum == player_localentnum;
 
 	self.oldorigin = self.origin;
@@ -58,10 +60,31 @@ float PlayerPredraw()
 	self.origin_z = lerp(self.origin_z, self.new_z, NET_LERP);
 	setorigin(self, self.origin);
 
-	if (isme)
-	{
-		self.viewmodel.Animate(frametime);
+	health = getstatf(STAT_HEALTH);
+	health = clampf(health, 0, 255);
+	max_health = getstatf(STAT_MAXHEALTH);
+	armor = getstatf(STAT_ARMORVALUE);
+	total_ammo = getstati(STAT_TOTALAMMO);
+	ammo_count = getstati(STAT_CURRENTAMMO);
+
+	// This is me
+	 if (isme)
+	 {
+		// We are alive
+		if (health >= 1)
+			self.viewmodel.Animate(frametime);
+		
+		// We are dead
+		else
+		{
+			if (self.viewmodel.modelindex != VIEWMODEL_NONE)
+			{
+				self.viewmodel.ChangeViewModel(VIEWMODEL_NONE);
+			}
+		}
 	} 
+
+	// This is another player
 	else 
 	{
 		PlayerStateMachine();
@@ -78,9 +101,10 @@ Handles the incoming packets/messages from the SVQC code
 */
 noref void CSQC_Ent_Update(float isnew)
 {
-	int isme = self.entnum == player_localentnum;
+	if (self == world) return;
 
 	float enttype = readbyte();
+	int isme = readbyte();
 	float flags;
 	switch (enttype)
 	{
@@ -100,19 +124,10 @@ noref void CSQC_Ent_Update(float isnew)
 		if (self && self.entnum != 0 && isnew) // first time we see this entity INIT
 		{
 			setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
-			
-			if (isme) 
-			{
-				CPlayerSpawn();
-				self.bodyframe1time = 0;
-				self.legsframe1time = 0;
-			}
-			else
-			{
-				WeaponEntitySpawn();
-			}
-
 			self.frame = PLAYER_ANIM_IDLE;
+			
+			if (isme) CPlayerSpawn();
+			else WeaponEntitySpawn();
 		}
 
 		// Origin
@@ -121,17 +136,6 @@ noref void CSQC_Ent_Update(float isnew)
 			self.new_x = readcoord();
 			self.new_y = readcoord();
 			self.new_z = readcoord();
-		}
-
-		// Player Health & Armor
-		if (flags & SENDFLAGS_STATS)
-		{
-			if (isme)
-			{
-				health = readbyte();
-				max_health = readbyte();
-				armor = readbyte();
-			}
 		}
 
 		// Current Weapon
@@ -143,8 +147,6 @@ noref void CSQC_Ent_Update(float isnew)
 				if (viewmodel_index == 0) viewmodel_index = VIEWMODEL_NONE;
 				self.viewmodel.current_viewmodel = viewmodel_index;
 				self.viewmodel.ChangeViewModel(viewmodel_index);
-				total_ammo = readbyte();
-				ammo_count = readbyte();
 				cl_viewmodel = viewmodel_index;
 			}
 			else
@@ -159,9 +161,7 @@ noref void CSQC_Ent_Update(float isnew)
 		{
 			if (isme)
 			{
-				self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
-				total_ammo = readbyte();
-				ammo_count = readbyte();
+				if (!isnew) self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
 			}
 			else
 			{
@@ -170,14 +170,22 @@ noref void CSQC_Ent_Update(float isnew)
 			}
 		}
 
+		// Hit
+		if (flags & SENDFLAGS_HIT)
+		{
+			int istarget = readbyte();
+			if (istarget == true)
+			{
+				print("I was shot");
+			}
+		}
+
 		// Shoot
 		if (flags & SENDFLAGS_SHOOT)
 		{
 			if (isme)
 			{
-				self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
-				total_ammo = readbyte();
-				ammo_count = readbyte();
+				if (!isnew) self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
 			}
 			else
 			{
@@ -211,6 +219,8 @@ Called EVERY game TICK!
 */
 void CSQC_UpdateView(float width, float height, float menushown)
 {
+	if (!self || self == world) return;
+
 	//clear and update our global screen resolution vars
 	clearscene();
 	g_width = width;
@@ -226,16 +236,19 @@ void CSQC_UpdateView(float width, float height, float menushown)
 	camang = getproperty(VF_ANGLES);
 
 	entity csqcplayer = findfloat(world, entnum, player_localentnum);
-	vector your_view_ofs = [0,0,getstatf(STAT_VIEWHEIGHT)];
-	setviewprop(VF_ORIGIN, csqcplayer.origin + your_view_ofs);
+	if (csqcplayer != world)
+	{
+		vector view_ofs = {0};
+		view_ofs.z = health > 0 ? getstatf(STAT_VIEWHEIGHT) : VIEWHEIGHT_ELIMINATED;
+		setviewprop(VF_ORIGIN, csqcplayer.origin + view_ofs);
+	
+		if (csqcplayer.viewmodel.debug_mode == false)
+			csqcplayer.viewmodel.UpdateBobbing(csqcplayer, frametime);
+	
+		//autoadd entities received from servers for drawing	
+		addentities(MASK_ENGINE | MASK_VIEWMODEL);
+	}
 
-	if (csqcplayer.viewmodel.debug_mode == false)
-		csqcplayer.viewmodel.UpdateBobbing(csqcplayer, frametime);
-
-	//autoadd entities received from servers for drawing	
-	addentities(MASK_ENGINE | MASK_VIEWMODEL);
-
-	//does what you think it does
 	renderscene();
 	draw_gui();
 };
@@ -286,7 +299,7 @@ float CSQC_InputEvent(float evtype, float scanx, float chary, float devid)
 	{
 	case IE_KEYDOWN:
 	
-		if (self.viewmodel.debug_mode == false) return;
+		if (self.viewmodel.debug_mode == false) return false;
 
 		switch (scanx)
 		{

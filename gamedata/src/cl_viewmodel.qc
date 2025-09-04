@@ -16,6 +16,20 @@ const float VIEWMODEL_FPS = 24.0;
 .CViewModel viewmodel;
 sViewModel viewmodels[36];
 
+
+/*
+SetFrame
+Changes the current animation that is playing in a model.
+It sets the INDEX of the animation.
+*/
+void CViewModel::SetFrame(int to)
+{
+    if (current_viewmodel == WEAPON_NONE) return;
+    this.frame = to;
+    this.frame1time = 0;
+};
+
+
 /*
 Called when you want to change the View Model
 to one of the VIEWMODEL constants, ie. Pistol, Shotgun etc.
@@ -39,10 +53,9 @@ void CViewModel::ChangeViewModel(int to)
     this.SetFrame(m.anim_idle);
 };
 
-
 /*
 CViewModel
-Constructor to initialize a View Model Entity
+Constructor to initialize the View Model Entity
 */
 void CViewModel::CViewModel()
 {
@@ -120,6 +133,8 @@ void CViewModel::CViewModel()
     this.renderflags |= RF_VIEWMODEL | RF_DEPTHHACK;
     this.effects |= EF_NOSHADOW;
 
+    this.SetFrame(m.anim_idle);
+
 };
 
 
@@ -134,8 +149,8 @@ void CViewModel::Animate(float ft)
     sViewModel *m = &viewmodels[this.current_viewmodel];
 
     int current_anim_length = 0;
-    int IDLE = m.anim_idle;
-    int SHOOT = m.anim_shoot;
+    int IDLE   = m.anim_idle;
+    int SHOOT  = m.anim_shoot;
     int RELOAD = m.anim_reload;
 
     switch(this.frame)
@@ -161,19 +176,6 @@ void CViewModel::Animate(float ft)
 
 
 /*
-SetFrame
-Changes the current animation that is playing in a model.
-It sets the INDEX of the animation.
-*/
-void CViewModel::SetFrame(int to)
-{
-    if (current_viewmodel == WEAPON_NONE) return;
-    this.frame = to;
-    this.frame1time = 0;
-};
-
-
-/*
 SetModelIndex
 Change the model based on index, and retrieved with 
 getmodelindex on the model filepath
@@ -183,18 +185,18 @@ void CViewModel::SetModelIndex(int to)
     setmodelindex(this, to);
 };
 
-const float VIEWBOB_FREQUENCY = 20.0; // sine speed
-const float VIEWBOB_AMPLITUDE = 3.0;  // max forward/back offset
+const float VIEWBOB_FREQUENCY = 10.0; // sine speed
 const float VIEWBOB_DECAY     = 0.05; // decay when stopping
-const float VIEWBOB_RAMP      = 0.05;  // ramp-in speed
+const float VIEWBOB_RAMP      = 0.05; // ramp-in speed
 /*
 CViewModel::UpdateBobbing
 Smooth forward/back bob with ramp-in
 */
 void CViewModel::UpdateBobbing(entity player, float ft)
 {   
-
     if (self.oldvelocity[1] != 0) return;
+    float VIEWBOB_AMPLITUDE = cvar("cl_bob") * 10;
+
 
     // compute movement delta
     vector delta = player.origin - player.oldorigin;
@@ -214,7 +216,8 @@ void CViewModel::UpdateBobbing(entity player, float ft)
     else
     {
         // accumulate bob time based on movement
-        this.bob_time += ft * moving * 0.5;
+        float _bob_spd = clampf(moving * 0.005, 0, 0.01);
+        this.bob_time += _bob_spd;
 
         // forward/back sine bob, scaled by ramp factor
         float bobX = sin(this.bob_time * VIEWBOB_FREQUENCY) * VIEWBOB_AMPLITUDE * this.bob_factor;
@@ -228,9 +231,6 @@ void CViewModel::UpdateBobbing(entity player, float ft)
     // remember last origin for next frame
    // player.oldorigin = player.origin;
 }
-
-
-
 
 
 /*

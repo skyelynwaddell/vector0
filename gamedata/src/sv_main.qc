@@ -4,12 +4,13 @@
 
 void main() 
 {
-
+    
 };
 
 //called for each frame that QC runs
 void StartFrame()
 {
+    network_send_clientstats();
 };
 
 void worldspawn()

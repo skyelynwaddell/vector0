@@ -8,7 +8,6 @@ void m_init()
 	PrecacheEverything();
 	splash_time = time + 2.5;
 	registercommand("togglemenu2");
-	
 	setcursormode(TRUE,"gfx/xhair", [16, 16], cvar("vid_conautoscale"));
 	current_menu = MENU_MAIN;
 };
@@ -57,7 +56,6 @@ void m_draw(vector screensize)
 	}
 
 	sui_menu_nav();
-	
 	sui_end();
 };
 

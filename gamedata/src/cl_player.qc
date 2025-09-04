@@ -38,39 +38,55 @@ void PlayerChangeBodyState(int to)
 	}
 };
 
+
+/*
+PlayerChangeAnim
+Invoke this to change the third person / multiplayer 
+animation state. 'to' refers to PLAYER_TOP_ANIM enum
+*/
 void PlayerChangeAnim(int to)
 {
 	self.body_anim = to;
-
 	int type = self.weapon_ent.type;
+
 	switch(to)
 	{
+		// --- IDLE ---
 		case PLAYER_TOP_ANIM_IDLE:
 			self.anim_time = 20;
 
-			if (type == WEAPON_PISTOL) PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_PISTOL);
+			if (type == WEAPON_PISTOL)    PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_PISTOL);
 			if (type == WEAPON_REVOLVER)  PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_PISTOL);
-			if (type == WEAPON_SMG)  PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_RIFLE);
-			if (type == WEAPON_PUMP)  PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_RIFLE);
+			if (type == WEAPON_SMG)       PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_RIFLE);
+			if (type == WEAPON_PUMP)      PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_RIFLE);
 		break;
+
+		// --- SHOOT ---
 		case PLAYER_TOP_ANIM_SHOOT:
 			self.anim_time = 5;
 
-			if (type == WEAPON_PISTOL) PlayerChangeBodyState(PLAYER_BODY_STATE_SHOOT_PISTOL);
+			if (type == WEAPON_PISTOL)   PlayerChangeBodyState(PLAYER_BODY_STATE_SHOOT_PISTOL);
 			if (type == WEAPON_REVOLVER) PlayerChangeBodyState(PLAYER_BODY_STATE_SHOOT_PISTOL);
-			if (type == WEAPON_SMG)  PlayerChangeBodyState(PLAYER_BODY_STATE_SHOOT_RIFLE);
-			if (type == WEAPON_PUMP)  PlayerChangeBodyState(PLAYER_BODY_STATE_SHOOT_RIFLE);
+			if (type == WEAPON_SMG)      PlayerChangeBodyState(PLAYER_BODY_STATE_SHOOT_RIFLE);
+			if (type == WEAPON_PUMP)     PlayerChangeBodyState(PLAYER_BODY_STATE_SHOOT_RIFLE);
 		break;
+
+		// --- RELOAD ---
 		case PLAYER_TOP_ANIM_RELOAD:
-			if (type == WEAPON_PISTOL) { self.anim_time = 25; PlayerChangeBodyState(PLAYER_BODY_STATE_RELOAD_PISTOL); }
+			if (type == WEAPON_PISTOL)   { self.anim_time = 25; PlayerChangeBodyState(PLAYER_BODY_STATE_RELOAD_PISTOL); }
 			if (type == WEAPON_REVOLVER) { self.anim_time = 25; PlayerChangeBodyState(PLAYER_BODY_STATE_RELOAD_PISTOL); }
-			if (type == WEAPON_SMG) { self.anim_time = 35; PlayerChangeBodyState(PLAYER_BODY_STATE_RELOAD_RIFLE); }
-			if (type == WEAPON_PUMP) { self.anim_time = 35; PlayerChangeBodyState(PLAYER_BODY_STATE_RELOAD_RIFLE); }
+			if (type == WEAPON_SMG)      { self.anim_time = 35; PlayerChangeBodyState(PLAYER_BODY_STATE_RELOAD_RIFLE);  }
+			if (type == WEAPON_PUMP)     { self.anim_time = 35; PlayerChangeBodyState(PLAYER_BODY_STATE_RELOAD_RIFLE);  }
 		break;
 	}
 }
 
 
+/*
+The Player's : Animation Player
+-------- The Movie 2025 -------
+Coming this fall to a theatre near you...
+*/
 void PlayerAnimPlayer()
 {
 	if (self.anim_finished == true) return;
@@ -85,7 +101,6 @@ void PlayerAnimPlayer()
 };
 
 
-
 /*
 CPlayerSpawn
 Called on the client side when the player spawns, inits the viewmodel and sets up the custom skin for the pistol arms.
@@ -94,6 +109,7 @@ void CPlayerSpawn() {
 	SpawnViewModel(); 
 	self.model_leg_state = PLAYER_LEG_STATE_IDLE;
 	PlayerChangeAnim(PLAYER_TOP_ANIM_IDLE);
+	frametimereset();
 };
 
 
@@ -182,6 +198,7 @@ void PlayerStateMachine()
 	}
 	self.legsframe1time = self.frame1time;
 	skel_build(self.skeletonindex, self, self.modelindex, retainfrac, hips, 0, addfrac);
+	//skel_build(self.skeletonindex, self, self.modelindex, 0, hips, 0, 1);
 	// ---------------------------------------
 
 	// ---------------------------------------
@@ -222,7 +239,7 @@ void PlayerStateMachine()
 	}
 	self.frame1time += frametime;
 	self.bodyframe1time = self.frame1time;
-	skel_build(self.skeletonindex, self, self.modelindex, 0, stomach, hand, 1.0);
+	skel_build(self.skeletonindex, self, self.modelindex, 0, stomach, hand, 1);
 	// ---------------------------------------
 
 

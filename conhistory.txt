@@ -1,85 +1,140 @@
-sv_playerslots 10
-sv_maxclients 10
-map test2
-connect localhost
-connect localhost
-connect localhost
-connect localhost
-connect localhost
-connect localhost
-sv_maxclients 10
-sv_playerslots 10
-deathmatch 1
-map tst2
-map test2
-deathmatch 1
-sv_playerslots 10
-sv_maxclients 10
-map test2
-sv_maxclients 10
-sv_playerslots 10
-deathmatch 1
-map test2
-connect localhost
-deathmatch 1
-sv_playerslots 10
-sv_maxclients 10
-map test2
-map test2
-map test2
-connect localhost
-sv_maxclients 10
-sv_playerslots 10
-deathmatch 1
-map test2
-deathmatch 1
-sv_playerslots 10
-sv_maxclients 10
-map test2
-sv_maxclients 10
-sv_playerslots 10
-deathmatch 1
-map test2
-connect localhost
-connect localhost
-connect localhost
-connect localhost
-deathmatch 1
-map test2
-sv_playerslots 10
-sv_maxclients 10
-map test2
-developer 1
-r_showbboxes
-r_showbboxes 1
-sv_cheats 1
-r_showbboxes 1
-map test2
-noclip
-noclip 1
-developer 1
-sv_cheats 1
-r_showbboxes 1
-deathmatch 1
-sv_maxclients 10
-sv_playerslots 10
-map test2
-map test2
-map test2
-connect localhost
-sv_playerslots 10
-sv_maxclients 10
-deathmatch 1
-developer 1
-sv_cheats 1
-r_showbboxes 1
-map test2
-map test2
-connect localhost
-sv_cheats 1
-r_showbboxes 1
-deathmatch 1
-sv_maxclients 10
-sv_playerslots 10
-map test2
-connect localhost
+
+/map surf_utopia 
+
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+gl_overbright
+gl_overbright 0
+vid_renderer 
+vid_renderer  gl
+vid_restart
+vid_renderer  vk
+vid_restart
+vid_renderer  gl
+vid_restart
+gamma 0
+gamma 1
+gamma 0.4
+gamma 1
+brightness 
+brightness  1
+brightness  0
+brightness  -1
+brightness  0
+/d3d_hlsl 
+/d3d_hlsl 0
+contrast 
+contrast 0.5
+contrast 1
+go
+go
+go
+go
+go
+go
+go
+go
+con
+skipdl
+skipdl
+skipdl
+go
+go
+go
+csqc_debug
+con
+skipdl
+skipdl
+skipdl
+go
+go
+go
+go
+con
+skipdl
+skipdl
+skipdl
+go
+con
+skipdl
+skipdl
+go
+cl_bob 0.3
+go
+go
+go
+con
+con
+observe HOST
+go
+con
+go
+con
+con
+con
+go
+con
+observe host
+con
+observe
+observe
+go
+go
+con
+observe
+observe localhost
+go
+go
+con
+go
+con
+observe
+spectator 1; observe;
+observe localhost
+con
+observe
+go
+go
+go
+go
+go
+con
+go
+spectator 1
+observe localhost
+go
+go
+go
+observe localhost
+go
+go
+con
+go
+spectator 1
+observe localhost

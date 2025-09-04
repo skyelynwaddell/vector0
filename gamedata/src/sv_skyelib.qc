@@ -5,6 +5,9 @@
 .int sv_shooting;
 .int reload_pressed_last;
 .int shoot_pressed_last;
+.int total_ammo;
+.int current_ammo;
+.int current_weapon;
 
 enum PLAYER_STATE {
 	FREE,
@@ -21,4 +24,19 @@ float delta(){
     if (dt > 0.1) dt = 0.16; // clamp to ~1 frame (16ms) to avoid big jumps
     if (dt < 0) dt = 0.16;  // clamp negatives too
     return dt;
+
 };
+
+// --- STATS ---
+const float STAT_MAXHEALTH    = 32;   // self.max_health
+const float STAT_ARMORVALUE   = 33;   // self.armorvalue
+const float STAT_TOTALAMMO    = 34;   // self.total_ammo
+const float STAT_CURRENTAMMO  = 35;   // self.current_ammo
+void network_send_clientstats() 
+{
+    clientstat(STAT_MAXHEALTH,   EV_FLOAT,   max_health);
+    clientstat(STAT_ARMORVALUE,  EV_FLOAT,   armorvalue);
+    clientstat(STAT_TOTALAMMO,   EV_INTEGER, total_ammo);
+    clientstat(STAT_CURRENTAMMO, EV_INTEGER, current_ammo);
+};
+
