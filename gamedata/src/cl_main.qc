@@ -103,7 +103,6 @@ float PlayerPredraw()
 	return true;
 };
 
-
 /*
 CSQC_Ent_Update
 Called everytime a PACKET is received (NOT every tick!)
@@ -130,8 +129,8 @@ noref void CSQC_Ent_Update(float isnew)
 		self.oldangles.z = readcoord();
 		self.predraw = PlayerPredraw;
 
-		// Player Spawned
-		if (self && self.entnum != 0 && isnew) // first time we see this entity INIT
+		// Create Event [Player Spawned]
+		if (self && self.entnum != 0 && isnew) 
 		{
 			setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
 			self.frame = PLAYER_ANIM_IDLE;

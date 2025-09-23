@@ -1,10 +1,12 @@
-# ![Map Compile Settings](tbdata/qengine/icon.png) qengine
+# ![Map Compile Settings](tbdata/Vector0/icon.png) vector0: fteqw edition
 3D FPS Game using FTEQW QuakeWorld engine. <br>
 https://www.fteqw.org/ <br>
 https://github.com/fte-team/fteqw <br>
 https://github.com/shpuld/sui-qc <br>
 
-For setup and getting started using qengine, follow the tasks below in order.
+For setup and getting started using vector0 & fteqw, follow the tasks below in order.
+
+To compile the newest copy of the fteqw engine with vector0 configs visit the: [vector0 fteqw fork](https://github.com/skyelynwaddell/fteqw/tree/vector0)
 
 ### Table of Contents
 - [QuakeC Manual](help/qcmanual.txt)
@@ -29,12 +31,12 @@ https://github.com/fte-team/fteqw/blob/master/engine/shaders/glsl/defaultskin.gl
 Download trenchbroom:
 https://trenchbroom.github.io/ <br>
 
-Drag the folder `qengine` from `/tbdata` into `TRENCHBROOM_INSTALL_PATH/games/`
+Drag the folder `Vector0` from `/tbdata` into `TRENCHBROOM_INSTALL_PATH/games/`
 
-After installing trenchbroom and adding `qengine` to the games folder, open the app and click `New Map...`
+After installing trenchbroom and adding `Vector0` to the games folder, open the app and click `New Map...`
 
-Select `qengine` from the games list, and click `Open preferences...` <br>
-Another list of games will show up in preferences, go down to `qengine`.
+Select `Vector0` from the games list, and click `Open preferences...` <br>
+Another list of games will show up in preferences, go down to `Vector0`.
 
 There will be 4 paths you will have to fill in
 
@@ -75,7 +77,7 @@ Parameters: -lit -bounce 2 ${MAP_BASE_NAME}.bsp
 
 ## Compiling the Game
 To compile the game you will need FTEQCC, it is included in the `compiler` folder, or can be downloaded from: <br> 
-https://www.fteqcc.org/
+https://www.fteqcc.org/ or really just join the discord and see what the newest version you can get is.
 
 If manually downloaded, add the files to the `compiler` folder.
 

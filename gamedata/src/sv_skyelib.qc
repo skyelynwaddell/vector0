@@ -1,4 +1,7 @@
-#define STAT_CURRENTWEAPON 33
+// sv_skyelib.qc
+// Skyel's Game Library - Server-side
+// Mostly static functions, or generic variables reusable across fps games
+
 /* Player sv_Globals */
 .float last_time;
 .int sv_reloading;
@@ -38,10 +41,12 @@ int IsMoving(entity ent_to_check_is_moving)
 
 
 // --- STATS ---
-const float STAT_MAXHEALTH    = 32;   // self.max_health
-const float STAT_ARMORVALUE   = 33;   // self.armorvalue
-const float STAT_TOTALAMMO    = 34;   // self.total_ammo
-const float STAT_CURRENTAMMO  = 35;   // self.current_ammo
+#define STAT_MAXHEALTH      32   // self.max_health
+#define STAT_ARMORVALUE     33   // self.armorvalue
+#define STAT_TOTALAMMO      34   // self.total_ammo
+#define STAT_CURRENTAMMO    35   // self.current_ammo
+#define STAT_CURRENTWEAPON  36   // self.current_weapon
+
 void network_send_clientstats() 
 {
     clientstat(STAT_MAXHEALTH,   EV_FLOAT,   max_health);

@@ -36,15 +36,12 @@ float input_cursor;
 .float new_x;
 .float new_y;
 .float new_z;
-
 .int legs_anim_old_index;        // previous animation index (PLAYER_ANIM_IDLE / RUN)
 .float legs_anim_old_frame;      // previous animation frame time
 .float leg_anim_time_since_change;  // crossfade timer
-
 .int body_anim_old_index;        // previous animation index (PLAYER_ANIM_IDLE / RUN)
 .float body_anim_old_frame;      // previous animation frame time
 .float body_anim_time_since_change;  // crossfade timer
-
 .int body_anim;
 .int anim_finished;
 .int anim_time;
@@ -105,7 +102,8 @@ entity(float entnums) num_for_ent =
 }
 
 // --- STATS ---
-const float STAT_MAXHEALTH    = 32;   // self.max_health
-const float STAT_ARMORVALUE   = 33;   // self.armorvalue
-const float STAT_TOTALAMMO    = 34;   // self.total_ammo
-const float STAT_CURRENTAMMO  = 35;   // self.current_ammo
+#define STAT_MAXHEALTH       32   // self.max_health
+#define STAT_ARMORVALUE      33   // self.armorvalue
+#define STAT_TOTALAMMO       34   // self.total_ammo
+#define STAT_CURRENTAMMO     35   // self.current_ammo
+#define STAT_CURRENTWEAPON   36   // self.current_weapon

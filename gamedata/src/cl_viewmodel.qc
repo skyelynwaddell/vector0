@@ -133,6 +133,10 @@ void CViewModel::CViewModel()
     this.renderflags |= RF_VIEWMODEL | RF_DEPTHHACK;
     this.effects |= EF_NOSHADOW;
 
+    // void(entity e, string skinfilename, optional string skindata) setcustomskin = #376; /* Part of FTE_QC_CUSTOMSKINS
+	// 	Sets an entity's skin overrides to a new skin object. Releases the entities old skin (refcounted). */
+
+    setcustomskin(this, "models/arms_newpistol/arms_newpistol.skin");
     this.SetFrame(m.anim_idle);
 
 };
@@ -185,7 +189,7 @@ void CViewModel::SetModelIndex(int to)
     setmodelindex(this, to);
 };
 
-const float VIEWBOB_FREQUENCY = 10.0; // sine speed
+const float VIEWBOB_FREQUENCY = 30.0; // sine speed
 const float VIEWBOB_DECAY     = 0.05; // decay when stopping
 const float VIEWBOB_RAMP      = 0.05; // ramp-in speed
 /*
@@ -195,8 +199,7 @@ Smooth forward/back bob with ramp-in
 void CViewModel::UpdateBobbing(entity player, float ft)
 {   
     if (self.oldvelocity[1] != 0) return;
-    float VIEWBOB_AMPLITUDE = cvar("cl_bob") * 10;
-
+    float VIEWBOB_AMPLITUDE = cvar("cl_bob") * 150.0;
 
     // compute movement delta
     vector delta = player.origin - player.oldorigin;
@@ -217,7 +220,7 @@ void CViewModel::UpdateBobbing(entity player, float ft)
     {
         // accumulate bob time based on movement
         float _bob_spd = clampf(moving * 0.005, 0, 0.01);
-        this.bob_time += _bob_spd;
+        this.bob_time += _bob_spd * ft * 60;
 
         // forward/back sine bob, scaled by ramp factor
         float bobX = sin(this.bob_time * VIEWBOB_FREQUENCY) * VIEWBOB_AMPLITUDE * this.bob_factor;
@@ -229,7 +232,7 @@ void CViewModel::UpdateBobbing(entity player, float ft)
     this.origin = viewmodels[this.current_viewmodel].origin + this.bob_offset;
 
     // remember last origin for next frame
-   // player.oldorigin = player.origin;
+    //player.oldorigin = player.origin;
 }
 
 

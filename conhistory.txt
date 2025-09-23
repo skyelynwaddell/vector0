@@ -224,3 +224,30 @@ con
 go
 con
 con
+go
+go
+viewmodel_debug
+viewmodel_debug 1
+cl_bob 10
+cl_bob 1
+cl_bob 0.5
+cl_bob 0.2
+cl_bob 0.2
+cl_bob 1
+cl_bob 0.5
+cl_bob 0.2
+cl_bob
+/viewmodel_debug
+/viewmodel_debug
+viewmodel_debug
+/viewmodel_debug
+/viewmodel_debug
+go
+go
+/modelviewer models/
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+/surf_debug 1
+r_showtris
+/modelviewer models/arms_newpistol/arms_newpistol.glb
+/modelviewer models/arms_newpistol/arms_newpistol.glb
