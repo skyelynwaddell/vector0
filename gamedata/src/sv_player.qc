@@ -296,11 +296,8 @@ Pre-Update function for the player.
 */
 void PlayerPreThink()
 {	
-	// if (IsMoving(self)) 
-	// 	self.SendFlags |= SENDFLAGS_ORIGIN; 
-
-	if (VectorLength(self.velocity) > 0.1)
-		self.SendFlags |= SENDFLAGS_ORIGIN;
+	if (IsMoving(self)) 
+		self.SendFlags |= SENDFLAGS_ORIGIN; 
 
 	self.SendFlags |= SENDFLAGS_ANGLES;
 

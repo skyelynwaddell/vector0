@@ -285,16 +285,16 @@ entity trace_ent;
 float trace_inopen;
 float trace_inwater;
 entity msg_entity;
-void() main;
-void() StartFrame;
-void() PlayerPreThink;
-void() PlayerPostThink;
-void() ClientKill;
-void() ClientConnect;
-void() PutClientInServer;
-void() ClientDisconnect;
-void() SetNewParms;
-void() SetChangeParms;
+void main();
+void StartFrame();
+void PlayerPreThink();
+void PlayerPostThink();
+void ClientKill();
+void ClientConnect();
+void PutClientInServer();
+void ClientDisconnect();
+void SetNewParms();
+void SetChangeParms();
 void end_sys_globals;
 .float modelindex;	/* This is the model precache index for the model that was set on the entity, instead of having to look up the model according to the .model field. Use setmodel to change it. */
 .vector absmin;	/* Set by the engine when the entity is relinked (by setorigin, setsize, or setmodel). This is in world coordinates. */
@@ -463,24 +463,68 @@ int serverid;	/* The unique id of this server within the server cluster. */
 .float pvsflags;	/* Reconfigures when the entity is visible to clients */
 .float uniquespawnid;	/* Incremented by 1 whenever the entity is respawned. Persists across remove calls, for when the two-second grace period is insufficient. */
 .float() customizeentityforclient;	/* Called just before an entity is sent to a client (non-csqc protocol). This gives you a chance to tailor 'self' according to what 'other' should see. */
-void(float reqid, float responsecode, string resourcebody) URI_Get_Callback;	/* Called as an eventual result of the uri_get builtin. */
-void() SpectatorConnect;	/* Called when a spectator joins the game. */
-void() SpectatorDisconnect;	/* Called when a spectator disconnects from the game. */
-void() SpectatorThink;	/* Called each frame for each spectator. */
-void(string cmd) SV_ParseClientCommand;	/* Provides QC with a way to intercept 'cmd foo' commands from the client. Very handy. Self will be set to the sending client, while the 'cmd' argument can be tokenize()d and each element retrieved via argv(argno). Unrecognised cmds MUST be passed on to the clientcommand builtin. */
-void(string dest, string from, string cmd, string info) SV_ParseClusterEvent;	/* Part of cluster mode. Handles cross-node events that were sent via clusterevent, on behalf of the named client. */
-float(string sender, string body) SV_ParseConnectionlessPacket;	/* Provides QC with a way to communicate between servers, or with client server browsers. Sender is the sender's ip. Body is the body of the message. You'll need to add your own password/etc support as required. Self is not valid. */
-void(float pauseduration) SV_PausedTic;	/* For each frame that the server is paused, this function will be called to give the gamecode a chance to unpause the server again. the pauseduration argument says how long the server has been paused for (the time global is frozen and will not increment while paused). Self is not valid. */
-float(float newstatus) SV_ShouldPause;	/* Called to give the qc a change to block pause/unpause requests. Return false for the pause request to be ignored. newstatus is 1 if the user is trying to pause the game. For the duration of the call, self will be set to the player who tried to pause, or to world if it was triggered by a server-side event. */
-void() SV_RunClientCommand;	/* Called each time a player movement packet was received from a client. Self is set to the player entity which should be updated, while the input_* globals specify the various properties stored within the input packet. The contents of this function should be somewaht identical to the equivelent function in CSQC, or prediction misses will occur. If you're feeling lazy, you can simply call 'runstandardplayerphysics' after modifying the inputs. */
-void() SV_AddDebugPolygons;	/* Called each video frame. This is the only place where ssqc is allowed to call the R_BeginPolygon/R_PolygonVertex/R_EndPolygon builtins. This is exclusively for debugging, and will break in anything but single player as it will not be called if the engine is not running both a client and a server. */
-void() SV_PlayerPhysics;	/* Legacy method to tweak player input that does not reliably work with prediction (prediction WILL break). Mods that care about prediction should use SV_RunClientCommand instead. If pr_no_playerphysics is set to 1, this function will never be called, which will either fix prediction or completely break player movement depending on whether the feature was even useful. */
-void() EndFrame;	/* Called after non-player entities have been run at the end of the physics frame. Player physics is performed out of order and can/will still occur between EndFrame and BeginFrame. */
-string(string addr, string uinfo, string features)  SV_CheckRejectConnection;	/* Called to give the mod a chance to ignore connection requests based upon client protocol support or other properties. Use infoget to read the uinfo and features arguments. */
-string(string uri, string method, string postdata, __in string requestheaders, __inout string responseheaders) Cef_GeneratePage;	/* Provides an entrypoint to generate pages for the CEF plugin from within QC. Headers are 
--separated key/value pairs (use tokenizebyseparator). */
-void(float prevprogs) init;	/* Part of FTE_MULTIPROGS. Called as soon as a progs is loaded, called at a time when entities are not valid. This is the only time when it is safe to call addprogs without field assignment. As it is also called as part of addprogs, this also gives you a chance to hook functions in modules that are already loaded (via externget+externget). */
-void() initents;	/* Part of FTE_MULTIPROGS. Called after fields have been finalized. This is the first point at which it is safe to call spawn(), and is called before any entity fields have been parsed. You can use this entrypoint to send notifications to other modules. */
+void URI_Get_Callback(float reqid, float responsecode, string resourcebody);	/* Called as an eventual result of the uri_get builtin. */
+void SpectatorConnect();	/* Called when a spectator joins the game. */
+void SpectatorDisconnect();	/* Called when a spectator disconnects from the game. */
+void SpectatorThink();	/* Called each frame for each spectator. */
+void SV_ParseClientCommand(string cmd); 
+/* Intercept client 'cmd foo' commands. 
+   Self is set to the sending client. 
+   Use tokenize() + argv(argno) to access args. 
+   Unrecognized commands must be passed to clientcommand builtin. */
+
+void SV_ParseClusterEvent(string dest, string from, string cmd, string info);
+/* Cluster mode: handles cross-node events sent via clusterevent on behalf of the named client. */
+
+float SV_ParseConnectionlessPacket(string sender, string body);
+/* Handle packets between servers or from client server browsers. 
+   Sender is the IP, body is the packet contents. Self is not valid. */
+
+void SV_PausedTic(float pauseduration);
+/* Called each frame while the server is paused. 
+   pauseduration = time the server has been paused. Self is not valid. */
+
+float SV_ShouldPause(float newstatus);
+/* Gives QC a chance to block pause/unpause requests. 
+   Return false to ignore the pause. 
+   newstatus = 1 if pause is requested. 
+   Self = player trying to pause, or world if server-triggered. */
+
+void SV_RunClientCommand();
+/* Called when a player movement packet is received. 
+   Self = player entity to update. 
+   Use input_* globals for movement data. 
+   Can call runstandardplayerphysics after modifying inputs. */
+
+void SV_AddDebugPolygons();
+/* Called each video frame. Only safe place to call R_BeginPolygon/R_PolygonVertex/R_EndPolygon. 
+   For debugging only; breaks in non-local multiplayer. */
+
+void SV_PlayerPhysics();
+/* Legacy player input tweaks (prediction may break). 
+   If pr_no_playerphysics = 1, this is never called. 
+   Mods should prefer SV_RunClientCommand. */
+
+void EndFrame();
+/* Called after non-player entities run at the end of the physics frame. 
+   Player physics may still occur between EndFrame and BeginFrame. */
+
+string SV_CheckRejectConnection(string addr, string uinfo, string features);
+/* Called to allow mods to reject connections based on protocol or client properties. 
+   Use infoget to parse uinfo and features. */
+
+string Cef_GeneratePage(string uri, string method, string postdata, __in string requestheaders, __inout string responseheaders);
+/* Generate pages for CEF plugin from QC. 
+   Headers are key/value pairs separated by newline (use tokenizebyseparator). */
+
+void init(float prevprogs);
+/* FTE_MULTIPROGS: Called as soon as a progs is loaded. 
+   Entities are not valid yet. Safe place to call addprogs or hook functions in already-loaded modules. */
+
+void initents();
+/* FTE_MULTIPROGS: Called after entity fields are finalized. 
+   Safe to call spawn(). Called before entity field parsing. Can notify other modules here. */
+
 float parm17, parm18, parm19, parm20, parm21, parm22, parm23, parm24, parm25, parm26, parm27, parm28, parm29, parm30, parm31, parm32;
 float parm33, parm34, parm35, parm36, parm37, parm38, parm39, parm40, parm41, parm42, parm43, parm44, parm45, parm46, parm47, parm48;
 float parm49, parm50, parm51, parm52, parm53, parm54, parm55, parm56, parm57, parm58, parm59, parm60, parm61, parm62, parm63, parm64;
@@ -721,25 +765,25 @@ const float FILE_WRITE = 2;	/* fputs will be used to write to the file. */
 const float FILE_READNL = 4;	/* Like FILE_READ, except newlines are not special. fgets reads the entire file into a tempstring. */
 const float FILE_MMAP_READ = 5;	/* The file will be loaded into memory. fgets returns a pointer to the first byte (and will always return the same value for this file). Cast this to your datatype. */
 const float FILE_MMAP_RW = 6;	/* Like FILE_MMAP_READ, except any changes to the data will be written back to disk once the file is closed. */
-void(vector vang) makevectors = #1; /*
+void makevectors(vector vang) = #1; /*
 		Takes an angle vector (pitch,yaw,roll) (+x=DOWN). Writes its results into v_forward, v_right, v_up vectors. */
 
-void(entity e, vector o) setorigin = #2; /*
+void setorigin(entity e, vector o) = #2; /*
 		Changes e's origin to be equal to o. Also relinks collision state (as well as setting absmin+absmax), which is required after changing .solid */
 
-void(entity e, string m) setmodel = #3; /*
+void setmodel(entity e, string m) = #3; /*
 		Looks up m in the model precache list, and sets both e.model and e.modelindex to match. BSP models will set e.mins and e.maxs accordingly, other models depend upon the value of sv_gameplayfix_setmodelrealbox - for compatibility you should always call setsize after all pickups or non-bsp models. Also relinks collision state. */
 
-void(entity e, vector min, vector max) setsize = #4; /*
+void setsize(entity e, vector min, vector max) = #4; /*
 		Sets the e's mins and maxs fields. Also relinks collision state, which sets absmin and absmax too. */
 
-void() breakpoint = #6; /*
+void breakpoint() = #6; /*
 		Trigger a debugging event. FTE will break into the qc debugger. Other engines may crash with a debug execption. */
 
-float() random = #7; /*
+float random() = #7; /*
 		Returns a random value between 0 and 1. Be warned, this builtin can return 1 in most engines, which can break arrays. */
 
-void(entity e, float chan, string samp, float vol, float atten, optional float speedpct, optional float flags, optional float timeofs) sound = #8; /*
+void sound(entity e, float chan, string samp, float vol, float atten, optional float speedpct, optional float flags, optional float timeofs) = #8; /*
 		Starts a sound centered upon the given entity.
 		chan is the entity sound channel to use, channel 0 will allow you to mix many samples at once, others will replace the old sample
 		'samp' must have been precached first
@@ -747,28 +791,28 @@ void(entity e, float chan, string samp, float vol, float atten, optional float s
 		If flags is specified, the reliable flag in the channels argument is used for additional channels. Flags should be made from SOUNDFLAG_* constants
 		timeofs should be negative in order to provide a delay before the sound actually starts. */
 
-vector(vector v) normalize = #9; /*
+vector normalize(vector v) = #9; /*
 		Shorten or lengthen a direction vector such that it is only one quake unit long. */
 
-void(string e) error = #10; /*
+void error(string e) = #10; /*
 		Ends the game with an easily readable error message. */
 
-void(string e) objerror = #11; /*
+void objerror(string e) = #11; /*
 		Displays a non-fatal easily readable error message concerning the self entity, including a field dump. self will be removed! */
 
-float(vector v) vlen = #12; /*
+float vlen(vector v) = #12; /*
 		Returns the square root of the dotproduct of a vector with itself. Or in other words the length of a distance vector, in quake units. */
 
-float(vector v, optional entity reference) vectoyaw = #13; /*
+float vectoyaw(vector v, optional entity reference) = #13; /*
 		Given a direction vector, returns the yaw angle in which that direction vector points. If an entity is passed, the yaw angle will be relative to that entity's gravity direction. */
 
-entity() spawn = #14; /*
+entity spawn() = #14; /*
 		Adds a brand new entity into the world! Hurrah, you're now a parent! */
 
-void(entity e) remove = #15; /*
+void remove(entity e) = #15; /*
 		Destroys the given entity and clears some limited fields (including model, modelindex, solid, classname). Any references to the entity following the call are an error. After two seconds, the entity will be reused, in the interim you can unfortunatly still read its fields to see if the reference is no longer valid. */
 
-void(vector v1, vector v2, float flags, entity ent) traceline = #16; /*
+void traceline(vector v1, vector v2, float flags, entity ent) = #16; /*
 		Traces a thin line through the world from v1 towards v2.
 		Will not collide with ent, ent.owner, or any entity who's owner field refers to ent.
 		The passed entity will also be used to determine whether to use a capsule trace, the contents that the trace should impact, and a couple of other extra fields that define the trace.
@@ -780,334 +824,216 @@ void(vector v1, vector v2, float flags, entity ent) traceline = #16; /*
 		flags&MOVE_EVERYTHING will stop if it hits anything, even non-solid entities.
 		flags&MOVE_LAGGED will backdate entity positions for the purposes of this builtin according to the indicated player ent's latency, to provide lag compensation. */
 
-entity() checkclient = #17; /*
+entity checkclient() = #17; /*
 		Returns one of the player entities. The returned player will change periodically. */
 
-entity(entity start, .string fld, string match) find = #18; /*
+entity find(entity start, .string fld, string match) = #18; /*
 		Scan for the next entity with a given field set to the given 'match' value. start should be either world, or the previous entity that was found. Returns world on failure/if there are no more.
 		If you have many many entities then you may find that hashtables will give more performance (but requires extra upkeep). */
 
-string(string s) precache_sound = #19; /*
+string precache_sound(string s) = #19; /*
 		Precaches a sound, making it known to clients and loading it from disk. This builtin (strongly) should be called during spawn functions. This builtin must be called for the sound before the sound builtin is called, or it might not even be heard. */
 
-string(string s) precache_model = #20; /*
+string precache_model(string s) = #20; /*
 		Precaches a model, making it known to clients and loading it from disk if it has a .bsp extension. This builtin (strongly) should be called during spawn functions. This must be called for each model name before setmodel may use that model name.
 		Modelindicies precached in SSQC will always be positive. CSQC precaches will be negative if they are not also on the server. */
 
-void(entity client, string s) stuffcmd = #21; /*
+void stuffcmd(entity client, string s) = #21; /*
 		Sends a console command (or cvar) to the client, where it will be executed. Different clients support different commands. Do NOT forget the final \n.
 		This builtin is generally considered evil. */
 
-void(entity client, float flags, string s) stuffcmdflags = #0:stuffcmdflags; /* Part of FTE_QC_STUFFCMDFLAGS
+void stuffcmdflags(entity client, float flags, string s) = #0:stuffcmdflags; /* Part of FTE_QC_STUFFCMDFLAGS
 		Sends a console command (or cvar) to the client, where it will be executed. Different clients support different commands. Do NOT forget the final \n.
 		This (just as evil) variant allows specifying some flags too. See the STUFFCMD_* constants. */
 
-entity(vector org, float rad, optional .entity chainfield) findradius = #22; /*
+entity findradius(vector org, float rad, optional .entity chainfield) = #22; /*
 		Finds all entities within a distance of the 'org' specified. One entity is returned directly, while other entities are returned via that entity's .chain field. */
 
-void(float msglvl, string s, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7) bprint = #23; /*
+void bprint(float msglvl, string s, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7) = #23; /*
 		QW: Concatenates all string arguments, and prints the messsage on the console of only all clients who's 'msg' infokey is set lower or equal to the supplied 'msglvl' argument. */
 
-void(entity client, float msglvl, string s, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6) sprint = #24; /*
+void sprint(entity client, float msglvl, string s, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6) = #24; /*
 		QW: Concatenates all string arguments, and prints the messsage on the named client's console, but only if that client's 'msg' infokey is set lower or equal to the supplied 'msglvl' argument. */
 
-void(string s, ...) dprint = #25; /*
+void dprint(string s, ...) = #25; /*
 		QW: Unconditionally prints the given message on the server's console.  Arguments will be concatenated into a single message. */
 
-string(float val) ftos = #26; /*
+string ftos(float val) = #26; /*
 		Returns a tempstring containing a representation of the given float. Precision depends upon engine. */
 
-string(vector val) vtos = #27; /*
+string vtos(vector val) = #27; /*
 		Returns a tempstring containing a representation of the given vector. Precision depends upon engine. */
 
-void() coredump = #28; /*
+void coredump() = #28; /*
 		Writes out a coredump. This contains stack, globals, and field info for all ents. This can be handy for debugging. */
 
-void() traceon = #29; /*
+void traceon() = #29; /*
 		Enables tracing. This may be spammy, slow, and stuff. Set debugger 1 in order to use fte's qc debugger. */
 
-void() traceoff = #30; /*
+void traceoff() = #30; /*
 		Disables tracing again. */
 
-void(entity e) eprint = #31; /*
+void eprint(entity e) = #31; /*
 		Debugging builtin that prints all fields of the given entity to the console. */
 
-float(float yaw, float dist, optional float settraceglobals) walkmove = #32; /*
+float walkmove(float yaw, float dist, optional float settraceglobals) = #32; /*
 		Attempt to walk the entity at a given angle for a given distance.
 		if settraceglobals is set, the trace_* globals will be set, showing the results of the movement.
 		This function will trigger touch events. */
 
-float() droptofloor = #34; /*
+float droptofloor() = #34; /*
 		Instantly moves the entity downwards until it hits the ground. If the entity is in solid or would need to drop more than 'pr_droptofloorunits' quake units, its position will be considered invalid and the builtin will abort, returning FALSE, otherwise TRUE. */
 
-void(float lightstyle, string stylestring, optional vector rgb) lightstyle = #35; /*
+void lightstyle(float lightstyle, string stylestring, optional vector rgb) = #35; /*
 		Specifies an auto-animating string that specifies the light intensity for entities using that lightstyle.
 		a is off, z is fully lit. Should be lower case only.
 		rgb will recolour all lights using that lightstyle. */
 
-float(float) rint = #36; /*
+float rint(float) = #36; /*
 		Rounds the given float up or down to the closest integeral value. X.5 rounds away from 0 */
 
-float(float) floor = #37; /*
+float floor(float) = #37; /*
 		Rounds the given float downwards, even when negative. */
 
-float(float) ceil = #38; /*
+float ceil(float) = #38; /*
 		Rounds the given float upwards, even when negative. */
 
-float(entity ent) checkbottom = #40; /*
+float checkbottom(entity ent) = #40; /*
 		Expensive checks to ensure that the entity is actually sitting on something solid, returns true if it is. */
 
-float(vector pos) pointcontents = #41; /*
+float pointcontents(vector pos) = #41; /*
 		Checks the given point to see what is there. Returns one of the SOLID_* constants. Just because a spot is empty does not mean that the player can stand there due to the size of the player - use tracebox for such tests. */
 
-float(float) fabs = #43; /*
+float fabs(float) = #43; /*
 		Removes the sign of the float, making it positive if it is negative. */
 
-vector(entity player, float missilespeed) aim = #44; /*
+vector aim(entity player, float missilespeed) = #44; /*
 		Returns a direction vector (specifically v_forward on error). This builtin attempts to guess what pitch angle to fire projectiles at for people that don't know about mouselook. Does not affect yaw angles. */
 
-float(string) cvar = #45; /*
+float cvar(string) = #45; /*
 		Returns the numeric value of the named cvar */
 
-void(string, ...) localcmd = #46; /*
+void localcmd(string, ...) = #46; /*
 		Adds the string to the console command queue. Commands will not be executed immediately, but rather at the start of the following frame. */
 
-entity(entity) nextent = #47; /*
+entity nextent(entity) = #47; /*
 		Returns the following entity. Skips over removed entities. Returns world when passed the last valid entity. */
 
-void(vector pos, vector dir, float colour, float count) particle = #48; /*
+void particle(vector pos, vector dir, float colour, float count) = #48; /*
 		Spawn 'count' particles around 'pos' moving in the direction 'dir', with a palette colour index between 'colour' and 'colour+8'. */
 
 #define ChangeYaw changeyaw
-void() changeyaw = #49; /*
+void changeyaw() = #49; /*
 		Changes the self.angles_y field towards self.ideal_yaw by up to self.yaw_speed. */
 
-vector(vector fwd, optional vector up) vectoangles = #51; /*
+vector vectoangles(vector fwd, optional vector up) = #51; /*
 		Returns the angles (+x=UP) required to orient an entity to look in the given direction. The 'up' argument is required if you wish to set a roll angle, otherwise it will be limited to just monster-style turning. */
 
-void(float to, float val) WriteByte = #52; /*
+void WriteByte(float to, float val) = #52; /*
 		Writes a single byte into a network message buffer. Typically you will find a more correct alternative to writing arbitary data. 'to' should be one of the MSG_* constants. MSG_ONE must have msg_entity set first. */
 
-void(float to, float val) WriteChar = #53;
-void(float to, float val) WriteShort = #54;
-void(float to, float val) WriteLong = #55;
-void(float to, float val) WriteCoord = #56;
-void(float to, float val) WriteAngle = #57;
-void(float to, string val) WriteString = #58;
-void(float to, entity val) WriteEntity = #59;
-float(float angle) sin = #60; /* Part of DP_QC_SINCOSSQRTPOW
+void WriteChar(float to, float val) = #53;
+void WriteShort(float to, float val) = #54;
+void WriteLong(float to, float val) = #55;
+void WriteCoord(float to, float val) = #56;
+void WriteAngle(float to, float val) = #57;
+void WriteString(float to, string val) = #58;
+void WriteEntity(float to, entity val) = #59;
+float sin(float angle) = #60; /* Part of DP_QC_SINCOSSQRTPOW
 		Forgive me father, for I have trigonometry homework. */
 
-float(float angle) cos = #61; /* Part of DP_QC_SINCOSSQRTPOW*/
-float(float value) sqrt = #62; /* Part of DP_QC_SINCOSSQRTPOW*/
-float(float a, float n) modulo = #0:modulo;
-void(entity ent) changepitch = #63; /* Part of DP_QC_CHANGEPITCH*/
-void(entity ent, entity ignore) tracetoss = #64;
-string(entity ent) etos = #65; /* Part of DP_QC_ETOS*/
-void(float step) movetogoal = #67; /*
-		Runs lots and lots of fancy logic in order to try to step the entity the specified distance towards its goalentity. */
-
-string(string s) precache_file = #68; /*
-		This builtin does nothing. It was used only as a hint for pak generation. */
-
-void(entity e) makestatic = #69; /*
-		Sends a copy of the entity's renderable fields to all clients, and REMOVES the entity, preventing further changes. This means it will be unmutable and non-solid. */
-
-void(string mapname, optional string newmapstartspot) changelevel = #70; /*
-		Attempts to change the map to the named map. If 'newmapstartspot' is specified, the state of the current map will be preserved, and the argument will be passed to the next map in the 'startspot' global, and the next map will be loaded from archived state if it was previously visited. If not specified, all archived map states will be purged. */
-
-void(string cvarname, string valuetoset) cvar_set = #72; /*
-		Instantly sets a cvar to the given string value. */
-
-void(entity ent, string text, optional string text2, optional string text3, optional string text4, optional string text5, optional string text6, optional string text7) centerprint = #73;
-void (vector pos, string samp, float vol, float atten) ambientsound = #74;
-string(string str) precache_model2 = #75;
-string(string str) precache_sound2 = #76;
-string(string str) precache_file2 = #77;
-void(entity player) setspawnparms = #78;
-void(entity killer, entity killee) logfrag = #79; /* Part of QW_ENGINE*/
-string(entity e, string key) infokey = #80; /* Part of FTE_QC_INFOKEY, QW_ENGINE
-		If e is world, returns the field 'key' from either the serverinfo or the localinfo. If e is a player, returns the value of 'key' from the player's userinfo string. There are a few special exceptions, like 'ip' which is not technically part of the userinfo. */
-
-float(entity e, string key) infokeyf = #0:infokeyf; /*
-		Identical to regular infokey, except returns a float. */
-
-float(string) stof = #81; /* Part of FRIK_FILE, FTE_QC_INFOKEY, FTE_STRINGS, QW_ENGINE, ZQ_QC_STRINGS*/
-#define unicast(pl,reli) do{msg_entity = pl; multicast('0 0 0', reli?MULITCAST_ONE_R:MULTICAST_ONE);}while(0)
-void(vector where, float set) multicast = #82; /* Part of FTE_QC_MULTICAST
-		Once the MSG_MULTICAST network message buffer has been filled with data, this builtin is used to dispatch it to the given target, filtering by pvs for reduced network bandwidth. */
-
-void(entity to, string str) redirectcmd = #101; /* Part of ??MVDSV_BUILTINS
-		Executes a single console command, and sends the text generated by it to the specified player. The command will be executed at the end of the frame once QC is no longer running - you may wish to pre/postfix it with 'echo'. */
-
-string(float style, optional __out vector rgb) getlightstyle = #0:getlightstyle; /*
-		Obtains the light style string for the given style. */
-
-vector(float style) getlightstylergb = #0:getlightstylergb; /*
-		Obtains the current rgb value of the specified light style. In csqc, this is correct with regard to the current frame, while ssqc gives no guarentees about time and ignores client cvars. Note: use getlight if you want the actual light value at a point. */
-
-void(float style, float val, optional vector rgb) lightstylestatic = #5; /*
-		Sets the lightstyle to an explicit numerical level. From Hexen2. */
-
-void(vector start, vector mins, vector maxs, vector end, float nomonsters, entity ent) tracebox = #90; /* Part of DP_QC_TRACEBOX
-		Exactly like traceline, but a box instead of a uselessly thin point. Acceptable sizes are limited by bsp format, q1bsp has strict acceptable size values. */
-
-vector() randomvec = #91; /* Part of DP_QC_RANDOMVEC
-		Returns a vector with random values. Each axis is independantly a value between -1 and 1 inclusive. */
-
-vector(vector org) getlight = #92;
-float(string cvarname, string defaultvalue) registercvar = #93; /* Part of DP_REGISTERCVAR
-		Creates a new cvar on the fly. If it does not already exist, it will be given the specified value. If it does exist, this is a no-op.
-		This builtin has the limitation that it does not apply to configs or commandlines. Such configs will need to use the set or seta command causing this builtin to be a noop.
-		In engines that support it, you will generally find the autocvar feature easier and more efficient to use. */
-
-float(float a, float b, ...) min = #94; /* Part of DP_QC_MINMAXBOUND
-		Returns the lowest value of its arguments. */
-
-float(float a, float b, ...) max = #95; /* Part of DP_QC_MINMAXBOUND
-		Returns the highest value of its arguments. */
-
-float(float minimum, float val, float maximum) bound = #96; /* Part of DP_QC_MINMAXBOUND
-		Returns val, unless minimum is higher, or maximum is less. */
-
-float(float value, float exp) pow = #97; /* Part of DP_QC_SINCOSSQRTPOW*/
-float(float v, optional float base) logarithm = #0:logarithm; /*
-		Determines the logarithm of the input value according to the specified base. This can be used to calculate how much something was shifted by. */
-
-#define findentity findfloat
-entity(entity start, .__variant fld, __variant match) findfloat = #98; /* Part of DP_QC_FINDFLOAT
-		Equivelent to the find builtin, but instead of comparing strings contents, this builtin compares the raw values. This builtin requires multiple calls in order to scan all entities - set start to the previous call's return value.
-		world is returned when there are no more entities. */
-
-float(string extname) checkextension = #99; /*
-		Checks for an extension by its name (eg: checkextension("FRIK_FILE") says that its okay to go ahead and use strcat).
-		Use cvar("pr_checkextension") to see if this builtin exists. */
-
-float(__variant funcref) checkbuiltin = #0:checkbuiltin; /*
-		Checks to see if the specified builtin is supported/mapped. This is intended as a way to check for #0 functions, allowing for simple single-builtin functions. Warning, if two different engines map different builtins to the same number, then this function will not tell you which will be called, only that it won't crash (the exception being #0, which are remapped as available). */
-
-float(string builtinname) builtin_find = #100; /*
-		Looks to see if the named builtin is valid, and returns the builtin number it exists at. */
-
-float(float value) anglemod = #102;
-void(string slot, string picname, float x, float y, float zone, optional entity player) showpic = #104; /* Part of TEI_SHOWLMP2*/
-void(string slot, optional entity player) hidepic = #105; /* Part of TEI_SHOWLMP2*/
-void(string slot, float x, float y, float zone, optional entity player) movepic = #106; /* Part of TEI_SHOWLMP2*/
-void(string slot, string picname, optional entity player) changepic = #107; /* Part of TEI_SHOWLMP2*/
-filestream(string filename, float mode, optional float mmapminsize) fopen = #110; /* Part of FRIK_FILE
-		Opens a file, typically prefixed with "data/", for either read or write access. */
-
-void(filestream fhandle) fclose = #111; /* Part of FRIK_FILE*/
-string(filestream fhandle) fgets = #112; /* Part of FRIK_FILE
-		Reads a single line out of the file. The new line character is not returned as part of the string. Returns the null string on EOF (use if not(string) to easily test for this, which distinguishes it from the empty string which is returned if the line being read is blank */
-
-void(filestream fhandle, string s, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7) fputs = #113; /* Part of FRIK_FILE
-		Writes the given string(s) into the file. For compatibility with fgets, you should ensure that the string is terminated with a \n - this will not otherwise be done for you. It is up to the engine whether dos or unix line endings are actually written. */
-
-int(filestream fhandle, void *ptr, int size) fread = #0:fread; /* Part of FTE_QC_FILE_BINARY
-		Reads binary data out of the file. Returns truncated lengths if the read exceeds the length of the file. */
-
-int(filestream fhandle, void *ptr, int size) fwrite = #0:fwrite; /* Part of FTE_QC_FILE_BINARY
-		Writes binary data out of the file. */
-
-#define ftell fseek //c compat
-int(filestream fhandle, optional int newoffset) fseek = #0:fseek; /* Part of FTE_QC_FILE_BINARY
-		Changes the current position of the file, if specified. Returns prior position, in bytes. */
-
-int(filestream fhandle, optional int newsize) fsize = #0:fsize; /* Part of FTE_QC_FILE_BINARY
-		Reports the total size of the file, in bytes. Can also be used to truncate/extend the file */
-
-float(string s) strlen = #114; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS*/
-string(string s1, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7, optional string s8) strcat = #115; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS*/
-string(string s, float start, float length) substring = #116; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS*/
-vector(string s) stov = #117; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS*/
-string(string s, ...) strzone = #118; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS
-		Create a semi-permanent copy of a string that only becomes invalid once strunzone is called on the string (instead of when the engine assumes your string has left scope). This builtin has become redundant in FTEQW due to the FTE_QC_PERSISTENTTEMPSTRINGS extension and is now functionally identical to strcat for compatibility with old engines+mods. */
-
-void(string s) strunzone = #119; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS
-		Destroys a string that was allocated by strunzone. Further references to the string MAY crash the game. In FTE, this function became redundant and now does nothing. */
-
-void(string cvar, float val) cvar_setf = #176;
-void(string soundname, optional float channel, optional float volume) localsound = #177; /*
-		Plays a sound... locally... probably best not to call this from ssqc. Also disables reverb. */
-
-float(string modelname, optional float queryonly) getmodelindex = #200; /*
-		Acts as an alternative to precache_model(foo);setmodel(bar, foo); return bar.modelindex;
-		If queryonly is set and the model was not previously precached, the builtin will return 0 without needlessly precaching the model. */
-
-__variant(float prnum, string funcname, ...) externcall = #201; /* Part of FTE_MULTIPROGS
-		Directly call a function in a different/same progs by its name.
-		prnum=0 is the 'default' or 'main' progs.
-		prnum=-1 means current progs.
-		prnum=-2 will scan through the active progs and will use the first it finds. */
-
-float(string progsname) addprogs = #202; /* Part of FTE_MULTIPROGS
-		Loads an additional .dat file into the current qcvm. The returned handle can be used with any of the externcall/externset/externvalue builtins.
-		There are cvars that allow progs to be loaded automatically. */
-
-__variant(float prnum, string varname) externvalue = #203; /* Part of FTE_MULTIPROGS
-		Reads a global in the named progs by the name of that global.
-		prnum=0 is the 'default' or 'main' progs.
-		prnum=-1 means current progs.
-		prnum=-2 will scan through the active progs and will use the first it finds. */
-
-void(float prnum, __variant newval, string varname) externset = #204; /* Part of FTE_MULTIPROGS
-		Sets a global in the named progs by name.
-		prnum=0 is the 'default' or 'main' progs.
-		prnum=-1 means current progs.
-		prnum=-2 will scan through the active progs and will use the first it finds. */
-
-void(entity portal, float state) openportal = #207; /*
-		Opens or closes the portals associated with a door or some such on q2 or q3 maps. On Q2BSPs, the entity should be the 'func_areaportal' entity - its style field will say which portal to open. On Q3BSPs, the entity is the door itself, the portal will be determined by the two areas found from a preceding setorigin call. */
-
-float(float attributes, string effectname, ...) RegisterTempEnt = #208; /* Part of FTE_PEXT_CUSTOMTENTS*/
-void(float type, vector pos, ...) CustomTempEnt = #209; /* Part of FTE_PEXT_CUSTOMTENTS*/
-float(optional float sleeptime) fork = #210; /* Part of FTE_MULTITHREADED
-		When called, this builtin simply returns. Twice.
-		The current 'thread' will return instantly with a return value of 0. The new 'thread' will return after sleeptime seconds with a return value of 1. See documentation for the 'sleep' builtin for limitations/requirements concerning the new thread. Note that QC should probably call abort in the new thread, as otherwise the function will return to the calling qc function twice also. */
-
-void(optional __variant ret) abort = #211; /* Part of FTE_MULTITHREADED
-		QC execution is aborted. Parent QC functions on the stack will be skipped, effectively this forces all QC functions to 'return ret' until execution returns to the engine. If ret is ommited, it is assumed to be 0. */
-
-void(float sleeptime) sleep = #212; /* Part of FTE_MULTITHREADED
-		Suspends the current QC execution thread for 'sleeptime' seconds.
-		Other QC functions can and will be executed in the interim, including changing globals and field state (but not simultaneously).
-		The self and other globals will be restored when the thread wakes up (or set to world if they were removed since the thread started sleeping). Locals will be preserved, but will not be protected from remove calls.
-		If the engine is expecting the QC to return a value (even in the parent/root function), the value 0 shall be used instead of waiting for the qc to resume. */
-
-void(entity player, string key, string value) forceinfokey = #213; /* Part of FTE_FORCEINFOKEY
-		Directly changes a user's info without pinging off the client. Also allows explicitly setting * keys, including *spectator. Does not affect the user's config or other servers. */
-
-void(string filename, float starttag, entity edict) chat = #214; /* Part of FTE_QC_NPCCHAT*/
-void(vector org, vector dmin, vector dmax, float colour, float effect, float count) particle2 = #215; /* Part of FTE_HEXEN2*/
-void(vector org, vector box, float colour, float effect, float count) particle3 = #216; /* Part of FTE_HEXEN2*/
-void(vector org, float radius, float colour, float effect, float count) particle4 = #217; /* Part of FTE_HEXEN2*/
-float(float number, float quantity) bitshift = #218; /* Part of EXT_BITSHIFT*/
-void(vector pos) te_lightningblood = #219; /* Part of FTE_TE_STANDARDEFFECTBUILTINS*/
-float(string s1, string sub, optional float startidx) strstrofs = #221; /* Part of FTE_STRINGS
-		Returns the 0-based offset of sub within the s1 string, or -1 if sub is not in s1.
-		If startidx is set, this builtin will ignore matches before that 0-based offset. */
-
-float(string str, float index) str2chr = #222; /* Part of FTE_STRINGS
-		Retrieves the character value at offset 'index'. */
-
-string(float chr, ...) chr2str = #223; /* Part of FTE_STRINGS
-		The input floats are considered character values, and are concatenated. */
-
-string(float ccase, float redalpha, float redchars, string str, ...) strconv = #224; /* Part of FTE_STRINGS
-		Converts quake chars in the input string amongst different representations.
-		ccase specifies the new case for letters.
-		 0: not changed.
-		 1: forced to lower case.
-		 2: forced to upper case.
-		redalpha and redchars switch between colour ranges.
-		 0: no change.
-		 1: Forced white.
-		 2: Forced red.
-		 3: Forced gold(low) (numbers only).
-		 4: Forced gold (high) (numbers only).
-		 5+6: Forced to white and red alternately.
-		You should not use this builtin in combination with UTF-8. */
+float cos(float angle) = #61; /* Part of DP_QC_SINCOSSQRTPOW */
+float sqrt(float value) = #62; /* Part of DP_QC_SINCOSSQRTPOW */
+float modulo(float a, float n) = #0:modulo;
+void changepitch(entity ent) = #63; /* Part of DP_QC_CHANGEPITCH */
+void tracetoss(entity ent, entity ignore) = #64;
+string etos(entity ent) = #65; /* Part of DP_QC_ETOS */
+void movetogoal(float step) = #67; /*
+    Runs lots and lots of fancy logic in order to try to step the entity the specified distance towards its goalentity. */
+string precache_file(string s) = #68; /*
+    This builtin does nothing. It was used only as a hint for pak generation. */
+void makestatic(entity e) = #69; /*
+    Sends a copy of the entity's renderable fields to all clients, and REMOVES the entity, preventing further changes. This means it will be unmutable and non-solid. */
+void changelevel(string mapname, optional string newmapstartspot) = #70; /*
+    Attempts to change the map to the named map. If 'newmapstartspot' is specified, the state of the current map will be preserved, and the argument will be passed to the next map in the 'startspot' global, and the next map will be loaded from archived state if it was previously visited. If not specified, all archived map states will be purged. */
+void cvar_set(string cvarname, string valuetoset) = #72; /*
+    Instantly sets a cvar to the given string value. */
+void centerprint(entity ent, string text, optional string text2, optional string text3, optional string text4, optional string text5, optional string text6, optional string text7) = #73;
+void ambientsound(vector pos, string samp, float vol, float atten) = #74;
+string precache_model2(string str) = #75;
+string precache_sound2(string str) = #76;
+string precache_file2(string str) = #77;
+void setspawnparms(entity player) = #78;
+void logfrag(entity killer, entity killee) = #79; /* Part of QW_ENGINE */
+string infokey(entity e, string key) = #80; /* Part of FTE_QC_INFOKEY, QW_ENGINE */
+float infokeyf(entity e, string key) = #0:infokeyf; /*
+    Identical to regular infokey, except returns a float. */
+float stof(string s) = #81; /* Part of FRIK_FILE, FTE_QC_INFOKEY, FTE_STRINGS, QW_ENGINE, ZQ_QC_STRINGS */
+void multicast(vector where, float set) = #82; /* Part of FTE_QC_MULTICAST */
+void redirectcmd(entity to, string str) = #101; /* Part of ??MVDSV_BUILTINS */
+string getlightstyle(float style, optional __out vector rgb) = #0:getlightstyle;
+vector getlightstylergb(float style) = #0:getlightstylergb;
+void lightstylestatic(float style, float val, optional vector rgb) = #5;
+void tracebox(vector start, vector mins, vector maxs, vector end, float nomonsters, entity ent) = #90; /* Part of DP_QC_TRACEBOX */
+vector randomvec() = #91; /* Part of DP_QC_RANDOMVEC */
+vector getlight(vector org) = #92;
+float registercvar(string cvarname, string defaultvalue) = #93; /* Part of DP_REGISTERCVAR */
+float min(float a, float b, ...) = #94; /* Part of DP_QC_MINMAXBOUND */
+float max(float a, float b, ...) = #95; /* Part of DP_QC_MINMAXBOUND */
+float bound(float minimum, float val, float maximum) = #96; /* Part of DP_QC_MINMAXBOUND */
+float pow(float value, float exp) = #97; /* Part of DP_QC_SINCOSSQRTPOW */
+float logarithm(float v, optional float base) = #0:logarithm; /*
+    Determines the logarithm of the input value according to the specified base. This can be used to calculate how much something was shifted by. */
+entity findfloat(entity start, .__variant fld, __variant match) = #98; /* Part of DP_QC_FINDFLOAT */
+float checkextension(string extname) = #99; /*
+    Checks for an extension by its name (eg: checkextension("FRIK_FILE") says that its okay to go ahead and use strcat).
+    Use cvar("pr_checkextension") to see if this builtin exists. */
+float checkbuiltin(__variant funcref) = #0:checkbuiltin; /*
+    Checks to see if the specified builtin is supported/mapped. */
+float builtin_find(string builtinname) = #100;
+float anglemod(float value) = #102;
+void showpic(string slot, string picname, float x, float y, float zone, optional entity player) = #104; /* Part of TEI_SHOWLMP2 */
+void hidepic(string slot, optional entity player) = #105; /* Part of TEI_SHOWLMP2 */
+void movepic(string slot, float x, float y, float zone, optional entity player) = #106; /* Part of TEI_SHOWLMP2 */
+void changepic(string slot, string picname, optional entity player) = #107; /* Part of TEI_SHOWLMP2 */
+filestream fopen(string filename, float mode, optional float mmapminsize) = #110; /* Part of FRIK_FILE */
+void fclose(filestream fhandle) = #111; /* Part of FRIK_FILE */
+string fgets(filestream fhandle) = #112; /* Part of FRIK_FILE */
+void fputs(filestream fhandle, string s, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7) = #113; /* Part of FRIK_FILE */
+int fread(filestream fhandle, void *ptr, int size) = #0:fread; /* Part of FTE_QC_FILE_BINARY */
+int fwrite(filestream fhandle, void *ptr, int size) = #0:fwrite; /* Part of FTE_QC_FILE_BINARY */
+int fseek(filestream fhandle, optional int newoffset) = #0:fseek; /* Part of FTE_QC_FILE_BINARY */
+int fsize(filestream fhandle, optional int newsize) = #0:fsize; /* Part of FTE_QC_FILE_BINARY */
+float strlen(string s) = #114; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS */
+string strcat(string s1, optional string s2, optional string s3, optional string s4, optional string s5, optional string s6, optional string s7, optional string s8) = #115; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS */
+string substring(string s, float start, float length) = #116; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS */
+vector stov(string s) = #117; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS */
+string strzone(string s, ...) = #118; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS */
+void strunzone(string s) = #119; /* Part of FRIK_FILE, FTE_STRINGS, ZQ_QC_STRINGS */
+void cvar_setf(string cvar, float val) = #176;
+void localsound(string soundname, optional float channel, optional float volume) = #177; /* Part of FTE_QC_NPCCHAT */
+float getmodelindex(string modelname, optional float queryonly) = #200; /* Part of FTE_QC_NPCCHAT */
+__variant externcall(float prnum, string funcname, ...) = #201; /* Part of FTE_MULTIPROGS */
+float addprogs(string progsname) = #202; /* Part of FTE_MULTIPROGS */
+__variant externvalue(float prnum, string varname) = #203; /* Part of FTE_MULTIPROGS */
+void externset(float prnum, __variant newval, string varname) = #204; /* Part of FTE_MULTIPROGS */
+void openportal(entity portal, float state) = #207; /* Part of FTE_MULTIPROGS */
+float RegisterTempEnt(float attributes, string effectname, ...) = #208; /* Part of FTE_PEXT_CUSTOMTENTS */
+void CustomTempEnt(float type, vector pos, ...) = #209; /* Part of FTE_PEXT_CUSTOMTENTS */
+float fork(optional float sleeptime) = #210; /* Part of FTE_MULTITHREADED */
+void abort(optional __variant ret) = #211; /* Part of FTE_MULTITHREADED */
+void sleep(float sleeptime) = #212; /* Part of FTE_MULTITHREADED */
+void forceinfokey(entity player, string key, string value) = #213; /* Part of FTE_FORCEINFOKEY */
+void chat(string filename, float starttag, entity edict) = #214; /* Part of FTE_QC_NPCCHAT */
+void particle2(vector org, vector dmin, vector dmax, float colour, float effect, float count) = #215; /* Part of FTE_HEXEN2 */
+void particle3(vector org, vector box, float colour, float effect, float count) = #216; /* Part of FTE_HEXEN2 */
+void particle4(vector org, float radius, float colour, float effect, float count) = #217; /* Part of FTE_HEXEN2 */
+float bitshift(float number, float quantity) = #218; /* Part of EXT_BITSHIFT */
+void te_lightningblood(vector pos) = #219; /* Part of FTE_TE_STANDARDEFFECTBUILTINS */
+float strstrofs(string s1, string sub, optional float startidx) = #221; /* Part of FTE_STRINGS */
+float str2chr(string str, float index) = #222; /* Part of FTE_STRINGS */
+string chr2str(float chr, ...) = #223; /* Part of FTE_STRINGS */
+string strconv(float ccase, float redalpha, float redchars, string str, ...) = #224; /* Part of FTE_STRINGS */
 
 string(float pad, string str1, ...) strpad = #225; /* Part of FTE_STRINGS
 		Pads the string with spaces, to ensure its a specific length (so long as a fixed-width font is used, anyway). If pad is negative, the spaces are added on the left. If positive the padding is on the right. */
@@ -1119,84 +1045,104 @@ string(infostring info, string key) infoget = #227; /* Part of FTE_STRINGS
 		Reads a named value from an infostring. The returned value is a tempstring */
 
 #define strcmp strncmp
-float(string s1, string s2, optional float len, optional float s1ofs, optional float s2ofs) strncmp = #228; /* Part of FTE_STRINGS
-		Compares up to 'len' chars in the two strings. s1ofs allows you to treat s2 as a substring to compare against, or should be 0.
-		Returns 0 if the two strings are equal, a negative value if s1 appears numerically lower, and positive if s1 appears numerically higher. */
+float strncmp(string s1, string s2, optional float len, optional float s1ofs, optional float s2ofs) = #228; /* Part of FTE_STRINGS
+    Compares up to 'len' chars in the two strings. s1ofs allows you to treat s2 as a substring to compare against, or should be 0.
+    Returns 0 if the two strings are equal, a negative value if s1 appears numerically lower, and positive if s1 appears numerically higher. */
 
-float(string s1, string s2) strcasecmp = #229; /* Part of FTE_STRINGS
-		Compares the two strings without case sensitivity.
-		Returns 0 if they are equal. The sign of the return value may be significant, but should not be depended upon. */
+float strcasecmp(string s1, string s2) = #229; /* Part of FTE_STRINGS
+    Compares the two strings without case sensitivity.
+    Returns 0 if they are equal. The sign of the return value may be significant, but should not be depended upon. */
 
-float(string s1, string s2, float len, optional float s1ofs, optional float s2ofs) strncasecmp = #230; /* Part of FTE_STRINGS
-		Compares up to 'len' chars in the two strings without case sensitivity. s1ofs allows you to treat s2 as a substring to compare against, or should be 0.
-		Returns 0 if they are equal. The sign of the return value may be significant, but should not be depended upon. */
+float strncasecmp(string s1, string s2, float len, optional float s1ofs, optional float s2ofs) = #230; /* Part of FTE_STRINGS
+    Compares up to 'len' chars in the two strings without case sensitivity. s1ofs allows you to treat s2 as a substring to compare against, or should be 0.
+    Returns 0 if they are equal. The sign of the return value may be significant, but should not be depended upon. */
 
-string(string s) strtrim = #0:strtrim; /*
-		Trims the whitespace from the start+end of the string. */
+string strtrim(string s) = #0:strtrim; /*
+    Trims the whitespace from the start+end of the string. */
 
-void() calltimeofday = #231; /* Part of FTE_CALLTIMEOFDAY
-		Asks the engine to instantly call the qc's 'timeofday' function, before returning. For compatibility with mvdsv.
-		timeofday should have the prototype: void(float secs, float mins, float hour, float day, float mon, float year, string strvalue)
-		The strftime builtin is more versatile and less weird. */
+void calltimeofday() = #231; /* Part of FTE_CALLTIMEOFDAY
+    Asks the engine to instantly call the qc's 'timeofday' function, before returning. For compatibility with mvdsv.
+    timeofday should have the prototype: void(float secs, float mins, float hour, float day, float mon, float year, string strvalue)
+    The strftime builtin is more versatile and less weird. */
 
-void(float num, float type, .__variant fld) clientstat = #232; /*
-		Specifies what data to use in order to send various stats, in a client-specific way.
-		'num' should be a value between 32 and 127, other values are reserved.
-		'type' must be set to one of the EV_* constants, one of EV_FLOAT, EV_STRING, EV_INTEGER, EV_ENTITY.
-		fld must be a reference to the field used, each player will be sent only their own copy of these fields. */
+void clientstat(float num, float type, .__variant fld) = #232; /*
+    Specifies what data to use in order to send various stats, in a client-specific way.
+    'num' should be a value between 32 and 127, other values are reserved.
+    'type' must be set to one of the EV_* constants, one of EV_FLOAT, EV_STRING, EV_INTEGER, EV_ENTITY.
+    fld must be a reference to the field used, each player will be sent only their own copy of these fields. */
 
-void(float num, float type, string name) globalstat = #233; /*
-		Specifies what data to use in order to send various stats, in a non-client-specific way. num and type are as in clientstat, name however, is the name of the global to read in the form of a string (pass "foo"). */
+void globalstat(float num, float type, string name) = #233; /*
+    Specifies what data to use in order to send various stats, in a non-client-specific way. num and type are as in clientstat, name however, is the name of the global to read in the form of a string (pass "foo"). */
 
-void(float num, float type, __variant *address) pointerstat = #0:pointerstat; /*
-		Specifies what data to use in order to send various stats, in a non-client-specific way. num and type are as in clientstat, address however, is the address of the variable you would like to use (pass &foo). */
+void pointerstat(float num, float type, __variant *address) = #0:pointerstat; /*
+    Specifies what data to use in order to send various stats, in a non-client-specific way. num and type are as in clientstat, address however, is the address of the variable you would like to use (pass &foo). */
 
-float(entity player) isbackbuffered = #234; /* Part of FTE_ISBACKBUFFERED
-		Returns if the given player's network buffer will take multiple network frames in order to clear. If this builtin returns non-zero, you should delay or reduce the amount of reliable (and also unreliable) data that you are sending to that client. */
+float isbackbuffered(entity player) = #234; /* Part of FTE_ISBACKBUFFERED
+    Returns if the given player's network buffer will take multiple network frames in order to clear. If this builtin returns non-zero, you should delay or reduce the amount of reliable (and also unreliable) data that you are sending to that client. */
 
-void(vector angle) rotatevectorsbyangle = #235; /*
-		rotates the v_forward,v_right,v_up matrix by the specified angles. */
+void rotatevectorsbyangle(vector angle) = #235; /*
+    rotates the v_forward,v_right,v_up matrix by the specified angles. */
 
-void(vector fwd, vector right, vector up) rotatevectorsbyvectors = #236;
-float(float mdlindex, string skinname) skinforname = #237;
-void(vector org, optional float count) te_bloodqw = #239; /* Part of FTE_TE_STANDARDEFFECTBUILTINS*/
-void(entity ent) te_muzzleflash = #0:te_muzzleflash;
-float(vector viewpos, entity entity) checkpvs = #240; /* Part of FTE_QC_CHECKPVS*/
-entity(string match, optional float matchnum) matchclientname = #241; /* Part of FTE_QC_MATCHCLIENTNAME*/
-void(string destaddress, string content) sendpacket = #242; /* Part of FTE_QC_SENDPACKET*/
-float(float dividend, float divisor) mod = #245;
-float(optional string host, optional string user, optional string pass, optional string defaultdb, optional string driver) sqlconnect = #250; /* Part of FTE_SQL*/
-void(float serveridx) sqldisconnect = #251; /* Part of FTE_SQL*/
-float(float serveridx, void(float serveridx, float queryidx, float rows, float columns, float eof, float firstrow) callback, float querytype, string query) sqlopenquery = #252; /* Part of FTE_SQL*/
-void(float serveridx, float queryidx) sqlclosequery = #253; /* Part of FTE_SQL*/
-string(float serveridx, float queryidx, float row, float column) sqlreadfield = #254; /* Part of FTE_SQL*/
-string(float serveridx, optional float queryidx) sqlerror = #255; /* Part of FTE_SQL*/
-string(float serveridx, string data) sqlescape = #256; /* Part of FTE_SQL*/
-string(float serveridx) sqlversion = #257; /* Part of FTE_SQL*/
-float(float serveridx, float queryidx, float row, float column) sqlreadfloat = #258; /* Part of FTE_SQL*/
-int(float serveridx, float queryidx, float row, float column, __variant *ptr, int maxsize) sqlreadblob = #0:sqlreadblob;
-string(float serveridx, __variant *ptr, int maxsize) sqlescapeblob = #0:sqlescapeblob;
-int(string) stoi = #259; /* Part of FTE_QC_INTCONV
-		Converts the given string into a true integer. Base 8, 10, or 16 is determined based upon the format of the string. */
+void rotatevectorsbyvectors(vector fwd, vector right, vector up) = #236;
 
-string(int) itos = #260; /* Part of FTE_QC_INTCONV
-		Converts the passed true integer into a base10 string. */
+float skinforname(float mdlindex, string skinname) = #237;
 
-int(string) stoh = #261; /* Part of FTE_QC_INTCONV
-		Reads a base-16 string (with or without 0x prefix) as an integer. Bugs out if given a base 8 or base 10 string. :P */
+void te_bloodqw(vector org, optional float count) = #239; /* Part of FTE_TE_STANDARDEFFECTBUILTINS*/
 
-string(int) htos = #262; /* Part of FTE_QC_INTCONV
-		Formats an integer as a base16 string, with leading 0s and no prefix. Always returns 8 characters. */
+void te_muzzleflash(entity ent) = #0:te_muzzleflash;
 
-int(float) ftoi = #0:ftoi; /* Part of FTE_QC_INTCONV
-		Converts the given float into a true integer without depending on extended qcvm instructions. */
+float checkpvs(vector viewpos, entity entity) = #240; /* Part of FTE_QC_CHECKPVS*/
 
-float(int) itof = #0:itof; /* Part of FTE_QC_INTCONV
-		Converts the given true integer into a float without depending on extended qcvm instructions. */
+entity matchclientname(string match, optional float matchnum) = #241; /* Part of FTE_QC_MATCHCLIENTNAME*/
 
-float(float modlindex, optional float useabstransforms) skel_create = #263; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Allocates a new uninitiaised skeletal object, with enough bone info to animate the given model.
-		eg: self.skeletonobject = skel_create(self.modelindex); */
+void sendpacket(string destaddress, string content) = #242; /* Part of FTE_QC_SENDPACKET*/
+
+float mod(float dividend, float divisor) = #245;
+
+float sqlconnect(optional string host, optional string user, optional string pass, optional string defaultdb, optional string driver) = #250; /* Part of FTE_SQL*/
+
+void sqldisconnect(float serveridx) = #251; /* Part of FTE_SQL*/
+
+float sqlopenquery(float serveridx, void(float serveridx, float queryidx, float rows, float columns, float eof, float firstrow) callback, float querytype, string query) = #252; /* Part of FTE_SQL*/
+
+void sqlclosequery(float serveridx, float queryidx) = #253; /* Part of FTE_SQL*/
+
+string sqlreadfield(float serveridx, float queryidx, float row, float column) = #254; /* Part of FTE_SQL*/
+
+string sqlerror(float serveridx, optional float queryidx) = #255; /* Part of FTE_SQL*/
+
+string sqlescape(float serveridx, string data) = #256; /* Part of FTE_SQL*/
+
+string sqlversion(float serveridx) = #257; /* Part of FTE_SQL*/
+
+float sqlreadfloat(float serveridx, float queryidx, float row, float column) = #258; /* Part of FTE_SQL*/
+
+int sqlreadblob(float serveridx, float queryidx, float row, float column, __variant *ptr, int maxsize) = #0:sqlreadblob;
+
+string sqlescapeblob(float serveridx, __variant *ptr, int maxsize) = #0:sqlescapeblob;
+
+int stoi(string s) = #259; /* Part of FTE_QC_INTCONV
+    Converts the given string into a true integer. Base 8, 10, or 16 is determined based upon the format of the string. */
+
+string itos(int n) = #260; /* Part of FTE_QC_INTCONV
+    Converts the passed true integer into a base10 string. */
+
+int stoh(string s) = #261; /* Part of FTE_QC_INTCONV
+    Reads a base-16 string (with or without 0x prefix) as an integer. Bugs out if given a base 8 or base 10 string. :P */
+
+string htos(int n) = #262; /* Part of FTE_QC_INTCONV
+    Formats an integer as a base16 string, with leading 0s and no prefix. Always returns 8 characters. */
+
+int ftoi(float f) = #0:ftoi; /* Part of FTE_QC_INTCONV
+    Converts the given float into a true integer without depending on extended qcvm instructions. */
+
+float itof(int n) = #0:itof; /* Part of FTE_QC_INTCONV
+    Converts the given true integer into a float without depending on extended qcvm instructions. */
+
+float skel_create(float modlindex, optional float useabstransforms) = #263; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Allocates a new uninitiaised skeletal object, with enough bone info to animate the given model.
+    eg: self.skeletonobject = skel_create(self.modelindex); */
+
 
 typedef struct
 {
@@ -1212,73 +1158,75 @@ typedef struct
 	float subblend[2];
 	float controllers[5];
 } skelblend_t;
-float(float skel, entity ent, float modelindex, float retainfrac, float firstbone, float lastbone, optional float addfrac) skel_build = #264; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Animation data (according to the entity's frame info) is pulled from the specified model and blended into the specified skeletal object.
-		If retainfrac is set to 0 on the first call and 1 on the others, you can blend multiple animations together according to the addfrac value. The final weight should be 1. Other values will result in scaling and/or other weirdness. You can use firstbone and lastbone to update only part of the skeletal object, to allow legs to animate separately from torso, use 0 for both arguments to specify all, as bones are 1-based. */
+float skel_build(float skel, entity ent, float modelindex, float retainfrac, float firstbone, float lastbone, optional float addfrac) = #264; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Animation data (according to the entity's frame info) is pulled from the specified model and blended into the specified skeletal object.
+    If retainfrac is set to 0 on the first call and 1 on the others, you can blend multiple animations together according to the addfrac value. The final weight should be 1. Other values will result in scaling and/or other weirdness. You can use firstbone and lastbone to update only part of the skeletal object, to allow legs to animate separately from torso, use 0 for both arguments to specify all, as bones are 1-based. */
 
-float(float skel, int numblends, skelblend_t *weights, int structsize) skel_build_ptr = #0:skel_build_ptr; /*
-		Like skel_build, but slightly simpler. */
+float skel_build_ptr(float skel, int numblends, skelblend_t *weights, int structsize) = #0:skel_build_ptr; /*
+    Like skel_build, but slightly simpler. */
 
-float(float skel) skel_get_numbones = #265; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Retrives the number of bones in the model. The valid range is 1<=bone<=numbones. */
+float skel_get_numbones(float skel) = #265; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Retrives the number of bones in the model. The valid range is 1<=bone<=numbones. */
 
-string(float skel, float bonenum) skel_get_bonename = #266; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Retrieves the name of the specified bone. Mostly only for debugging. */
+string skel_get_bonename(float skel, float bonenum) = #266; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Retrieves the name of the specified bone. Mostly only for debugging. */
 
-float(float skel, float bonenum) skel_get_boneparent = #267; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Retrieves which bone this bone's position is relative to. Bone 0 refers to the entity's position rather than an actual bone */
+float skel_get_boneparent(float skel, float bonenum) = #267; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Retrieves which bone this bone's position is relative to. Bone 0 refers to the entity's position rather than an actual bone */
 
-float(float skel, string tagname) skel_find_bone = #268; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Finds a bone by its name, from the model that was used to create the skeletal object. */
+float skel_find_bone(float skel, string tagname) = #268; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Finds a bone by its name, from the model that was used to create the skeletal object. */
 
-vector(float skel, float bonenum) skel_get_bonerel = #269; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Gets the bone position and orientation relative to the bone's parent. Return value is the offset, and v_forward, v_right, v_up contain the orientation. */
+vector skel_get_bonerel(float skel, float bonenum) = #269; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Gets the bone position and orientation relative to the bone's parent. Return value is the offset, and v_forward, v_right, v_up contain the orientation. */
 
-vector(float skel, float bonenum) skel_get_boneabs = #270; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Gets the bone position and orientation relative to the entity. Return value is the offset, and v_forward, v_right, v_up contain the orientation.
-		Use gettaginfo for world coord+orientation. */
+vector skel_get_boneabs(float skel, float bonenum) = #270; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Gets the bone position and orientation relative to the entity. Return value is the offset, and v_forward, v_right, v_up contain the orientation.
+    Use gettaginfo for world coord+orientation. */
 
-void(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) skel_set_bone = #271; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Sets a bone position relative to its parent. If the orientation arguments are not specified, v_forward+v_right+v_up are used instead. */
+void skel_set_bone(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) = #271; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Sets a bone position relative to its parent. If the orientation arguments are not specified, v_forward+v_right+v_up are used instead. */
 
-void(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) skel_premul_bone = #272; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Transforms a single bone by a matrix. You can use makevectors to generate a rotation matrix from an angle. */
+void skel_premul_bone(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) = #272; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Transforms a single bone by a matrix. You can use makevectors to generate a rotation matrix from an angle. */
 
-void(float skel, float startbone, float endbone, vector org, optional vector fwd, optional vector right, optional vector up) skel_premul_bones = #273; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Transforms an entire consecutive range of bones by a matrix. You can use makevectors to generate a rotation matrix from an angle, but you'll probably want to divide the angle by the number of bones. */
+void skel_premul_bones(float skel, float startbone, float endbone, vector org, optional vector fwd, optional vector right, optional vector up) = #273; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Transforms an entire consecutive range of bones by a matrix. You can use makevectors to generate a rotation matrix from an angle, but you'll probably want to divide the angle by the number of bones. */
 
-void(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) skel_postmul_bone = #0:skel_postmul_bone; /*
-		Transforms a single bone by a matrix. You can use makevectors to generate a rotation matrix from an angle. */
+void skel_postmul_bone(float skel, float bonenum, vector org, optional vector fwd, optional vector right, optional vector up) = #0:skel_postmul_bone; /*
+    Transforms a single bone by a matrix. You can use makevectors to generate a rotation matrix from an angle. */
 
-void(float skeldst, float skelsrc, float startbone, float entbone) skel_copybones = #274; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Copy bone data from one skeleton directly into another. */
+void skel_copybones(float skeldst, float skelsrc, float startbone, float entbone) = #274; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Copy bone data from one skeleton directly into another. */
 
-void(float skel) skel_delete = #275; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Deletes a skeletal object. The actual delete is delayed, allowing the skeletal object to be deleted in an entity's predraw function yet still be valid by the time the addentity+renderscene builtins need it. Also uninstanciates any ragdoll currently in effect on the skeletal object. */
+void skel_delete(float skel) = #275; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Deletes a skeletal object. The actual delete is delayed, allowing the skeletal object to be deleted in an entity's predraw function yet still be valid by the time the addentity+renderscene builtins need it. Also uninstanciates any ragdoll currently in effect on the skeletal object. */
 
-float(float modidx, string framename) frameforname = #276; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Looks up a framegroup from a model by name, avoiding the need for hardcoding. Returns -1 on error. */
+float frameforname(float modidx, string framename) = #276; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Looks up a framegroup from a model by name, avoiding the need for hardcoding. Returns -1 on error. */
 
-float(float modidx, float framenum) frameduration = #277; /* Part of FTE_CSQC_SKELETONOBJECTS
-		Retrieves the duration (in seconds) of the specified framegroup. */
+float frameduration(float modidx, float framenum) = #277; /* Part of FTE_CSQC_SKELETONOBJECTS
+    Retrieves the duration (in seconds) of the specified framegroup. */
 
-void(float modidx, float framenum, __inout float basetime, float targettime, void(float timestamp, int code, string data) callback) processmodelevents = #0:processmodelevents; /* Part of FTE_GFX_MODELEVENTS
-		Calls a callback for each event that has been reached. Basetime is set to targettime. */
+void processmodelevents(float modidx, float framenum, __inout float basetime, float targettime, void(float timestamp, int code, string data) callback) = #0:processmodelevents; /* Part of FTE_GFX_MODELEVENTS
+    Calls a callback for each event that has been reached. Basetime is set to targettime. */
 
-float(float modidx, float framenum, __inout float basetime, float targettime, __out int code, __out string data) getnextmodelevent = #0:getnextmodelevent; /*
-		Reports the next event within a model's animation. Returns a boolean if an event was found between basetime and targettime. Writes to basetime,code,data arguments (if an event was found, basetime is set to the event's time, otherwise to targettime).
-		WARNING: this builtin cannot deal with multiple events with the same timestamp (only the first will be reported). */
+float getnextmodelevent(float modidx, float framenum, __inout float basetime, float targettime, __out int code, __out string data) = #0:getnextmodelevent; /*
+    Reports the next event within a model's animation. Returns a boolean if an event was found between basetime and targettime. Writes to basetime,code,data arguments (if an event was found, basetime is set to the event's time, otherwise to targettime).
+    WARNING: this builtin cannot deal with multiple events with the same timestamp (only the first will be reported). */
 
-float(float modidx, float framenum, int eventidx, __out float timestamp, __out int code, __out string data) getmodeleventidx = #0:getmodeleventidx; /*
-		Reports an indexed event within a model's animation. Writes to timestamp,code,data arguments on success. Returns false if the animation/event/model was out of range/invalid. Does not consider looping animations (retry from index 0 if it fails and you know that its a looping animation). This builtin is more annoying to use than getnextmodelevent, but can be made to deal with multiple events with the exact same timestamp. */
+float getmodeleventidx(float modidx, float framenum, int eventidx, __out float timestamp, __out int code, __out string data) = #0:getmodeleventidx; /*
+    Reports an indexed event within a model's animation. Writes to timestamp,code,data arguments on success. Returns false if the animation/event/model was out of range/invalid. Does not consider looping animations (retry from index 0 if it fails and you know that its a looping animation). This builtin is more annoying to use than getnextmodelevent, but can be made to deal with multiple events with the exact same timestamp. */
 
 #define dotproduct(v1,v2) ((vector)(v1)*(vector)(v2))
-vector(vector v1, vector v2) crossproduct = #0:crossproduct; /* Part of FTE_QC_CROSSPRODUCT
-		Small helper function to calculate the crossproduct of two vectors. */
+vector crossproduct(vector v1, vector v2) = #0:crossproduct; /* Part of FTE_QC_CROSSPRODUCT
+    Small helper function to calculate the crossproduct of two vectors. */
 
-float(entity pusher, vector move, vector amove) pushmove = #0:pushmove;
-void(float action, optional vector pos, optional float radius, optional float quant, ...) terrain_edit = #278; /* Part of FTE_TERRAIN_MAP
-		Realtime terrain editing. Actions are the TEREDIT_ constants. */
+float pushmove(entity pusher, vector move, vector amove) = #0:pushmove;
+
+void terrain_edit(float action, optional vector pos, optional float radius, optional float quant, ...) = #278; /* Part of FTE_TERRAIN_MAP
+    Realtime terrain editing. Actions are the TEREDIT_ constants. */
+
 
 typedef struct
 {
@@ -1290,366 +1238,243 @@ typedef struct
 	vector	tdir;
 	float	tbias;
 } brushface_t;
-int(float modelidx, int brushid, brushface_t *out_faces, int maxfaces, int *out_contents) brush_get = #0:brush_get; /* Part of FTE_RAW_MAP
-		Queries a brush's information. You must pre-allocate the face array for the builtin to write to. Return value is the number of faces retrieved, 0 on error. */
+int brush_get(float modelidx, int brushid, brushface_t *out_faces, int maxfaces, int *out_contents) = #0:brush_get; /* Part of FTE_RAW_MAP
+    Queries a brush's information. Must pre-allocate face array. Returns number of faces retrieved, 0 on error. */
 
-int(float modelidx, brushface_t *in_faces, int numfaces, int contents, optional int brushid) brush_create = #0:brush_create; /* Part of FTE_RAW_MAP
-		Inserts a new brush into the model. Return value is the new brush's id. */
+int brush_create(float modelidx, brushface_t *in_faces, int numfaces, int contents, optional int brushid) = #0:brush_create; /* Part of FTE_RAW_MAP
+    Inserts a new brush into the model. Returns the new brush's id. */
 
-void(float modelidx, int brushid) brush_delete = #0:brush_delete; /* Part of FTE_RAW_MAP
-		Destroys the specified brush. */
+void brush_delete(float modelidx, int brushid) = #0:brush_delete; /* Part of FTE_RAW_MAP
+    Destroys the specified brush. */
 
-float(float modelid, int brushid, int faceid, float selectedstate) brush_selected = #0:brush_selected; /* Part of FTE_RAW_MAP
-		Allows you to easily set transient visual properties of a brush. returns old value. selectedstate=-1 changes nothing (called for its return value). */
+float brush_selected(float modelid, int brushid, int faceid, float selectedstate) = #0:brush_selected; /* Part of FTE_RAW_MAP
+    Sets transient visual properties of a brush. Returns old value. selectedstate=-1 changes nothing. */
 
-int(float modelid, int brushid, int faceid, vector *points, int maxpoints) brush_getfacepoints = #0:brush_getfacepoints; /* Part of FTE_RAW_MAP
-		Returns the list of verticies surrounding the given face. If face is 0, returns the center of the brush (if space for 1 point) or the mins+maxs (if space for 2 points). */
+int brush_getfacepoints(float modelid, int brushid, int faceid, vector *points, int maxpoints) = #0:brush_getfacepoints; /* Part of FTE_RAW_MAP
+    Returns vertices of the given face. Face 0 returns center or mins+maxs. */
 
-int(int faceid, brushface_t *in_faces, int numfaces, vector *points, int maxpoints) brush_calcfacepoints = #0:brush_calcfacepoints; /* Part of FTE_RAW_MAP
-		Determines the points of the specified face, if the specified brush were to actually be created. */
+int brush_calcfacepoints(int faceid, brushface_t *in_faces, int numfaces, vector *points, int maxpoints) = #0:brush_calcfacepoints; /* Part of FTE_RAW_MAP
+    Determines points of a face if brush were created. */
 
-int(float modelid, vector *planes, float *dists, int numplanes, int *out_brushes, int *out_faces, int maxresults) brush_findinvolume = #0:brush_findinvolume; /* Part of FTE_RAW_MAP
-		Allows you to easily obtain a list of brushes+faces within the given bounding region. If out_faces is not null, the same brush might be listed twice. */
+int brush_findinvolume(float modelid, vector *planes, float *dists, int numplanes, int *out_brushes, int *out_faces, int maxresults) = #0:brush_findinvolume; /* Part of FTE_RAW_MAP
+    Obtains brushes+faces within the bounding region. */
 
-void(optional entity ent, optional vector neworigin) touchtriggers = #279; /*
-		Triggers a touch events between self and every SOLID_TRIGGER entity that it is in contact with. This should typically just be the triggers touch functions. Also optionally updates the origin of the moved entity. */
+void touchtriggers(optional entity ent, optional vector neworigin) = #279; /* Triggers touch events with SOLID_TRIGGER entities. Optionally updates origin. */
 
-void(float buf, float fl) WriteFloat = #280;
-float(entity skelent, string dollcmd, float animskel) skel_ragupdate = #281; /*
-		Updates the skeletal object attached to the entity according to its origin and other properties.
-		if animskel is non-zero, the ragdoll will animate towards the bone state in the animskel skeletal object, otherwise they will pick up the model's base pose which may not give nice results.
-		If dollcmd is not set, the ragdoll will update (this should be done each frame).
-		If the doll is updated without having a valid doll, the model's default .doll will be instanciated.
-		commands:
-		 doll foo.doll : sets up the entity to use the named doll file
-		 dollstring TEXT : uses the doll file directly embedded within qc, with that extra prefix.
-		 cleardoll : uninstanciates the doll without destroying the skeletal object.
-		 animate 0.5 : specifies the strength of the ragdoll as a whole 
-		 animatebody somebody 0.5 : specifies the strength of the ragdoll on a specific body (0 will disable ragdoll animations on that body).
-		 enablejoint somejoint 1 : enables (or disables) a joint. Disabling joints will allow the doll to shatter. */
+void WriteFloat(float buf, float fl) = #280;
 
-float*(float skel) skel_mmap = #282; /*
-		Map the bones in VM memory. They can then be accessed via pointers. Each bone is 12 floats, the four vectors interleaved (sadly). */
+float skel_ragupdate(entity skelent, string dollcmd, float animskel) = #281; /* Updates skeletal object attached to entity. See dollcmd usage comments. */
 
-void(entity ent, float bonenum, vector org, optional vector angorfwd, optional vector right, optional vector up) skel_set_bone_world = #283; /*
-		Sets the world position of a bone within the given entity's attached skeletal object. The world position is dependant upon the owning entity's position. If no orientation argument is specified, v_forward+v_right+v_up are used for the orientation instead. If 1 is specified, it is understood as angles. If 3 are specified, they are the forawrd/right/up vectors to use. */
+float* skel_mmap(float skel) = #282; /* Maps bones in VM memory; each bone = 12 floats, four vectors interleaved. */
 
-string(float modidx, float framenum) frametoname = #284;
-string(float modidx, float skin) skintoname = #285;
-float(float resourcetype, float tryload, string resourcename) resourcestatus = #286; /*
-		resourcetype must be one of the RESTYPE_ constants. Returns one of the RESSTATE_ constants. Tryload 0 is a query only. Tryload 1 will attempt to reload the content if it was flushed. */
+void skel_set_bone_world(entity ent, float bonenum, vector org, optional vector angorfwd, optional vector right, optional vector up) = #283; /* Sets world position of a bone in entity's skeletal object. */
 
-hashtable(float tabsize, optional float defaulttype) hash_createtab = #287; /* Part of FTE_QC_HASHTABLES
-		Creates a hash table object with at least 'tabsize' slots. hash table with index 0 is a game-persistant table and will NEVER be returned by this builtin (except as an error return). */
+string frametoname(float modidx, float framenum) = #284;
 
-void(hashtable table) hash_destroytab = #288; /* Part of FTE_QC_HASHTABLES
-		Destroys a hash table object. */
+string skintoname(float modidx, float skin) = #285;
 
-void(hashtable table, string name, __variant value, optional float typeandflags) hash_add = #289; /* Part of FTE_QC_HASHTABLES
-		Adds the given key with the given value to the table.
-		If flags&HASH_REPLACE, the old value will be removed, if not set then multiple values may be added for a single key, they won't overwrite.
-		The type argument describes how the value should be stored and saved to files. While you can claim that all variables are just vectors, being more precise can result in less issues with tempstrings or saved games. */
+float resourcestatus(float resourcetype, float tryload, string resourcename) = #286; /* Returns RESSTATE_ constants. tryload=1 attempts reload. */
 
-__variant(hashtable table, string name, optional __variant deflt, optional float requiretype, optional float index) hash_get = #290; /* Part of FTE_QC_HASHTABLES
-		looks up the specified key name in the hash table. returns deflt if key was not found. If stringsonly=1, the return value will be in the form of a tempstring, otherwise it'll be the original value argument exactly as it was. If requiretype is specified, then values not of the specified type will be ignored. Hurrah for multiple types with the same name. */
+hashtable hash_createtab(float tabsize, optional float defaulttype) = #287; /* Creates a hash table. */
 
-__variant(hashtable table, string name) hash_delete = #291; /* Part of FTE_QC_HASHTABLES
-		removes the named key. returns the value of the object that was destroyed, or 0 on error. */
+void hash_destroytab(hashtable table) = #288; /* Destroys a hash table. */
 
-string(hashtable table, float idx) hash_getkey = #292; /* Part of FTE_QC_HASHTABLES
-		gets some random key name. add+delete can change return values of this, so don't blindly increment the key index if you're removing all. */
+void hash_add(hashtable table, string name, __variant value, optional float typeandflags) = #289; /* Adds key/value to table. */
 
-float(string name) checkcommand = #294; /* Part of FTE_QC_CHECKCOMMAND
-		Checks to see if the supplied name is a valid command, cvar, or alias. Returns 0 if it does not exist. */
+__variant hash_get(hashtable table, string name, optional __variant deflt, optional float requiretype, optional float index) = #290; /* Looks up key in table. */
 
-string(string s) argescape = #295; /*
-		Marks up a string so that it can be reliably tokenized as a single argument later. */
+__variant hash_delete(hashtable table, string name) = #291; /* Removes key from table. Returns value or 0 on error. */
 
-void(string dest, string from, string cmd, string info) clusterevent = #0:clusterevent; /*
-		Only functions in mapcluster mode. Sends an event to whichever server the named player is on. The destination server can then dispatch the event to the client or handle it itself via the SV_ParseClusterEvent entrypoint. If dest is empty, the event is broadcast to ALL servers. If the named player can't be found, the event will be returned to this server with the cmd prefixed with 'error:'. */
+string hash_getkey(hashtable table, float idx) = #292; /* Gets a key name by index. */
 
-string(entity player, optional string newnode) clustertransfer = #0:clustertransfer; /*
-		Only functions in mapcluster mode. Initiate transfer of the player to a different node. Can take some time. If dest is specified, returns null on error. Otherwise returns the current/new target node (or null if not transferring). */
+float checkcommand(string name) = #294; /* Checks if name is valid command, cvar, or alias. */
 
-float(float mdlidx) modelframecount = #0:modelframecount; /*
-		Retrieves the number of frames in the specified model. */
+string argescape(string s) = #295; /* Marks string for reliable tokenization as single argument. */
 
-void(string texturename, optional float flags, optional float is2d) R_BeginPolygon = #306; /*
-		Specifies the shader to use for the following polygons, along with optional flags.
-		If is2d, the polygon will be drawn as soon as the EndPolygon call is made, rather than waiting for renderscene. This allows complex 2d effects. */
+void clusterevent(string dest, string from, string cmd, string info) = #0:clusterevent; /* Sends event to cluster server. */
 
-void(vector org, vector texcoords, vector rgb, float alpha) R_PolygonVertex = #307; /*
-		Specifies a polygon vertex with its various properties. */
+string clustertransfer(entity player, optional string newnode) = #0:clustertransfer; /* Initiates player transfer to a different node. */
 
-void() R_EndPolygon = #308; /*
-		Ends the current polygon. At least 3 verticies must have been specified. You do not need to call beginpolygon if you wish to draw another polygon with the same shader. */
+float modelframecount(float mdlidx) = #0:modelframecount; /* Retrieves number of frames in model. */
 
-float(string effectname) particleeffectnum = #335; /* Part of DP_ENT_TRAILEFFECTNUM, FTE_SV_POINTPARTICLES
-		Precaches the named particle effect. If your effect name is of the form 'foo.bar' then particles/foo.cfg will be loaded by the client if foo.bar was not already defined.
-		Different engines will have different particle systems, this specifies the QC API only. */
+void R_BeginPolygon(string texturename, optional float flags, optional float is2d) = #306; /* Sets shader for following polygons. */
 
-void(float effectnum, entity ent, vector start, vector end) trailparticles = #336; /* Part of FTE_SV_POINTPARTICLES
-		Draws the given effect between the two named points. If ent is not world, distances will be cached in the entity in order to avoid framerate dependancies. The entity is not otherwise used. */
+void R_PolygonVertex(vector org, vector texcoords, vector rgb, float alpha) = #307; /* Specifies polygon vertex. */
 
-void(float effectnum, vector origin, optional vector dir, optional float count) pointparticles = #337; /* Part of FTE_SV_POINTPARTICLES
-		Spawn a load of particles from the given effect at the given point traveling or aiming along the direction specified. The number of particles are scaled by the count argument.
-		For regular particles, the dir vector is multiplied by the 'veladd' property (while orgadd will push the particles along it). Decals will use it as a hint to align to the correct surface. In both cases, it should normally be a unit vector, but other lengths will still work. If it has length 0 then FTE will assume downwards. */
+void R_EndPolygon() = #308; /* Ends current polygon. */
 
-void(string s, ...) print = #339; /* Part of DP_SV_PRINT
-		Unconditionally print on the local system's console, even in ssqc (doesn't care about the value of the developer cvar). */
+float particleeffectnum(string effectname) = #335; /* Precaches particle effect. */
 
-void(entity ent) runstandardplayerphysics = #347; /*
-		Perform the engine's standard player movement prediction upon the given entity using the input_* globals to describe movement. */
+void trailparticles(float effectnum, entity ent, vector start, vector end) = #336; /* Draws effect between points. */
 
-float(entity ent) wasfreed = #353; /*
-		Quickly check to see if the entity is currently free. This function is only valid during the two-second non-reuse window, after that it may give bad results. Try one second to make it more robust. */
+void pointparticles(float effectnum, vector origin, optional vector dir, optional float count) = #337; /* Spawns particles from effect. */
 
-string(string key) serverkey = #354; /*
-		Look up a key in the server's public serverinfo string */
+void print(string s, ...) = #339; /* Prints to local console. */
 
-float(string key, optional float assumevalue) serverkeyfloat = #0:serverkeyfloat; /*
-		Version of serverkey that returns the value as a float (which avoids tempstrings). */
+void runstandardplayerphysics(entity ent) = #347; /* Performs standard player movement prediction. */
 
-__variant*(int size) memalloc = #384; /* Part of FTE_MEMALLOC
-		Allocate an arbitary block of memory */
+float wasfreed(entity ent) = #353; /* Checks if entity is free. */
 
-void(__variant *ptr) memfree = #385; /* Part of FTE_MEMALLOC
-		Frees a block of memory that was allocated with memfree */
+string serverkey(string key) = #354; /* Look up key in server info string. */
 
-void(__variant *dst, __variant *src, int size) memcpy = #386; /* Part of FTE_MEMALLOC
-		Copys memory from one location to another */
+float serverkeyfloat(string key, optional float assumevalue) = #0:serverkeyfloat; /* Version of serverkey returning float. */
 
-void(__variant *dst, int val, int size) memfill8 = #387; /* Part of FTE_MEMALLOC
-		Sets an entire block of memory to a specified value. Pretty much always 0. */
+__variant* memalloc(int size) = #384; /* Allocates memory block. */
 
-__variant(__variant *dst, float ofs) memgetval = #388; /*
-		Looks up the 32bit value stored at a pointer-with-offset. */
+void memfree(__variant *ptr) = #385; /* Frees allocated memory block. */
 
-void(__variant *dst, float ofs, __variant val) memsetval = #389; /*
-		Changes the 32bit value stored at the specified pointer-with-offset. */
+void memcpy(__variant *dst, __variant *src, int size) = #386; /* Copies memory. */
 
-__variant*(__variant *base, float ofs) memptradd = #390; /*
-		Perform some pointer maths. Woo. */
+void memfill8(__variant *dst, int val, int size) = #387; /* Fills memory with value. */
 
-float(string s) memstrsize = #0:memstrsize; /*
-		strlen, except ignores utf-8 */
+__variant memgetval(__variant *dst, float ofs) = #388; /* Reads 32-bit value at pointer+offset. */
 
-float(entity e, float nowreadonly) entityprotection = #0:entityprotection; /*
-		Changes the protection on the specified entity to protect it from further edits from QC. The return value is the previous setting. Note that this can be used to unprotect the world, but doing so long term is not advised as you will no longer be able to detect invalid entity references. Also, world is not networked, so results might not be seen by clients (or in other words, world.avelocity_y=64 is a bad idea). */
+void memsetval(__variant *dst, float ofs, __variant val) = #389; /* Writes 32-bit value at pointer+offset. */
 
-entity(entity from, optional entity to) copyentity = #400; /* Part of DP_QC_COPYENTITY
-		Copies all fields from one entity to another. */
+__variant* memptradd(__variant *base, float ofs) = #390; /* Performs pointer math. */
 
-void setcolors(entity ent, float colours) = #401; /*
-		Changes a player's colours. The bits 0-3 are the lower/trouser colour, bits 4-7 are the upper/shirt colours. */
+float memstrsize(string s) = #0:memstrsize; /* String length ignoring UTF-8. */
 
-entity(.string field, string match, optional .entity chainfield) findchain = #402; /* Part of DP_QC_FINDCHAIN*/
-entity(.float fld, float match, optional .entity chainfield) findchainfloat = #403; /* Part of DP_QC_FINDCHAINFLOAT*/
-void(vector org, string modelname, float startframe, float endframe, float framerate) effect = #404; /* Part of DP_SV_EFFECT
-		Spawns a self-animating sprite */
+float entityprotection(entity e, float nowreadonly) = #0:entityprotection; /* Changes protection of entity. */
 
-void(vector org, vector dir, float count) te_blood = #405; /* Part of DP_TE_BLOOD*/
-void(vector mincorner, vector maxcorner, float explosionspeed, float howmany) te_bloodshower = #406; /* Part of _DP_TE_BLOODSHOWER*/
-void(vector org, vector color) te_explosionrgb = #407; /* Part of DP_TE_EXPLOSIONRGB*/
-void(vector mincorner, vector maxcorner, vector vel, float howmany, float color, float gravityflag, float randomveljitter) te_particlecube = #408; /* Part of DP_TE_PARTICLECUBE*/
-void(vector mincorner, vector maxcorner, vector vel, float howmany, float color) te_particlerain = #409; /* Part of DP_TE_PARTICLERAIN*/
-void(vector mincorner, vector maxcorner, vector vel, float howmany, float color) te_particlesnow = #410; /* Part of DP_TE_PARTICLESNOW*/
-void(vector org, vector vel, float howmany) te_spark = #411; /* Part of DP_TE_SPARK*/
-void(vector org) te_gunshotquad = #412; /* Part of _DP_TE_QUADEFFECTS1*/
-void(vector org) te_spikequad = #413; /* Part of _DP_TE_QUADEFFECTS1*/
-void(vector org) te_superspikequad = #414; /* Part of _DP_TE_QUADEFFECTS1*/
-void(vector org) te_explosionquad = #415; /* Part of _DP_TE_QUADEFFECTS1*/
-void(vector org) te_smallflash = #416; /* Part of DP_TE_SMALLFLASH*/
-void(vector org, float radius, float lifetime, vector color) te_customflash = #417; /* Part of DP_TE_CUSTOMFLASH*/
-void(vector org, optional float count) te_gunshot = #418; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_spike = #419; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_superspike = #420; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_explosion = #421; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_tarexplosion = #422; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_wizspike = #423; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_knightspike = #424; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_lavasplash = #425; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org) te_teleport = #426; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(vector org, float color, float colorlength) te_explosion2 = #427; /* Part of DP_TE_STANDARDEFFECTBUILTINS*/
-void(entity own, vector start, vector end) te_lightning1 = #428; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(entity own, vector start, vector end) te_lightning2 = #429; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(entity own, vector start, vector end) te_lightning3 = #430; /* Part of DP_TE_STANDARDEFFECTBUILTINS, FTE_TE_STANDARDEFFECTBUILTINS*/
-void(entity own, vector start, vector end) te_beam = #431; /* Part of DP_TE_STANDARDEFFECTBUILTINS*/
-void(vector dir) vectorvectors = #432; /* Part of DP_QC_VECTORVECTORS*/
-void(vector org) te_plasmaburn = #433; /* Part of _DP_TE_PLASMABURN*/
-float(entity e, float s) getsurfacenumpoints = #434; /* Part of DP_QC_GETSURFACE*/
-vector(entity e, float s, float n) getsurfacepoint = #435; /* Part of DP_QC_GETSURFACE*/
-vector(entity e, float s) getsurfacenormal = #436; /* Part of DP_QC_GETSURFACE*/
-string(entity e, float s) getsurfacetexture = #437; /* Part of DP_QC_GETSURFACE*/
-float(entity e, vector p) getsurfacenearpoint = #438; /* Part of DP_QC_GETSURFACE*/
-vector(entity e, float s, vector p) getsurfaceclippedpoint = #439; /* Part of DP_QC_GETSURFACE*/
-void(entity e, string s) clientcommand = #440; /* Part of KRIMZON_SV_PARSECLIENTCOMMAND*/
-float(string s) tokenize = #441; /* Part of KRIMZON_SV_PARSECLIENTCOMMAND*/
-string(float n) argv = #442; /* Part of KRIMZON_SV_PARSECLIENTCOMMAND*/
-void(entity e, entity tagentity, string tagname) setattachment = #443; /* Part of DP_GFX_QUAKE3MODELTAGS*/
-searchhandle(string pattern, float caseinsensitive, float quiet) search_begin = #444; /* Part of DP_QC_FS_SEARCH
-		initiate a filesystem scan based upon filenames. Be sure to call search_end on the returned handle. */
+entity copyentity(entity from, optional entity to) = #400; /* Copies all fields from one entity to another. */
 
-void(searchhandle handle) search_end = #445; /* Part of DP_QC_FS_SEARCH*/
-float(searchhandle handle) search_getsize = #446; /* Part of DP_QC_FS_SEARCH
-		Retrieves the number of files that were found. */
+void setcolors(entity ent, float colours) = #401; /* Sets player colors. */
 
-string(searchhandle handle, float num) search_getfilename = #447; /* Part of DP_QC_FS_SEARCH
-		Retrieves name of one of the files that was found by the initial search. */
+entity findchain(.string field, string match, optional .entity chainfield) = #402; 
 
-float(searchhandle handle, float num) search_getfilesize = #0:search_getfilesize; /* Part of FTE_QC_FS_SEARCH_SIZEMTIME
-		Retrieves the size of one of the files that was found by the initial search. */
+entity findchainfloat(.float fld, float match, optional .entity chainfield) = #403;
 
-string(searchhandle handle, float num) search_getfilemtime = #0:search_getfilemtime; /* Part of FTE_QC_FS_SEARCH_SIZEMTIME
-		Retrieves modification time of one of the files. */
+void effect(vector org, string modelname, float startframe, float endframe, float framerate) = #404; /* Spawns self-animating sprite. */
 
-string(string cvarname) cvar_string = #448; /* Part of DP_QC_CVAR_STRING*/
-entity(entity start, .float fld, float match) findflags = #449; /* Part of DP_QC_FINDFLAGS*/
-entity(.float fld, float match, optional .entity chainfield) findchainflags = #450; /* Part of DP_QC_FINDCHAINFLAGS*/
-float(entity ent, string tagname) gettagindex = #451; /* Part of DP_MD3_TAGSINFO*/
-vector(entity ent, float tagindex) gettaginfo = #452; /* Part of DP_MD3_TAGSINFO
-		Obtains the current worldspace position+orientation of the bone or tag from the given entity. The return value is the world coord, v_forward, v_right, v_up are also set according to the bone/tag's orientation. */
 
-void(entity player) dropclient = #453; /* Part of DP_SV_DROPCLIENT*/
-entity() spawnclient = #454; /* Part of DP_SV_BOTCLIENT*/
-float(entity client) clienttype = #455; /* Part of DP_SV_BOTCLIENT*/
-void(float target, string str) WriteUnterminatedString = #456; /* Part of DP_SV_WRITEUNTERMINATEDSTRING*/
-void(vector org, vector vel, float howmany) te_flamejet = #457; /* Part of _DP_TE_FLAMEJET*/
-entity(float entnum) edict_num = #459; /* Part of DP_QC_EDICT_NUM*/
-strbuf() buf_create = #460; /* Part of DP_QC_STRINGBUFFERS*/
-void(strbuf bufhandle) buf_del = #461; /* Part of DP_QC_STRINGBUFFERS*/
-float(strbuf bufhandle) buf_getsize = #462; /* Part of DP_QC_STRINGBUFFERS*/
-void(strbuf bufhandle_from, strbuf bufhandle_to) buf_copy = #463; /* Part of DP_QC_STRINGBUFFERS*/
-void(strbuf bufhandle, float sortprefixlen, float backward) buf_sort = #464; /* Part of DP_QC_STRINGBUFFERS*/
-string(strbuf bufhandle, string glue) buf_implode = #465; /* Part of DP_QC_STRINGBUFFERS*/
-string(strbuf bufhandle, float string_index) bufstr_get = #466; /* Part of DP_QC_STRINGBUFFERS*/
-void(strbuf bufhandle, float string_index, string str) bufstr_set = #467; /* Part of DP_QC_STRINGBUFFERS*/
-float(strbuf bufhandle, string str, float ordered) bufstr_add = #468; /* Part of DP_QC_STRINGBUFFERS*/
-void(strbuf bufhandle, float string_index) bufstr_free = #469; /* Part of DP_QC_STRINGBUFFERS*/
-float(float s) asin = #471; /* Part of DP_QC_ASINACOSATANATAN2TAN*/
-float(float c) acos = #472; /* Part of DP_QC_ASINACOSATANATAN2TAN*/
-float(float t) atan = #473; /* Part of DP_QC_ASINACOSATANATAN2TAN*/
-float(float c, float s) atan2 = #474; /* Part of DP_QC_ASINACOSATANATAN2TAN*/
-float(float a) tan = #475; /* Part of DP_QC_ASINACOSATANATAN2TAN
-		Forgive me father, for I have a sunbed and I'm not afraid to use it. */
-
-float(string s) strlennocol = #476; /* Part of DP_QC_STRINGCOLORFUNCTIONS
-		Returns the number of characters in the string after any colour codes or other markup has been parsed. */
-
-string(string s) strdecolorize = #477; /* Part of DP_QC_STRINGCOLORFUNCTIONS
-		Flattens any markup/colours, removing them from the string. */
-
-string(float uselocaltime, string format, ...) strftime = #478; /* Part of DP_QC_STRFTIME*/
-float(string s, string separator1, ...) tokenizebyseparator = #479; /* Part of DP_QC_TOKENIZEBYSEPARATOR*/
-string(string s) strtolower = #480; /* Part of DP_QC_STRING_CASE_FUNCTIONS*/
-string(string s) strtoupper = #481; /* Part of DP_QC_STRING_CASE_FUNCTIONS*/
-string(string s) cvar_defstring = #482; /* Part of DP_QC_CVAR_DEFSTRING*/
-void(vector origin, string sample, float volume, float attenuation) pointsound = #483; /* Part of DP_SV_POINTSOUND*/
-string(string search, string replace, string subject) strreplace = #484; /* Part of DP_QC_STRREPLACE*/
-string(string search, string replace, string subject) strireplace = #485; /* Part of DP_QC_STRREPLACE*/
-vector(entity e, float s, float n, float a) getsurfacepointattribute = #486; /* Part of DP_QC_GETSURFACEPOINTATTRIBUTE*/
-float(float caseinsensitive, string s, ...) crc16 = #494; /* Part of DP_QC_CRC16*/
-float(string name) cvar_type = #495; /* Part of DP_QC_CVAR_TYPE*/
-float() numentityfields = #496; /* Part of DP_QC_ENTITYDATA
-		Gives the number of named entity fields. Note that this is not the size of an entity, but rather just the number of unique names (ie: vectors use 4 names rather than 3). */
-
-float(string fieldname) findentityfield = #0:findentityfield; /*
-		Find a field index by name. */
-
+void te_blood(vector org, vector dir, float count) = #405; /* DP_TE_BLOOD */
+void te_bloodshower(vector mincorner, vector maxcorner, float explosionspeed, float howmany) = #406; /* _DP_TE_BLOODSHOWER */
+void te_explosionrgb(vector org, vector color) = #407; /* DP_TE_EXPLOSIONRGB */
+void te_particlecube(vector mincorner, vector maxcorner, vector vel, float howmany, float color, float gravityflag, float randomveljitter) = #408; /* DP_TE_PARTICLECUBE */
+void te_particlerain(vector mincorner, vector maxcorner, vector vel, float howmany, float color) = #409; /* DP_TE_PARTICLERAIN */
+void te_particlesnow(vector mincorner, vector maxcorner, vector vel, float howmany, float color) = #410; /* DP_TE_PARTICLESNOW */
+void te_spark(vector org, vector vel, float howmany) = #411; /* DP_TE_SPARK */
+void te_gunshotquad(vector org) = #412; /* _DP_TE_QUADEFFECTS1 */
+void te_spikequad(vector org) = #413; /* _DP_TE_QUADEFFECTS1 */
+void te_superspikequad(vector org) = #414; /* _DP_TE_QUADEFFECTS1 */
+void te_explosionquad(vector org) = #415; /* _DP_TE_QUADEFFECTS1 */
+void te_smallflash(vector org) = #416; /* DP_TE_SMALLFLASH */
+void te_customflash(vector org, float radius, float lifetime, vector color) = #417; /* DP_TE_CUSTOMFLASH */
+void te_gunshot(vector org, optional float count) = #418; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_spike(vector org) = #419; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_superspike(vector org) = #420; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_explosion(vector org) = #421; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_tarexplosion(vector org) = #422; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_wizspike(vector org) = #423; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_knightspike(vector org) = #424; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_lavasplash(vector org) = #425; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_teleport(vector org) = #426; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_explosion2(vector org, float color, float colorlength) = #427; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_lightning1(entity own, vector start, vector end) = #428; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_lightning2(entity own, vector start, vector end) = #429; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_lightning3(entity own, vector start, vector end) = #430; /* DP_TE_STANDARDEFFECTBUILTINS */
+void te_beam(entity own, vector start, vector end) = #431; /* DP_TE_STANDARDEFFECTBUILTINS */
+void vectorvectors(vector dir) = #432; /* DP_QC_VECTORVECTORS */
+void te_plasmaburn(vector org) = #433; /* _DP_TE_PLASMABURN */
+float getsurfacenumpoints(entity e, float s) = #434; /* DP_QC_GETSURFACE */
+vector getsurfacepoint(entity e, float s, float n) = #435; /* DP_QC_GETSURFACE */
+vector getsurfacenormal(entity e, float s) = #436; /* DP_QC_GETSURFACE */
+string getsurfacetexture(entity e, float s) = #437; /* DP_QC_GETSURFACE */
+float getsurfacenearpoint(entity e, vector p) = #438; /* DP_QC_GETSURFACE */
+vector getsurfaceclippedpoint(entity e, float s, vector p) = #439; /* DP_QC_GETSURFACE */
+void clientcommand(entity e, string s) = #440; /* KRIMZON_SV_PARSECLIENTCOMMAND */
+float tokenize(string s) = #441; /* KRIMZON_SV_PARSECLIENTCOMMAND */
+string argv(float n) = #442; /* KRIMZON_SV_PARSECLIENTCOMMAND */
+void setattachment(entity e, entity tagentity, string tagname) = #443; /* DP_GFX_QUAKE3MODELTAGS */
+searchhandle search_begin(string pattern, float caseinsensitive, float quiet) = #444; /* DP_QC_FS_SEARCH */
+void search_end(searchhandle handle) = #445; /* DP_QC_FS_SEARCH */
+float search_getsize(searchhandle handle) = #446; /* DP_QC_FS_SEARCH */
+string search_getfilename(searchhandle handle, float num) = #447; /* DP_QC_FS_SEARCH */
+float search_getfilesize(searchhandle handle, float num) = #0:search_getfilesize; /* FTE_QC_FS_SEARCH_SIZEMTIME */
+string search_getfilemtime(searchhandle handle, float num) = #0:search_getfilemtime; /* FTE_QC_FS_SEARCH_SIZEMTIME */
+string cvar_string(string cvarname) = #448; /* DP_QC_CVAR_STRING */
+entity findflags(entity start, .float fld, float match) = #449; /* DP_QC_FINDFLAGS */
+entity findchainflags(.float fld, float match, optional .entity chainfield) = #450; /* DP_QC_FINDCHAINFLAGS */
+float gettagindex(entity ent, string tagname) = #451; /* DP_MD3_TAGSINFO */
+vector gettaginfo(entity ent, float tagindex) = #452; /* DP_MD3_TAGSINFO */
+void dropclient(entity player) = #453; /* DP_SV_DROPCLIENT */
+entity spawnclient() = #454; /* DP_SV_BOTCLIENT */
+float clienttype(entity client) = #455; /* DP_SV_BOTCLIENT */
+void WriteUnterminatedString(float target, string str) = #456; /* DP_SV_WRITEUNTERMINATEDSTRING */
+void te_flamejet(vector org, vector vel, float howmany) = #457; /* _DP_TE_FLAMEJET */
+entity edict_num(float entnum) = #459; /* DP_QC_EDICT_NUM */
+strbuf buf_create() = #460; /* DP_QC_STRINGBUFFERS */
+void buf_del(strbuf bufhandle) = #461; /* DP_QC_STRINGBUFFERS */
+float buf_getsize(strbuf bufhandle) = #462; /* DP_QC_STRINGBUFFERS */
+void buf_copy(strbuf bufhandle_from, strbuf bufhandle_to) = #463; /* DP_QC_STRINGBUFFERS */
+void buf_sort(strbuf bufhandle, float sortprefixlen, float backward) = #464; /* DP_QC_STRINGBUFFERS */
+string buf_implode(strbuf bufhandle, string glue) = #465; /* DP_QC_STRINGBUFFERS */
+string bufstr_get(strbuf bufhandle, float string_index) = #466; /* DP_QC_STRINGBUFFERS */
+void bufstr_set(strbuf bufhandle, float string_index, string str) = #467; /* DP_QC_STRINGBUFFERS */
+float bufstr_add(strbuf bufhandle, string str, float ordered) = #468; /* DP_QC_STRINGBUFFERS */
+void bufstr_free(strbuf bufhandle, float string_index) = #469; /* DP_QC_STRINGBUFFERS */
+float asin(float s) = #471; /* DP_QC_ASINACOSATANATAN2TAN */
+float acos(float c) = #472; /* DP_QC_ASINACOSATANATAN2TAN */
+float atan(float t) = #473; /* DP_QC_ASINACOSATANATAN2TAN */
+float atan2(float c, float s) = #474; /* DP_QC_ASINACOSATANATAN2TAN */
+float tan(float a) = #475; /* DP_QC_ASINACOSATANATAN2TAN */
+float strlennocol(string s) = #476; /* DP_QC_STRINGCOLORFUNCTIONS */
+string strdecolorize(string s) = #477; /* DP_QC_STRINGCOLORFUNCTIONS */
+string strftime(float uselocaltime, string format, ...) = #478; /* DP_QC_STRFTIME */
+float tokenizebyseparator(string s, string separator1, ...) = #479; /* DP_QC_TOKENIZEBYSEPARATOR */
+string strtolower(string s) = #480; /* DP_QC_STRING_CASE_FUNCTIONS */
+string strtoupper(string s) = #481; /* DP_QC_STRING_CASE_FUNCTIONS */
+string cvar_defstring(string s) = #482; /* DP_QC_CVAR_DEFSTRING */
+void pointsound(vector origin, string sample, float volume, float attenuation) = #483; /* DP_SV_POINTSOUND */
+string strreplace(string search, string replace, string subject) = #484; /* DP_QC_STRREPLACE */
+string strireplace(string search, string replace, string subject) = #485; /* DP_QC_STRREPLACE */
+vector getsurfacepointattribute(entity e, float s, float n, float a) = #486; /* DP_QC_GETSURFACEPOINTATTRIBUTE */
+float crc16(float caseinsensitive, string s, ...) = #494; /* DP_QC_CRC16 */
+float cvar_type(string name) = #495; /* DP_QC_CVAR_TYPE */
+float numentityfields() = #496; /* DP_QC_ENTITYDATA */
+float findentityfield(string fieldname) = #0:findentityfield; 
 typedef .__variant field_t;
-field_t(float fieldnum) entityfieldref = #0:entityfieldref; /*
-		Returns a field value that can be directly used to read entity fields. Be sure to validate the type with entityfieldtype before using. */
-
-string(float fieldnum) entityfieldname = #497; /* Part of DP_QC_ENTITYDATA
-		Retrieves the name of the given entity field. */
-
-float(float fieldnum) entityfieldtype = #498; /* Part of DP_QC_ENTITYDATA
-		Provides information about the type of the field specified by the field num. Returns one of the EV_ values. */
-
-string(float fieldnum, entity ent) getentityfieldstring = #499; /* Part of DP_QC_ENTITYDATA*/
-float(float fieldnum, entity ent, string s) putentityfieldstring = #500; /* Part of DP_QC_ENTITYDATA*/
-void(float to, string s, float sz) WritePicture = #501; /* Part of DP_SV_WRITEPICTURE
-		Encodes the named image across the network as-is adhering to some size limit. In FTE, this simply writes the string and is equivelent to writestring and sz is ignored. WritePicture should be paired with ReadPicture in csqc. */
-
-string(string filename, optional float makereferenced) whichpack = #503; /* Part of DP_QC_WHICHPACK
-		Returns the pak file name that contains the file specified. progs/player.mdl will generally return something like 'pak0.pak'. If makereferenced is true, clients will automatically be told that the returned package should be pre-downloaded and used, even if allow_download_refpackages is not set. */
-
-string(string in) uri_escape = #510; /* Part of DP_QC_URI_ESCAPE*/
-string(string in) uri_unescape = #511; /* Part of DP_QC_URI_ESCAPE*/
-float(entity ent) num_for_edict = #512;
+field_t entityfieldref(float fieldnum) = #0:entityfieldref;
+string entityfieldname(float fieldnum) = #497; /* DP_QC_ENTITYDATA */
+float entityfieldtype(float fieldnum) = #498; /* DP_QC_ENTITYDATA */
+string getentityfieldstring(float fieldnum, entity ent) = #499; /* DP_QC_ENTITYDATA */
+float putentityfieldstring(float fieldnum, entity ent, string s) = #500; /* DP_QC_ENTITYDATA */
+void WritePicture(float to, string s, float sz) = #501; /* DP_SV_WRITEPICTURE */
+string whichpack(string filename, optional float makereferenced) = #503; /* DP_QC_WHICHPACK */
+string uri_escape(string in) = #510; /* DP_QC_URI_ESCAPE */
+string uri_unescape(string in) = #511; /* DP_QC_URI_ESCAPE */
+float num_for_edict(entity ent) = #512;
 #define uri_post uri_get
-float(string uril, float id, optional string postmimetype, optional string postdata) uri_get = #513; /* Part of DP_QC_URI_GET, DP_QC_URI_POST
-		uri_get() gets content from an URL and calls a callback "uri_get_callback" with it set as string; an unique ID of the transfer is returned
-		returns 1 on success, and then calls the callback with the ID, 0 or the HTTP status code, and the received data in a string
-		For a POST request, you will typically want the postmimetype set to application/x-www-form-urlencoded.
-		For a GET request, omit the mime+data entirely.
-		Consult your webserver/php/etc documentation for best-practise. */
+float uri_get(string uril, float id, optional string postmimetype, optional string postdata) = #513; /* DP_QC_URI_GET/POST */
+float tokenize_console(string str) = #514; 
+float argv_start_index(float idx) = #515;
+float argv_end_index(float idx) = #516;
+void buf_cvarlist(strbuf strbuf, string pattern, string antipattern) = #517;
+string cvar_description(string cvarname) = #518;
+float gettime(optional float timetype) = #519;
+void loadfromdata(string s) = #529;
+void loadfromfile(string s) = #530;
+void setpause(float pause) = #531;
+float precache_vwep_model(string mname) = #532;
+float log(float v, optional float base) = #532;
+float buf_loadfile(string filename, strbuf bufhandle) = #535;
+float buf_writefile(filestream filehandle, strbuf bufhandle, optional float startpos, optional float numstrings) = #536;
+float physics_supported(optional float force) = #0:physics_supported;
+void physics_enable(entity e, float physics_enabled) = #540;
+void physics_addforce(entity e, vector force, vector relative_ofs) = #541;
+void physics_addtorque(entity e, vector torque) = #542;
+void callfunction(.../*, string funcname*/) = #605;
+void writetofile(filestream fh, entity e) = #606;
+float isfunction(string s) = #607;
+float parseentitydata(entity e, string s, optional float offset) = #613;
+string generateentitydata(entity e) = #0:generateentitydata;
+string netaddress_resolve(string dnsname, optional float defport) = #625;
+string sprintf(string fmt, ...) = #627;
+float getsurfacenumtriangles(entity e, float s) = #628;
+vector getsurfacetriangle(entity e, float s, float n) = #629;
+string digest_hex(string digest, string data, ...) = #639;
 
-float(string str) tokenize_console = #514; /*
-		Tokenize a string exactly as the console's tokenizer would do so. The regular tokenize builtin became bastardized for convienient string parsing, which resulted in a large disparity that can be exploited to bypass checks implemented in a naive SV_ParseClientCommand function, therefore you can use this builtin to make sure it exactly matches. */
-
-float(float idx) argv_start_index = #515; /*
-		Returns the character index that the tokenized arg started at. */
-
-float(float idx) argv_end_index = #516; /*
-		Returns the character index that the tokenized arg stopped at. */
-
-void(strbuf strbuf, string pattern, string antipattern) buf_cvarlist = #517;
-string(string cvarname) cvar_description = #518; /*
-		Retrieves the description of a cvar, which might be useful for tooltips or help files. This may still not be useful. */
-
-float(optional float timetype) gettime = #519;
-void(string s) loadfromdata = #529; /*
-		Reads a set of entities from the given string. This string should have the same format as a .ent file or a saved game. Entities will be spawned as required. If you need to see the entities that were created, you should use parseentitydata instead. */
-
-void(string s) loadfromfile = #530; /*
-		Reads a set of entities from the named file. This file should have the same format as a .ent file or a saved game. Entities will be spawned as required. If you need to see the entities that were created, you should use parseentitydata instead. */
-
-void(float pause) setpause = #531; /*
-		Sets whether the server should or should not be paused. This does not affect auto-paused things like when the console is down. */
-
-float(string mname) precache_vwep_model = #532; /* Part of ZQ_VWEP*/
-float(float v, optional float base) log = #532; /* Part of ??MVDSV_BUILTINS
-		Determines the logarithm of the input value according to the specified base. This can be used to calculate how much something was shifted by. */
-
-float(string filename, strbuf bufhandle) buf_loadfile = #535; /*
-		Appends the named file into a string buffer (which must have been created in advance). The return value merely says whether the file was readable. */
-
-float(filestream filehandle, strbuf bufhandle, optional float startpos, optional float numstrings) buf_writefile = #536; /*
-		Writes the contents of a string buffer onto the end of the supplied filehandle (you must have already used fopen). Additional optional arguments permit you to constrain the writes to a subsection of the stringbuffer. */
-
-float(optional float force) physics_supported = #0:physics_supported; /*
-		Queries whether rigid body physics is enabled or not. CSQC and SSQC may report different values. If the force argument is used then the engine will try to activate or release physics (returning the new state, which may fail if plugins or dlls are missing). Note that restarting the physics engine is likely to result in hitches when collision trees get generated. The state may change if a plugin is disabled mid-map. */
-
-void(entity e, float physics_enabled) physics_enable = #540; /*
-		Enable or disable the physics attached to a MOVETYPE_PHYSICS entity. Entities which have been disabled in this way will stop taking so much cpu time. */
-
-void(entity e, vector force, vector relative_ofs) physics_addforce = #541; /*
-		Apply some impulse directional force upon a MOVETYPE_PHYSICS entity. */
-
-void(entity e, vector torque) physics_addtorque = #542; /*
-		Apply some impulse rotational force upon a MOVETYPE_PHYSICS entity. */
-
-void(.../*, string funcname*/) callfunction = #605; /*
-		Invokes the named function. The function name is always passed as the last parameter and must always be present. The others are passed to the named function as-is */
-
-void(filestream fh, entity e) writetofile = #606; /*
-		Writes an entity's fields to the named frik_file file handle. */
-
-float(string s) isfunction = #607; /*
-		Returns true if the named function exists and can be called with the callfunction builtin. */
-
-float(entity e, string s, optional float offset) parseentitydata = #613; /*
-		Reads a single entity's fields into an already-spawned entity. s should contain field pairs like in a saved game: {"foo1" "bar" "foo2" "5"}. Returns <=0 on failure, otherwise returns the offset in the string that was read to. */
-
-string(entity e) generateentitydata = #0:generateentitydata; /*
-		Dumps the entities fields into a string which can later be parsed with parseentitydata. */
-
-string(string dnsname, optional float defport) netaddress_resolve = #625;
-string(string fmt, ...) sprintf = #627; /* Part of DP_QC_SPRINTF*/
-float(entity e, float s) getsurfacenumtriangles = #628;
-vector(entity e, float s, float n) getsurfacetriangle = #629;
-string(string digest, string data, ...) digest_hex = #639;
 #ifdef _ACCESSORS
 accessor strbuf : float
 {

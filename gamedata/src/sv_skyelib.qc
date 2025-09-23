@@ -17,7 +17,7 @@ enum PLAYER_STATE {
 .PLAYER_STATE state;
 
 float delta(){ 
-    if (self.last_time == 0) return;
+    if (self.last_time == 0) return 0.0;
     float dt = time - self.last_time;
     self.last_time = time;
     // On first call last_time=0 so dt will be large, so clamp it:
