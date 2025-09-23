@@ -75,7 +75,6 @@ vector GetSpawnPoint()
 {
 	entity spawnpoint = world;
 	spawnpoint = find(spawnpoint, classname, "info_player_start");
-
 	return spawnpoint.origin + '0 0 1';
 };
 
@@ -86,10 +85,8 @@ Handles the player's jump action based on button input.
 */
 void Player_HandleJump() 
 {
-	if(self.button2)
-		PlayerJump();
-	else
-		self.flags = self.flags | FL_JUMPRELEASED;
+	if(self.button2) PlayerJump();
+	else self.flags = self.flags | FL_JUMPRELEASED;
 }
 
 
@@ -299,10 +296,12 @@ Pre-Update function for the player.
 */
 void PlayerPreThink()
 {	
-	
+	// if (IsMoving(self)) 
+	// 	self.SendFlags |= SENDFLAGS_ORIGIN; 
+
 	if (VectorLength(self.velocity) > 0.1)
 		self.SendFlags |= SENDFLAGS_ORIGIN;
-	
+
 	self.SendFlags |= SENDFLAGS_ANGLES;
 
 	CheckImpulses();
@@ -474,9 +473,6 @@ void SV_ParseClientCommand(string command_string)
 		case "mp":
 			print("foo");
 		break;
-		// case "reload":
-		// 	print("foooooo");
-		// break;
 		default: break;
 	}
 };

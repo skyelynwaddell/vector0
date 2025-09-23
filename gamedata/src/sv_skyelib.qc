@@ -24,8 +24,18 @@ float delta(){
     if (dt > 0.1) dt = 0.16; // clamp to ~1 frame (16ms) to avoid big jumps
     if (dt < 0) dt = 0.16;  // clamp negatives too
     return dt;
-
 };
+
+
+/*
+IsMoving
+Returns true if the entity provided is currently moving
+*/
+int IsMoving(entity ent_to_check_is_moving)
+{
+	return VectorLength(ent_to_check_is_moving.velocity) > 0.1;
+}
+
 
 // --- STATS ---
 const float STAT_MAXHEALTH    = 32;   // self.max_health

@@ -1,5 +1,5 @@
 25000
-_______________________________________2025-09-04_04:27:46
+hellooo_world__________________________2025-09-22_17:23:40
 1
 Player Name
 {
@@ -69,7 +69,7 @@ Player Name
 	parm63 0x0 //0
 	parm_string ""
 }
-\maxclients\10\maxspectators\8\hostname\unnamed\minpitch\-90\maxpitch\90\pm_airstep\1\coop\0\mapname\de_dust2\skill\1\map\de_dust2
+\maxclients\10\maxspectators\8\hostname\unnamed\minpitch\-90\maxpitch\90\pm_airstep\1\coop\0\mapname\test2\skill\1\map\test2
 
 {
 skill			"1"
@@ -95,5 +95,5 @@ set nextserver		""
 }
 {
 }
-de_dust2
+test2
 0

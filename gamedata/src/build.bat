@@ -5,7 +5,7 @@ pushd %~dp0
 echo.
 choice /M "Run the game?"
 if errorlevel 2 goto skip
-"..\..\fteqw64.exe" -basedir ..\..\
+"..\..\vector0.exe" -basedir ..\..\
 
 :skip
 popd

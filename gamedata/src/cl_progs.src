@@ -4,6 +4,7 @@ defs.qc
 globals.qc
 sh_customdefs.qc
 cl_skyelib.qc
+ws.qc
 sui_sys.qc
 cl_viewmodel.qc
 cl_weaponentity.qc

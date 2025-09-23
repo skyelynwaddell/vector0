@@ -5,6 +5,7 @@ Client Side Quake C Init Func
 noref void CSQC_Init(float apiver, string enginename, float enginever)
 {
 	PrecacheEverything();
+	WS_Connect();
 };
 
 
@@ -39,8 +40,6 @@ noref void CSQC_WorldLoaded() =
 
 };
 
-
-
 /*
 PlayerPredraw
 Called before Update event
@@ -48,7 +47,8 @@ Put Server Side Updates in here...
 */
 float PlayerPredraw()
 {
-	if (!self || self == world) return false;
+	if (!self || self == world) return true;
+	if (self == 0) return true;
 
 	int isme = self.entnum == player_localentnum;
 
@@ -68,19 +68,29 @@ float PlayerPredraw()
 	ammo_count = getstati(STAT_CURRENTAMMO);
 
 	// This is me
-	 if (isme)
-	 {
-		// We are alive
-		if (health >= 1)
-			self.viewmodel.Animate(frametime);
-		
-		// We are dead
+	if (isme)
+	{
+		// We have a viewmodel , we are probably a player
+		if (self.viewmodel)
+		{
+			// We are alive
+			if (health >= 1)
+			{
+				self.viewmodel.Animate(frametime);
+			}
+			// We are dead
+			else
+			{
+				if (self.viewmodel.modelindex != VIEWMODEL_NONE)
+				{
+					self.viewmodel.ChangeViewModel(VIEWMODEL_NONE);
+				}
+			}
+		}
+		// We have NO viewmodel , we are probably a spectator
 		else
 		{
-			if (self.viewmodel.modelindex != VIEWMODEL_NONE)
-			{
-				self.viewmodel.ChangeViewModel(VIEWMODEL_NONE);
-			}
+			return true;
 		}
 	} 
 
@@ -205,8 +215,6 @@ noref void CSQC_Ent_Update(float isnew)
 	/*=================================
 	PLAYER END
 	//=================================*/
-
-
 	default: error("ERROR in CSQC_Ent_Update: Misaligned bytes or unknown Entity type. Make sure you are reading all bytes you sent from the server in the correct order. Try running csqcdebug 1");
 	}
 };
@@ -220,6 +228,8 @@ Called EVERY game TICK!
 void CSQC_UpdateView(float width, float height, float menushown)
 {
 	if (!self || self == world) return;
+	
+	WS_Update(); // Call to receive messages from websocket server
 
 	//clear and update our global screen resolution vars
 	clearscene();
@@ -236,13 +246,13 @@ void CSQC_UpdateView(float width, float height, float menushown)
 	camang = getproperty(VF_ANGLES);
 
 	entity csqcplayer = findfloat(world, entnum, player_localentnum);
-	if (csqcplayer != world)
+	if (csqcplayer && csqcplayer != world)
 	{
 		vector view_ofs = {0};
 		view_ofs.z = health > 0 ? getstatf(STAT_VIEWHEIGHT) : VIEWHEIGHT_ELIMINATED;
 		setviewprop(VF_ORIGIN, csqcplayer.origin + view_ofs);
 	
-		if (csqcplayer.viewmodel.debug_mode == false)
+		if (csqcplayer.viewmodel && csqcplayer.viewmodel.debug_mode == false)
 			csqcplayer.viewmodel.UpdateBobbing(csqcplayer, frametime);
 	
 		//autoadd entities received from servers for drawing	
@@ -267,18 +277,23 @@ float CSQC_ConsoleCommand(string cmd)
 	{
 		case "viewmodel_debug":
 			entity csqcplayer = findfloat(world, entnum, player_localentnum);
+			if (!csqcplayer || !csqcplayer.viewmodel)
+			{
+				print("Cannot toggle viewmodel debug: viewmodel is NULL\n");
+				return TRUE;
+			}
 			if (csqcplayer.viewmodel.debug_mode == true)
 			{
 				csqcplayer.viewmodel.debug_mode = false;
-				print("Viewmodel Debug Mode Disabled");
+				print("Viewmodel Debug Mode Disabled\n");
 			}
 			else
 			{
 				csqcplayer.viewmodel.debug_mode = true;
-				print("Viewmodel Debug Mode Enabled");
+				print("Viewmodel Debug Mode Enabled\n");
 			}
-
 		break;
+
 
 		default:
 			return FALSE;
@@ -299,6 +314,7 @@ float CSQC_InputEvent(float evtype, float scanx, float chary, float devid)
 	{
 	case IE_KEYDOWN:
 	
+		if (!self || !self.viewmodel) return false;
 		if (self.viewmodel.debug_mode == false) return false;
 
 		switch (scanx)

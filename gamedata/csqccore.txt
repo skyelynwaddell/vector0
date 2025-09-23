@@ -1,6 +1,6 @@
 general {
 "maxprogs" "64"
-"numentities" "5"
+"numentities" "3"
 }
 progs 0 {
 "filename" "csprogs.dat"
@@ -8,26 +8,31 @@ progs 0 {
 }
 stacktrace {
 //0 csprogs.dat
+	"0:PlayerPredraw" //cl_main.qc
+	{
+		"isme"	"1"
+		ofs5868 1 // 0.000000
+	}
 	"0:CSQC_UpdateView" //cl_main.qc
 	{
-		"width"	"512"
-		"height"	"384"
-		"menushown"	"1"
-		"csqcplayer" "entity 1"
-		"view_ofs"	"'0 0 3'"
-		ofs5885 1077936128 // 3.000000
-		ofs5886 3 // 0.000000
+		"width"	"0"
+		"height"	"0"
+		"menushown"	"0"
+		"csqcplayer" "entity 0"
+		"view_ofs"	"'0 0 0'"
+		ofs5885 0 // 0.000000
+		ofs5886 0 // 0.000000
 	}
 }
 globals 0 {
 "self" "0"
 "other" "0"
 "world" "0"
-"time" "25.493042"
-"cltime" "0.249066"
+"time" "13.676043"
+"cltime" "0.233124"
 "frametime" "0.100000"
 "player_localentnum" "1"
-"player_localnum" "4"
+"player_localnum" "1"
 "maxclients" "10"
 "clientcommandframe" "5"
 "servercommandframe" "4"
@@ -46,7 +51,7 @@ globals 0 {
 "trace_ent" "0"
 "trace_inopen" "0"
 "trace_inwater" "0"
-"input_timelength" "0.023000"
+"input_timelength" "0.009000"
 "input_angles" "0 0 0"
 "input_movevalues" "0 0 0"
 "input_buttons" "512"
@@ -2934,8 +2939,9 @@ entity 0{
 }
 entity 1{
 "modelindex" "3"
-"absmin" "-120.646 -4.48875 -23.8019"
-"absmax" "121.696 252.077 43.4425"
+"absmin" "-107.839 -59.9385 -19.7941"
+"absmax" "134.503 196.628 47.4504"
+"origin" "12.8077 -55.4497 4.00781"
 "model" "models/monster_shotgunner/monster_shotgunner_nowep.glb"
 "frame" "12"
 "mins" "-119.646 -3.48875 -22.8019"
@@ -2947,7 +2953,7 @@ entity 1{
 "entnum" "1"
 "drawmask" "1"
 "predraw" "0:PlayerPredraw"
-"oldangles" "-1.83655 80.3101 0"
+"oldangles" "-2.82349 63.7042 0"
 "model_body_state" "1"
 "body_anim" "1"
 "anim_time" "5"
@@ -2967,55 +2973,6 @@ entity 2{
 "dimension_solid" "255"
 "dimension_hit" "255"
 "tag_entity" "1"
-"tag_index" "19"
-"drawflags" "96"
-"drawmask" "1"
-"predraw" "0:WeaponEntity::WeaponPredraw"
-"::integer[0]" "1"
-"CViewModel::__mcurrent_viewmodel" "1"
-"WeaponEntity::__mtype" "1"
-"::function[0]" "0:WeaponEntity::ChangeWeapon"
-"CViewModel::__mAnimate" "0:WeaponEntity::ChangeWeapon"
-"WeaponEntity::__mChangeWeapon" "0:WeaponEntity::ChangeWeapon"
-"::function[1]" "0:WeaponEntity::WeaponPredraw"
-"CViewModel::__mSetFrame" "0:WeaponEntity::WeaponPredraw"
-"WeaponEntity::__mWeaponPredraw" "0:WeaponEntity::WeaponPredraw"
-}
-entity 3{
-"modelindex" "3"
-"absmin" "-120.646 -4.48875 -23.8019"
-"absmax" "121.696 252.077 43.4425"
-"model" "models/monster_shotgunner/monster_shotgunner_nowep.glb"
-"frame" "12"
-"mins" "-119.646 -3.48875 -22.8019"
-"maxs" "120.696 251.077 42.4425"
-"size" "240.342 254.566 65.2444"
-"dimension_solid" "255"
-"dimension_hit" "255"
-"drawflags" "96"
-"entnum" "4"
-"drawmask" "1"
-"predraw" "0:PlayerPredraw"
-"oldangles" "0 0 0"
-"model_body_state" "1"
-"body_anim" "1"
-"anim_time" "5"
-"weapon_ent" "4"
-}
-entity 4{
-"modelindex" "-2"
-"absmin" "-2.43738 -8.71009 -5.72106"
-"absmax" "2.40799 7.25947 14.6734"
-"movetype" "8"
-"classname" "WeaponEntity"
-"model" "models/9mm/9mm.glb"
-"mins" "-1.43738 -7.71009 -4.72106"
-"maxs" "1.40799 6.25947 13.6734"
-"size" "2.84537 13.9696 18.3944"
-"owner" "3"
-"dimension_solid" "255"
-"dimension_hit" "255"
-"tag_entity" "3"
 "tag_index" "19"
 "drawflags" "96"
 "drawmask" "1"

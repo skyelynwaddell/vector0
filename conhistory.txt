@@ -138,3 +138,83 @@ con
 go
 spectator 1
 observe localhost
+con
+observe localhost
+map surf_utopia
+map surf_utopia
+map surf_utopia
+map surf_utopia
+map de_dust2
+go
+go
+go
+con
+con
+go
+con
+go
+go
+go
+go
+con
+go
+go
+go
+go
+go
+gp
+go
+go
+r_renderscale 0.25
+r_renderscale -.50
+r_renderscale -.25
+r_renderscale -100
+ 
+r_renderscale -10
+r_renderscale -1
+r_renderscale -2
+go
+go
+observe 
+observe 1
+go
+sv_cheats 1
+r_showbboxes 1
+go
+go
+r_showbboxes 1
+go
+cl_addport 2997
+cl_http_enable 
+cl_net_enable
+cl_allowdownload 1
+cl_net_enable
+set_mode -1
+net_enabled 1
+net_enable_websockets 1
+go
+net_enable_websockets
+net_enable_tls
+net_enable_dtls 1
+go
+sv_port 2997
+go
+sv_port
+go
+/map de_dust2 
+cpm
+con
+go
+con
+go
+go
+con
+con
+go
+go
+con
+con
+con
+go
+con
+go
