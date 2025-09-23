@@ -390,7 +390,6 @@ float MySendEntity(entity playerent, float changedflags)
 	if (changedflags & SENDFLAGS_MODELINDEX)
 		WriteShort(MSG_ENTITY, self.modelindex);
 
-	playerent.SendFlags = 0;
 	return true;
 };
 
@@ -419,7 +418,6 @@ void PlayerSpawn()
 	PlayerSetAmmo();
 
 	self.SendEntity = MySendEntity;
-	self.SendFlags = 0;
 	self.SendFlags = SENDFLAGS_ORIGIN | SENDFLAGS_MODELINDEX;
 };
 

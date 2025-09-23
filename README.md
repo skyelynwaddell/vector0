@@ -1,5 +1,5 @@
 # ![Map Compile Settings](tbdata/qengine/icon.png) qengine
-3D Game Engine using FTEQW and the Quake Engine source code. <br>
+3D FPS Game using FTEQW QuakeWorld engine. <br>
 https://www.fteqw.org/ <br>
 https://github.com/fte-team/fteqw <br>
 https://github.com/shpuld/sui-qc <br>
