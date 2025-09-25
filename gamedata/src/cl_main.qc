@@ -6,6 +6,7 @@ noref void CSQC_Init(float apiver, string enginename, float enginever)
 {
 	PrecacheEverything();
 	WS_Connect();
+	SkinsInit();
 };
 
 
@@ -170,13 +171,30 @@ noref void CSQC_Ent_Update(float isnew)
 		{
 			if (isme)
 			{
-				if (!isnew) self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
+				if (!isnew) 
+				{
+					self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
+					localsound(viewmodels[self.viewmodel.current_viewmodel].sound_reload, CHAN_AUTO, 0.2);
+				}
 			}
 			else
 			{
 				if (self.body_anim != PLAYER_TOP_ANIM_RELOAD)
+				{
 					PlayerChangeAnim(PLAYER_TOP_ANIM_RELOAD);
+					sound(self, CHAN_AUTO, viewmodels[self.viewmodel.current_viewmodel].sound_shoot, 0.2, ATTN_NORM);
+				}
 			}
+		}
+
+		// Jump
+		if (flags & SENDFLAGS_JUMP)
+		{
+			// if (isme)
+			// 	localsound("sound/player/player_jump.ogg", CHAN_AUTO, 1);
+			// else
+			print("WHAT THE FUCK?!");
+			localsound("sound/player/player_jump.ogg", CHAN_AUTO, 1);
 		}
 
 		// Hit
@@ -194,13 +212,21 @@ noref void CSQC_Ent_Update(float isnew)
 		{
 			if (isme)
 			{
-				if (!isnew) self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
+				if (!isnew) 
+				{
+					self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
+					localsound(viewmodels[self.viewmodel.current_viewmodel].sound_shoot, CHAN_AUTO, 0.2);
+				}
 			}
 			else
 			{
 				if (self.body_anim != PLAYER_TOP_ANIM_SHOOT)
+				{
 					PlayerChangeAnim(PLAYER_TOP_ANIM_SHOOT);
+					sound(self, CHAN_AUTO, viewmodels[self.viewmodel.current_viewmodel].sound_shoot, 0.2, ATTN_NORM);
+				}
 			}
+			
 		}
 
 		// Model Index (Current Model's Animation)

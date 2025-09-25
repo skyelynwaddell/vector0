@@ -1,11 +1,11 @@
-// Game: qengine
+// Game: Vector0
 // Format: Valve
 // entity 0
 {
 "mapversion" "220"
 "classname" "worldspawn"
-"_tb_def" "external:/home/skye/github/qengine/tbdata/qengine/gamedata.fgd"
-"wad" "/home/skye/github/qengine/gamedata/maps/textures.wad"
+"_tb_def" "external:/home/skye/github/vector0/tbdata/vector0/gamedata.fgd"
+"wad" "/home/skye/github/vector0/gamedata/maps/textures.wad"
 "sky" "canyon_"
 "message" "hellooo world"
 // brush 0

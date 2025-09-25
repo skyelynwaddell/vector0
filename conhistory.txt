@@ -1,12 +1,38 @@
-
+cl
+cl_legacystains 
+cl_legacystains 0
+light_level
+/viewmodel_debug
+/viewmodel_debug
+modelviewer
+modelviewer models/arms_newpistol/arms_newpistol.glb
+modelviewer models/arms_newpistol/arms_newpistol.glb
+modelviewer models/arms_newpistol/arms_newpistol.glb
+/viewmodel_debug
+skill
+sound 
+modelviewer models/arms_newpistol/arms_newpistol.glb
+modelviewer models/arms_newpistol/arms_newpistol.glb
+/csqc_progname 
+mod_gltf_privatematerials 0
+modelviewer models/arms_newpistol/arms_newpistol.glb
+mod_gltf_privatematerials 1
+modelviewer models/arms_newpistol/arms_newpistol.glb
+/mod_gltf_privatematerials 0
+modelviewer models/arms_newpistol/arms_newpistol.glb
+modelviewer models/arms_newpistol/arms_newpistol.glb
+modelviewer models/arms_newpistol/arms_newpistol.glb ""
+modelviewer models/arms_newpistol/arms_newpistol.glb skins/camo_toxic.skin
+/modelviewer models/arms_pump/arms_pump.glb
+brightness
+brightness 0.1
+brightness 0.
+modelviewer models/arms_revolver/arms_revolver.glv
+modelviewer models/arms_revolver/arms_revolver.glb
+modelviewer models/arms_smg/arms_smg.glb
+modelviewer models/arms_smg/arms_smg.glb
+windows
 /map surf_utopia 
-
-/map surf_utopia 
-/map surf_utopia 
-/map surf_utopia 
-/map surf_utopia 
-/map surf_utopia 
-
 /map surf_utopia 
 /map surf_utopia 
 /map surf_utopia 
@@ -29,225 +55,54 @@
 /map surf_utopia 
 /map surf_utopia 
 /map surf_utopia 
-gl_overbright
-gl_overbright 0
-vid_renderer 
-vid_renderer  gl
-vid_restart
-vid_renderer  vk
-vid_restart
-vid_renderer  gl
-vid_restart
-gamma 0
-gamma 1
-gamma 0.4
-gamma 1
-brightness 
-brightness  1
-brightness  0
-brightness  -1
-brightness  0
-/d3d_hlsl 
-/d3d_hlsl 0
-contrast 
-contrast 0.5
-contrast 1
-go
-go
-go
-go
-go
-go
-go
-go
-con
-skipdl
-skipdl
-skipdl
-go
-go
-go
-csqc_debug
-con
-skipdl
-skipdl
-skipdl
-go
-go
-go
-go
-con
-skipdl
-skipdl
-skipdl
-go
-con
-skipdl
-skipdl
-go
-cl_bob 0.3
-go
-go
-go
-con
-con
-observe HOST
-go
-con
-go
-con
-con
-con
-go
-con
-observe host
-con
-observe
-observe
-go
-go
-con
-observe
-observe localhost
-go
-go
-con
-go
-con
-observe
-spectator 1; observe;
-observe localhost
-con
-observe
-go
-go
-go
-go
-go
-con
-go
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+spdevmap
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/cl_splitscreen 
+/cl_splitscreen  1
+/cl_splitscreen  TRU
+/cl_splitscreen  TRUE
+/cl_splitscreen  1
 spectator 1
-observe localhost
-go
-go
-go
-observe localhost
-go
-go
-con
-go
-spectator 1
-observe localhost
-con
-observe localhost
-map surf_utopia
-map surf_utopia
-map surf_utopia
-map surf_utopia
-map de_dust2
-go
-go
-go
-con
-con
-go
-con
-go
-go
-go
-go
-con
-go
-go
-go
-go
-go
-gp
-go
-go
-r_renderscale 0.25
-r_renderscale -.50
-r_renderscale -.25
-r_renderscale -100
- 
-r_renderscale -10
-r_renderscale -1
-r_renderscale -2
-go
-go
-observe 
-observe 1
-go
-sv_cheats 1
-r_showbboxes 1
-go
-go
-r_showbboxes 1
-go
-cl_addport 2997
-cl_http_enable 
-cl_net_enable
-cl_allowdownload 1
-cl_net_enable
-set_mode -1
-net_enabled 1
-net_enable_websockets 1
-go
-net_enable_websockets
-net_enable_tls
-net_enable_dtls 1
-go
-sv_port 2997
-go
-sv_port
-go
-/map de_dust2 
-cpm
-con
-go
-con
-go
-go
-con
-con
-go
-go
-con
-con
-con
-go
-con
-go
-con
-go
-con
-go
-con
-con
-go
-go
-viewmodel_debug
-viewmodel_debug 1
-cl_bob 10
-cl_bob 1
-cl_bob 0.5
-cl_bob 0.2
-cl_bob 0.2
-cl_bob 1
-cl_bob 0.5
-cl_bob 0.2
-cl_bob
-/viewmodel_debug
-/viewmodel_debug
-viewmodel_debug
-/viewmodel_debug
-/viewmodel_debug
-go
-go
-/modelviewer models/
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-/surf_debug 1
-r_showtris
-/modelviewer models/arms_newpistol/arms_newpistol.glb
-/modelviewer models/arms_newpistol/arms_newpistol.glb
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 
+/map surf_utopia 

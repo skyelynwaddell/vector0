@@ -120,9 +120,10 @@ the players location and moves them.
 */
 void HandleInputs(float ft)
 {
-	input_movevalues_x = bound(-350, input_movevalues_x, 350);
-	input_movevalues_y = bound(-350, input_movevalues_y, 350);
-	input_movevalues_z = bound(-350, input_movevalues_z, 350);
+	int max_input = 350;
+	input_movevalues_x = bound(-max_input, input_movevalues_x, max_input);
+	input_movevalues_y = bound(-max_input, input_movevalues_y, max_input);
+	input_movevalues_z = bound(-max_input, input_movevalues_z, max_input);
 };
 
 

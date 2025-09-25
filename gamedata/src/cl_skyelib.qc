@@ -81,12 +81,12 @@ typedef struct sViewModel {
     int anim_reload_length;
     int anim_finished;
     int automatic;
-    string material_names[MAX_SKINS];
-    string textures[MAX_SKINS];
+    string sound_shoot;
+    string sound_reload;
+    Skin skin;
     vector origin;
     vector angles;
     vector scale;
-    string skins[MAX_SKINS];
 } sViewModel;
 
 entity(float entnums) num_for_ent = 

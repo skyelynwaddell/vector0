@@ -16,7 +16,6 @@ const float VIEWMODEL_FPS = 24.0;
 .CViewModel viewmodel;
 sViewModel viewmodels[36];
 
-
 /*
 SetFrame
 Changes the current animation that is playing in a model.
@@ -51,6 +50,7 @@ void CViewModel::ChangeViewModel(int to)
     setsize(this, m.scale, m.scale);
     this.SetModelIndex(getmodelindex((string)m.model_index));
     this.SetFrame(m.anim_idle);
+    setcustomskin(this, m.skin.filepath);
 };
 
 /*
@@ -76,6 +76,10 @@ void CViewModel::CViewModel()
     m.origin = [72, 29, -93];
     m.angles = [-1, -218, 358];
     m.scale = [1, 1, 1];
+    m.skin = SKIN_TOXIC;
+
+    m.sound_shoot = "sound/weapons/pistol_shot.ogg";
+    m.sound_reload = "sound/weapons/pistol_reload.ogg";
 
     // === PUMP VIEWMODEL ===
     m = &viewmodels[WEAPON_PUMP];
@@ -92,6 +96,10 @@ void CViewModel::CViewModel()
     m.origin = [-35, -45, -108];
     m.angles = [-4, -163, 358];
     m.scale = [1, 1, 1];
+    m.skin = SKIN_TOXIC;
+
+    m.sound_shoot = "sound/weapons/shotgun.ogg";
+    m.sound_reload = "sound/weapons/shotgun_reload.ogg";
 
     // === REVOLVER VIEWMODEL ===
     m = &viewmodels[WEAPON_REVOLVER];
@@ -108,6 +116,10 @@ void CViewModel::CViewModel()
     m.origin = [-35, -8, -124];
     m.angles = [3, -174, 358];
     m.scale = [1, 1, 1];
+    m.skin = SKIN_TOXIC;
+
+    m.sound_shoot = "sound/weapons/revolver_shot.ogg";
+    m.sound_reload = "sound/weapons/revolver_reload.ogg";
 
     // === SMG VIEWMODEL ===
     m = &viewmodels[WEAPON_SMG];
@@ -124,6 +136,10 @@ void CViewModel::CViewModel()
     m.origin = [-35, 0, -105];
     m.angles = [3, -179, 358];
     m.scale = [1, 1, 1];
+    m.skin = SKIN_TOXIC;
+
+    m.sound_shoot = "sound/weapons/mp_shot.ogg";
+    m.sound_reload = "sound/weapons/mp_reload.ogg";
 
     // Init Global Viewmodel
     this.classname = "CViewModel";
@@ -132,13 +148,8 @@ void CViewModel::CViewModel()
     this.drawmask = MASK_VIEWMODEL;
     this.renderflags |= RF_VIEWMODEL | RF_DEPTHHACK;
     this.effects |= EF_NOSHADOW;
-
-    // void(entity e, string skinfilename, optional string skindata) setcustomskin = #376; /* Part of FTE_QC_CUSTOMSKINS
-	// 	Sets an entity's skin overrides to a new skin object. Releases the entities old skin (refcounted). */
-
-    setcustomskin(this, "models/arms_newpistol/arms_newpistol.skin");
+    
     this.SetFrame(m.anim_idle);
-
 };
 
 

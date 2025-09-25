@@ -2,21 +2,20 @@
 //	Main.qc - mostly functions that will be called from the engine and are expected to exist
 //
 
-void main() 
-{
-    
+void main() {};
+
+// Create Event
+void worldspawn()
+{	
+    precache_everything();
 };
 
-//called for each frame that QC runs
+// Update Event
 void StartFrame()
 {
     network_send_clientstats();
 };
 
-void worldspawn()
-{	
-	
-};
 
 void SpectatorConnect()
 {	

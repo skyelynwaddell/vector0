@@ -1,5 +1,6 @@
 ../csprogs.dat
 cl_defs.qc
+skins.qc
 defs.qc
 globals.qc
 sh_customdefs.qc

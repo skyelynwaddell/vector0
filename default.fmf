@@ -1,6 +1,6 @@
 FTEMANIFEST 1
 GAME mygame
 BASEGAME gamedata
-NAME "qengine"
+NAME "Vector0"
 DISABLEHOMEDIR 1
 MAINCONFIG "config.cfg"

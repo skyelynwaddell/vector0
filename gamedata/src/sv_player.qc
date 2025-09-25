@@ -21,12 +21,15 @@ Invokes the jump action for the player.
 */
 void PlayerJump()
 {
+	// make sure we are on the ground
 	if (!(self.flags & FL_ONGROUND))
 		return;
 
+	// make sure we have already released jumping
 	if ( !(self.flags & FL_JUMPRELEASED) )
 		return;
 	
+	sound(self, CHAN_AUTO, "sound/player/player_jump.ogg", 0.2, ATTN_NORM);
 	self.weaponframe = 0;
 	self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
 	self.button2 = 0;
@@ -206,7 +209,7 @@ shooter is: self
 */
 int Raycast()
 { 
-	int raycast_dist = 128;
+	int raycast_dist = 10000;
 	makevectors(self.angles);
 	traceline(self.origin, self.origin + v_forward * raycast_dist, 0, self);
 
@@ -238,7 +241,7 @@ void Shoot()
 
 	if (Raycast()) {
 		trace_ent.health -= 10;
-		if (trace_ent.health < 1) trace_ent.health = -1;
+		if (trace_ent.health < 1) trace_ent.health = -1; // if they are -1 health on Server they will lay sideways on the floor like they got FLATENED out
 
 		trace_ent.SendFlags |= SENDFLAGS_HIT;
 	}
@@ -309,6 +312,8 @@ void PlayerPreThink()
 
 	ShootCooldown();
 	ReloadCooldown();
+	
+	Player_HandleJump();
 };
 
 
@@ -319,7 +324,9 @@ Post-Update function for the player.
 void PlayerPostThink()
 {
 	if(self.flags & FL_ONGROUND)
+	{
     	self.velocity *= 0.9;
+	}
 };
 
 

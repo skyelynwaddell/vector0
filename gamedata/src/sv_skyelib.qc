@@ -2,7 +2,7 @@
 // Skyel's Game Library - Server-side
 // Mostly static functions, or generic variables reusable across fps games
 
-/* Player sv_Globals */
+/* Player sv_globals */
 .float last_time;
 .int sv_reloading;
 .int sv_shooting;
@@ -12,6 +12,9 @@
 .int current_ammo;
 .int current_weapon;
 
+.int was_jumping;
+.int was_on_ground;
+
 enum PLAYER_STATE {
 	FREE,
 	SHOOTING,
@@ -19,6 +22,10 @@ enum PLAYER_STATE {
 };
 .PLAYER_STATE state;
 
+/*
+delta
+Returns the current delta time
+*/
 float delta(){ 
     if (self.last_time == 0) return 0.0;
     float dt = time - self.last_time;
@@ -37,7 +44,17 @@ Returns true if the entity provided is currently moving
 int IsMoving(entity ent_to_check_is_moving)
 {
 	return VectorLength(ent_to_check_is_moving.velocity) > 0.1;
-}
+};
+
+/*
+precache_everything
+Called once on worldspawn load to precache 
+any sv side imports such as sounds, etc.
+*/
+void precache_everything()
+{
+    precache_sound("sound/player/player_jump.ogg");
+};
 
 
 // --- STATS ---
