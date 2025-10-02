@@ -2,7 +2,6 @@
 
 void PrecacheEverything()
 {
-	precache_sound("demon/dland2.wav");
 	precache_model("models/monster_shotgunner/monster_shotgunner_nowep.glb");
 	precache_model("models/test.glb");
     precache_model("models/pump/pump.glb");

@@ -9,6 +9,9 @@ struct Weapon {
     float reload_time;
     int automatic;
     float timer;
+
+    string sound_shoot;
+    string sound_reload;
 };  
 
 // all the diffrent ammo types a weapon can use
@@ -93,6 +96,9 @@ void WeaponsInit()
     self.ammo_pools[WEAPON_NONE].ammo_type   = AMMO_NONE;
     self.ammo_pools[WEAPON_NONE].amount      = 0;
 
+    self.weapons[WEAPON_NONE].sound_shoot = __NULL__;
+    self.weapons[WEAPON_NONE].sound_shoot = __NULL__;
+
     // Pistol
     self.weapons[WEAPON_PISTOL].name         = "Pistol";
     self.weapons[WEAPON_PISTOL].ammo_type    = AMMO_9MM;
@@ -104,6 +110,9 @@ void WeaponsInit()
     self.weapons[WEAPON_PISTOL].automatic    = false;
     self.ammo_pools[WEAPON_PISTOL].ammo_type = AMMO_9MM;
     self.ammo_pools[WEAPON_PISTOL].amount    = 30;
+
+    self.weapons[WEAPON_PISTOL].sound_shoot = "sound/weapons/pistol_shot.ogg";
+    self.weapons[WEAPON_PISTOL].sound_reload = "sound/weapons/pistol_reload.ogg";
 
     // Pump
     self.weapons[WEAPON_PUMP].name         = "Shotgun";
@@ -117,6 +126,9 @@ void WeaponsInit()
     self.ammo_pools[WEAPON_PUMP].ammo_type = AMMO_SHOTGUN_SHELLS;
     self.ammo_pools[WEAPON_PUMP].amount    = 30;
 
+    self.weapons[WEAPON_PUMP].sound_shoot = "sound/weapons/shotgun.ogg";
+    self.weapons[WEAPON_PUMP].sound_reload = "sound/weapons/shotgun_reload.ogg";
+
     // Revolver
     self.weapons[WEAPON_REVOLVER].name         = "Revolver";
     self.weapons[WEAPON_REVOLVER].ammo_type    = AMMO_365;
@@ -129,6 +141,9 @@ void WeaponsInit()
     self.ammo_pools[WEAPON_REVOLVER].ammo_type = AMMO_365;
     self.ammo_pools[WEAPON_REVOLVER].amount    = 30;
 
+    self.weapons[WEAPON_REVOLVER].sound_shoot = "sound/weapons/revolver_shot.ogg";
+    self.weapons[WEAPON_REVOLVER].sound_reload = "sound/weapons/revolver_reload.ogg";
+
     // SMG
     self.weapons[WEAPON_SMG].name         = "SMG";
     self.weapons[WEAPON_SMG].ammo_type    = AMMO_9MM;
@@ -140,6 +155,9 @@ void WeaponsInit()
     self.weapons[WEAPON_SMG].automatic    = true;
     self.ammo_pools[WEAPON_SMG].ammo_type = AMMO_9MM;
     self.ammo_pools[WEAPON_SMG].amount    = 30;
+
+    self.weapons[WEAPON_SMG].sound_shoot = "sound/weapons/mp_shot.ogg";
+    self.weapons[WEAPON_SMG].sound_reload = "sound/weapons/mp_reload.ogg";
 
     ChangeWeapon(WEAPON_PISTOL);
 

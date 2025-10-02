@@ -2666,7 +2666,7 @@ void(float buf, __uint fl) WriteUInt = #0:WriteUInt; /*
 void(float buf, __int64 fl) WriteInt64 = #0:WriteInt64; /*
 		Writes all 8 bytes of a 64bit integer. This uses variable-length coding and will send only a single byte for any value between -64 and 63. */
 
-void(float buf, __uint64 fl) WriteUInt64 = #0:WriteUInt64; /*
+void(float buf, __uint64 fl) WriteUInt64 = #655:WriteUInt64; /*
 		Writes all 8 bytes of a 64bit unsigned integer. Values between 0-127 will be sent in a single byte. */
 
 #endif

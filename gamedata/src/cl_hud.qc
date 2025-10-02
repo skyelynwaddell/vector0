@@ -2,6 +2,16 @@ void draw_gui()
 {
     sui_begin(g_width, g_height);
 
+	int hitmarker_size = 16;
+	vector hitmarker_pos;
+	hitmarker_pos.x = (g_width - hitmarker_size) * 0.5;
+	hitmarker_pos.y = (g_height - hitmarker_size) * 0.5;
+
+	if (hitmarker_timer > 0)
+	{
+		sui_pic(hitmarker_pos, [hitmarker_size, hitmarker_size, 0], "textures/hitmarker.png", '1 1 1', 1, __NULL__);
+		hitmarker_timer -= frametime;
+	}
 	// string chapter = "CHAPTER 1";
 	// string mission_name = "MISSION ESCAPE";
 	// vector textsize = '8 8 0'; // character size

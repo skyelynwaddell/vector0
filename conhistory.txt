@@ -106,3 +106,27 @@ spectator 1
 /map surf_utopia 
 /map surf_utopia 
 /map surf_utopia 
+go
+go
+go
+go
+go
+con
+go
+con
+go
+con
+con
+con
+go
+go
+con
+mp
+sv_mp
+go
+mp
+cmd mp
+go
+go
+go
+go

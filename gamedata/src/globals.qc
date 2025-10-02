@@ -3,6 +3,14 @@
 #define false 0
 
 #define NET_LERP 0.25
+const float VIEWHEIGHT_DEFAULT    = 64; // View height default
+const float VIEWHEIGHT_CROUCH     = 32; // View height while crouching
+const float VIEWHEIGHT_ELIMINATED = 3;  // View hight when eliminated
+
+// use these with setsize() for min / max parms
+vector SCALE_MIN = [-14, -14, 0];       // player scale minimum
+vector SCALE_DEFAULT = [14, 14, 72];    // player scale max when standing
+vector SCALE_CROUCH = [14, 14, 32];     // player scale max when crouching
 
 enum NET_ENTITY {
     ENTITY_PLAYER=1,
@@ -30,6 +38,7 @@ enum PLAYER_BODY_STATE {
     PLAYER_BODY_STATE_IDLE_RIFLE,
     PLAYER_BODY_STATE_SHOOT_RIFLE,
     PLAYER_BODY_STATE_RELOAD_RIFLE,
+    PLAYER_BODY_STATE_IDLE,
 };
 
 enum PLAYER_ANIM {
@@ -63,16 +72,24 @@ enum WEAPON_TYPE {
 };
 
 enum SENDFLAGS {
-	SENDFLAGS_ORIGIN         = 1,
-	SENDFLAGS_CURRENTWEAPON  = 2,
-    SENDFLAGS_SHOOT          = 4,
-    SENDFLAGS_RELOAD         = 8,
-    SENDFLAGS_MODELINDEX     = 16,
-    SENDFLAGS_ANGLES         = 32,
-    SENDFLAGS_STATS          = 64,
-    SENDFLAGS_HIT            = 128,
-    SENDFLAGS_JUMP           = 256,
+	SENDFLAGS_ORIGIN         = 1<<0,   // sends the current players origin / position
+	SENDFLAGS_CURRENTWEAPON  = 1<<1,   // sends the current players weapon & ammo/pool
+    SENDFLAGS_SHOOT          = 1<<2,   // alerts CL that the player has FIRED a shot
+    SENDFLAGS_RELOAD         = 1<<3,   // sent when the player RELOADS
+    SENDFLAGS_MODELINDEX     = 1<<4,  // Sets the PLAYER MODEL index (ie. model for the player ; NOT THE GUN / VIEWMODEL)
+    SENDFLAGS_ANGLES         = 1<<5,  // sends the current players angles, like if they are looking up/down etc.
+    SENDFLAGS_STATS          = 1<<9,  // sends player stats - just use stats... 
+    SENDFLAGS_HIT            = 1<<7, // alerts that I have been shot
+    SENDFLAGS_JUMP           = 1<<8, // called when player jumps
+    SENDFLAGS_TARGETSHOT     = 1<<6, // Called when I have successfully SHOT someone ELSE.
 };
+
+// --- STATS ---
+#define STAT_MAXHEALTH       32   // self.max_health
+#define STAT_ARMORVALUE      33   // self.armorvalue
+#define STAT_TOTALAMMO       34   // self.total_ammo
+#define STAT_CURRENTAMMO     35   // self.current_ammo
+#define STAT_CURRENTWEAPON   36   // self.current_weapon
 
 
 float VectorLength(vector v){ return v_x*v_x + v_y*v_y + v_z*v_z; };
@@ -91,6 +108,8 @@ float absf(float val)
     if (val < 0) return -val;
     return val;
 };
+
+
 
 // float PlayerGet(){
 //     return findfloat(world, entnum, player_localentnum);

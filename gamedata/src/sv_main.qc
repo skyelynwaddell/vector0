@@ -8,6 +8,7 @@ void main() {};
 void worldspawn()
 {	
     precache_everything();
+    gamemode = GAMEMODE_DEATHMATCH;
 };
 
 // Update Event

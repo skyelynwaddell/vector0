@@ -55,6 +55,7 @@ void PlayerChangeAnim(int to)
 		case PLAYER_TOP_ANIM_IDLE:
 			self.anim_time = 20;
 
+			if (type == WEAPON_NONE)	  PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE);
 			if (type == WEAPON_PISTOL)    PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_PISTOL);
 			if (type == WEAPON_REVOLVER)  PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_PISTOL);
 			if (type == WEAPON_SMG)       PlayerChangeBodyState(PLAYER_BODY_STATE_IDLE_RIFLE);
@@ -207,6 +208,11 @@ void PlayerStateMachine()
 	self.frame1time = self.bodyframe1time;
 	switch(self.model_body_state)
 	{
+		// IDLE - NO WEAPON
+		case PLAYER_BODY_STATE_IDLE:
+			self.frame = PLAYER_ANIM_IDLE;
+		break;
+
 		// PISTOL IDLE
 		case PLAYER_BODY_STATE_IDLE_PISTOL:
 			self.frame = PLAYER_ANIM_PISTOL;
@@ -242,7 +248,6 @@ void PlayerStateMachine()
 	self.bodyframe1time = self.frame1time;
 	skel_build(self.skeletonindex, self, self.modelindex, 0, stomach, hand, 1);
 	// ---------------------------------------
-
 
 	// ---------------------------------------
 	// --- Rotate Hips ---

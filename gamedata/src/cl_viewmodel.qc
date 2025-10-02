@@ -78,9 +78,6 @@ void CViewModel::CViewModel()
     m.scale = [1, 1, 1];
     m.skin = SKIN_TOXIC;
 
-    m.sound_shoot = "sound/weapons/pistol_shot.ogg";
-    m.sound_reload = "sound/weapons/pistol_reload.ogg";
-
     // === PUMP VIEWMODEL ===
     m = &viewmodels[WEAPON_PUMP];
     m.model_path = "models/arms_pump/arms_pump.glb";
@@ -97,9 +94,6 @@ void CViewModel::CViewModel()
     m.angles = [-4, -163, 358];
     m.scale = [1, 1, 1];
     m.skin = SKIN_TOXIC;
-
-    m.sound_shoot = "sound/weapons/shotgun.ogg";
-    m.sound_reload = "sound/weapons/shotgun_reload.ogg";
 
     // === REVOLVER VIEWMODEL ===
     m = &viewmodels[WEAPON_REVOLVER];
@@ -118,9 +112,6 @@ void CViewModel::CViewModel()
     m.scale = [1, 1, 1];
     m.skin = SKIN_TOXIC;
 
-    m.sound_shoot = "sound/weapons/revolver_shot.ogg";
-    m.sound_reload = "sound/weapons/revolver_reload.ogg";
-
     // === SMG VIEWMODEL ===
     m = &viewmodels[WEAPON_SMG];
     m.model_path = "models/arms_smg/arms_smg.glb";
@@ -137,9 +128,6 @@ void CViewModel::CViewModel()
     m.angles = [3, -179, 358];
     m.scale = [1, 1, 1];
     m.skin = SKIN_TOXIC;
-
-    m.sound_shoot = "sound/weapons/mp_shot.ogg";
-    m.sound_reload = "sound/weapons/mp_reload.ogg";
 
     // Init Global Viewmodel
     this.classname = "CViewModel";
@@ -159,6 +147,10 @@ Called every game TICK to animate the viewmodels current animation
 */
 void CViewModel::Animate(float ft)
 {
+    int raycast_dist = 10000;
+	makevectors(self.oldangles);
+	drawline(1.0, self.oldorigin, self.oldorigin + v_forward * raycast_dist, '255 255 255', 1.0);
+
     if (current_viewmodel == WEAPON_NONE) return;
 
     sViewModel *m = &viewmodels[this.current_viewmodel];

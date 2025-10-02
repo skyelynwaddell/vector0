@@ -123,7 +123,8 @@ noref void CSQC_Ent_Update(float isnew)
 	PLAYER
 	//=================================*/
 	case ENTITY_PLAYER:
-		flags = readbyte();
+		string _flags = readstring();
+		flags = stof(_flags);
 
 		self.oldangles.x = readcoord();
 		self.oldangles.y = readcoord();
@@ -174,7 +175,6 @@ noref void CSQC_Ent_Update(float isnew)
 				if (!isnew) 
 				{
 					self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_reload); 
-					localsound(viewmodels[self.viewmodel.current_viewmodel].sound_reload, CHAN_AUTO, 0.2);
 				}
 			}
 			else
@@ -182,24 +182,14 @@ noref void CSQC_Ent_Update(float isnew)
 				if (self.body_anim != PLAYER_TOP_ANIM_RELOAD)
 				{
 					PlayerChangeAnim(PLAYER_TOP_ANIM_RELOAD);
-					sound(self, CHAN_AUTO, viewmodels[self.viewmodel.current_viewmodel].sound_shoot, 0.2, ATTN_NORM);
 				}
 			}
-		}
-
-		// Jump
-		if (flags & SENDFLAGS_JUMP)
-		{
-			// if (isme)
-			// 	localsound("sound/player/player_jump.ogg", CHAN_AUTO, 1);
-			// else
-			print("WHAT THE FUCK?!");
-			localsound("sound/player/player_jump.ogg", CHAN_AUTO, 1);
 		}
 
 		// Hit
 		if (flags & SENDFLAGS_HIT)
 		{
+			// I was shot by someone
 			int istarget = readbyte();
 			if (istarget == true)
 			{
@@ -215,7 +205,6 @@ noref void CSQC_Ent_Update(float isnew)
 				if (!isnew) 
 				{
 					self.viewmodel.SetFrame(viewmodels[self.viewmodel.current_viewmodel].anim_shoot);
-					localsound(viewmodels[self.viewmodel.current_viewmodel].sound_shoot, CHAN_AUTO, 0.2);
 				}
 			}
 			else
@@ -223,10 +212,19 @@ noref void CSQC_Ent_Update(float isnew)
 				if (self.body_anim != PLAYER_TOP_ANIM_SHOOT)
 				{
 					PlayerChangeAnim(PLAYER_TOP_ANIM_SHOOT);
-					sound(self, CHAN_AUTO, viewmodels[self.viewmodel.current_viewmodel].sound_shoot, 0.2, ATTN_NORM);
 				}
 			}
 			
+		}
+
+		// Target Shot
+		if (flags & SENDFLAGS_TARGETSHOT)
+		{
+			if (!isnew && isme)
+			{
+				print("target_shot\n");
+				hitmarker_timer = 50;
+			}
 		}
 
 		// Model Index (Current Model's Animation)
@@ -300,7 +298,7 @@ float CSQC_ConsoleCommand(string cmd)
 	string command = argv(0);
 	switch(command)
 	{
-		case "viewmodel_debug":
+		case "cl_viewmodeldebug":
 			entity csqcplayer = findfloat(world, entnum, player_localentnum);
 			if (!csqcplayer || !csqcplayer.viewmodel)
 			{

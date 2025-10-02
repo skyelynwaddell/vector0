@@ -11,9 +11,19 @@
 .int total_ammo;
 .int current_ammo;
 .int current_weapon;
-
 .int was_jumping;
 .int was_on_ground;
+.int crouching;
+.int crouch_toggle;
+.int crouch_was_pressed;
+.vector view_ofs_lerp;
+
+enum GAMEMODE {
+	GAMEMODE_DEATHMATCH,	// 5 v 5 Team Based Deathmatch
+	GAMEMODE_FFA,			// Free For All
+	GAMEMODE_DUAL,			// Dual - 1 vs 1
+};
+GAMEMODE gamemode;
 
 enum PLAYER_STATE {
 	FREE,
@@ -46,6 +56,7 @@ int IsMoving(entity ent_to_check_is_moving)
 	return VectorLength(ent_to_check_is_moving.velocity) > 0.1;
 };
 
+
 /*
 precache_everything
 Called once on worldspawn load to precache 
@@ -53,17 +64,33 @@ any sv side imports such as sounds, etc.
 */
 void precache_everything()
 {
+    //player sounds
     precache_sound("sound/player/player_jump.ogg");
+
+    //pistol
+	precache_sound("sound/weapons/pistol_shot.ogg");
+	precache_sound("sound/weapons/pistol_reload.ogg");
+
+	//shotgun
+	precache_sound("sound/weapons/shotgun.ogg");
+	precache_sound("sound/weapons/shotgun_reload.ogg");
+
+	//revolver
+	precache_sound("sound/weapons/revolver_shot.ogg");
+	precache_sound("sound/weapons/revolver_reload.ogg");
+
+	//mp
+	precache_sound("sound/weapons/mp_shot.ogg");
+	precache_sound("sound/weapons/mp_reload.ogg");
 };
 
 
-// --- STATS ---
-#define STAT_MAXHEALTH      32   // self.max_health
-#define STAT_ARMORVALUE     33   // self.armorvalue
-#define STAT_TOTALAMMO      34   // self.total_ammo
-#define STAT_CURRENTAMMO    35   // self.current_ammo
-#define STAT_CURRENTWEAPON  36   // self.current_weapon
-
+/*
+network_send_clientstats
+Sends the clientstats every server tick
+these are variables SERVER side controls
+that client side needs access to (ie. Health, Armor, etc.)
+*/
 void network_send_clientstats() 
 {
     clientstat(STAT_MAXHEALTH,   EV_FLOAT,   max_health);

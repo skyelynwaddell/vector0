@@ -59,8 +59,7 @@ int ammo_count;
 float health;
 float max_health;
 int armor;
-
-const float VIEWHEIGHT_ELIMINATED = 3;
+int hitmarker_timer;
 
 enum WEAPON_BASE_TYPE {
     WEAPON_BASE_TYPE_NONE,
@@ -81,8 +80,6 @@ typedef struct sViewModel {
     int anim_reload_length;
     int anim_finished;
     int automatic;
-    string sound_shoot;
-    string sound_reload;
     Skin skin;
     vector origin;
     vector angles;
@@ -99,11 +96,5 @@ entity(float entnums) num_for_ent =
 		finder = finder.chain;
 	}
 	return finder;
-}
+};
 
-// --- STATS ---
-#define STAT_MAXHEALTH       32   // self.max_health
-#define STAT_ARMORVALUE      33   // self.armorvalue
-#define STAT_TOTALAMMO       34   // self.total_ammo
-#define STAT_CURRENTAMMO     35   // self.current_ammo
-#define STAT_CURRENTWEAPON   36   // self.current_weapon

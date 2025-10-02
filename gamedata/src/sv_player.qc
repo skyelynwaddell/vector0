@@ -1,4 +1,3 @@
-
 //
 //	Player.qc - Various stuff done for the player, including per-frame functions like PlayerPreThink and PlayerPostThink, also client specific stuff like PutClientInServer etc.
 //
@@ -22,14 +21,14 @@ Invokes the jump action for the player.
 void PlayerJump()
 {
 	// make sure we are on the ground
-	if (!(self.flags & FL_ONGROUND))
+	if ( !(self.flags & FL_ONGROUND) )
 		return;
 
 	// make sure we have already released jumping
 	if ( !(self.flags & FL_JUMPRELEASED) )
 		return;
 	
-	sound(self, CHAN_AUTO, "sound/player/player_jump.ogg", 0.2, ATTN_NORM);
+	pointsound(self.origin, "sound/player/player_jump.ogg", 0.2, ATTN_NORM);
 	self.weaponframe = 0;
 	self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
 	self.button2 = 0;
@@ -44,7 +43,7 @@ void CheckImpulses()
 {
 	switch (self.impulse)
 	{
-		case VIEWMODEL_NONE:
+		case VIEWMODEL_NONE: // KEY #0 || case 10, which corresponds to KEY 0, because key 10 doesnt exist and self.impulse=0 actually means NOTHING is pressed, and NOT key 0... idfk anymore dude.
 			ChangeWeapon(WEAPON_NONE);
 		break;
 
@@ -90,7 +89,7 @@ void Player_HandleJump()
 {
 	if(self.button2) PlayerJump();
 	else self.flags = self.flags | FL_JUMPRELEASED;
-}
+};
 
 
 /*
@@ -133,7 +132,8 @@ void Reload()
     self.sv_reloading = true;
     self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].reload_time;
     self.SendFlags |= SENDFLAGS_RELOAD;
-}
+	pointsound(self.origin, self.weapons[self.current_weapon].sound_reload, 0.2, ATTN_NORM);
+};
 
 
 /*
@@ -151,7 +151,7 @@ void HandleReload()
         Reload();
 
     self.reload_pressed_last = reload_pressed_now;
-}
+};
 
 
 /*
@@ -197,7 +197,7 @@ void ReloadCooldown()
 		self.state = FREE;
 		self.SendFlags |= SENDFLAGS_CURRENTWEAPON;
 	}
-}
+};
 
 
 /*
@@ -215,7 +215,7 @@ int Raycast()
 
 	if (trace_ent) return true;
 	return false;
-}
+};
 
 
 /*
@@ -225,6 +225,7 @@ Immediately invokes using the players current weapon
 void Shoot()
 {
 	if (self.state != FREE) return;	
+	if (self.health < 1) return;
 
 	if (self.weapons[self.current_weapon].ammo_count <= 0)
 	{
@@ -237,15 +238,26 @@ void Shoot()
 	self.sv_shooting = true;
 	self.weapons[self.current_weapon].timer = self.weapons[self.current_weapon].fire_rate;
 	self.SendFlags |= SENDFLAGS_SHOOT;
+	pointsound(self.origin, self.weapons[self.current_weapon].sound_shoot, 0.2, ATTN_NORM);
+
 	PlayerSetAmmo();
 
-	if (Raycast()) {
+	if (Raycast()) 
+	{
+		// trace_ent = the dude that just got shot
 		trace_ent.health -= 10;
-		if (trace_ent.health < 1) trace_ent.health = -1; // if they are -1 health on Server they will lay sideways on the floor like they got FLATENED out
+		if (trace_ent.health < 1) 
+		{
+			trace_ent.health = -1; // if they are -1 health on Server they will lay sideways on the floor like they got FLATENED out
+			return;
+		}
 
 		trace_ent.SendFlags |= SENDFLAGS_HIT;
+
+		// tell the player WHO did the shot - that it succeeeded
+		if (self != trace_ent) self.SendFlags |= SENDFLAGS_TARGETSHOT;
 	}
-}
+};
 
 
 /*
@@ -271,7 +283,7 @@ void HandleShoot()
     }
 
     self.shoot_pressed_last = shoot_pressed_now;
-}
+};
 
 
 /*
@@ -290,7 +302,41 @@ void ShootCooldown()
 		self.sv_shooting = false;
 		self.state = FREE;
 	}
-}
+};
+
+
+/*
+PlayerCrouch
+When invoked will immediately toggle the stance of the player
+*/
+void PlayerCrouch()
+{
+	self.crouching = !self.crouching;
+	float viewheight = self.crouching ? VIEWHEIGHT_CROUCH : VIEWHEIGHT_DEFAULT;
+	self.view_ofs_lerp = [0,0,viewheight];
+
+	if (self.crouching == true)
+		setsize(self, SCALE_MIN, SCALE_CROUCH);
+	else
+		setsize(self, SCALE_MIN, SCALE_DEFAULT);
+};
+
+
+/*
+PlayerHandleCrouch
+Called every game tick to determine if the player IS crouching or not...
+*/
+void PlayerHandleCrouch()
+{
+	if (self.button5 && self.crouch_was_pressed == false)
+	{
+		PlayerCrouch();
+		self.crouch_was_pressed = true;
+	}
+
+	if (self.button5 == false) self.crouch_was_pressed = false;
+	self.view_ofs = lerp_vec(self.view_ofs, self.view_ofs_lerp, 0.1);
+};
 
 
 /*
@@ -327,6 +373,8 @@ void PlayerPostThink()
 	{
     	self.velocity *= 0.9;
 	}
+
+	PlayerHandleCrouch();
 };
 
 
@@ -367,7 +415,9 @@ float MySendEntity(entity playerent, float changedflags)
 	// Header & Message Type
 	WriteByte(MSG_ENTITY, ENTITY_PLAYER);
 	WriteByte(MSG_ENTITY, isme);
-	WriteByte(MSG_ENTITY, changedflags);
+
+	string _flags = ftos(changedflags);
+	WriteString(MSG_ENTITY, _flags);
 
 	// Angles
 	WriteCoord(MSG_ENTITY, self.angles_x);
@@ -411,13 +461,16 @@ void PlayerSpawn()
 	self.armorvalue = 0;
 	self.movetype = MOVETYPE_WALK;
 	self.fixangle = TRUE;
-	self.view_ofs = [0, 0, 64];
+
+	self.view_ofs_lerp = [0, 0, VIEWHEIGHT_DEFAULT];
+	self.view_ofs = [0, 0, VIEWHEIGHT_DEFAULT];
 	
 	precache_model("models/pump/pump.glb");
 	precache_model("models/monster_shotgunner/monster_shotgunner_nowep.glb");
 	setmodel(self, "models/monster_shotgunner/monster_shotgunner_nowep.glb");
 	setorigin(self, GetSpawnPoint());
-	setsize(self, [-14, -14, 0], [14, 14, 72]);
+	setsize(self, SCALE_MIN, SCALE_DEFAULT);
+
 	WeaponsInit();
 	PlayerSetAmmo();
 
@@ -448,23 +501,12 @@ void ClientDisconnect()
 };
 
 
-void SetNewParms()
-{
-};
-
-void SetChangeParms()
-{
-};
-
-void info_player_start()
-{
-};
-
-void SV_PausedTic(float elapsedtime)
-{
-	// if (elapsedtime > 2) setpause(0);
-};
-
+/*
+SV_ParseClientCommand
+You can define custom SV console commands here
+in the switch statement based on their string
+**** These must be prefixed with `cmd` to work!! (ie. cmd mp)
+*/
 void SV_ParseClientCommand(string command_string) 
 {
 	tokenize(command_string);
@@ -472,16 +514,49 @@ void SV_ParseClientCommand(string command_string)
 
 	switch (cmd)
 	{
-		case "mp":
-			print("foo");
+		// Example command : `cmd foo` prints `bar`
+		case "foo":
+			print("bar");
 		break;
+
+		// Deathmatch
+		case "gamemode_deathmatch":
+			gamemode = GAMEMODE_DEATHMATCH;
+			print("Mode: Deathmatch");
+		break;
+
+		// Free for All
+		case "gamemode_ffa":
+			gamemode = GAMEMODE_FFA;
+			print("Mode: Free for All");
+		break;
+
+		// Dual - 1 vs 1
+		case "gamemode_dual":
+			gamemode = GAMEMODE_DUAL;
+			print("Mode: Dual");
+		break;
+
 		default: break;
 	}
 };
 
 
+/*
+SV_RunClientCommand
+i guess you run client commands from server here idk
+*/
 void SV_RunClientCommand()
 {
 	runstandardplayerphysics(self);
 };
 
+
+// Other stuffs not yet implemented / used
+void SetNewParms(){};
+void SetChangeParms(){};
+void info_player_start(){};
+void SV_PausedTic(float elapsedtime)
+{
+	// if (elapsedtime > 2) setpause(0);
+};

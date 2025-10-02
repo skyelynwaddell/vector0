@@ -1995,7 +1995,7 @@ void	fteextensions.qc	/^void(float apilevel, string enginename, float enginevers
 void	fteextensions.qc	/^void(float buf, __double dbl) WriteDouble = #0:WriteDouble; \/*$/;"	f
 void	fteextensions.qc	/^void(float buf, __int64 fl) WriteInt64 = #0:WriteInt64; \/*$/;"	f
 void	fteextensions.qc	/^void(float buf, __uint fl) WriteUInt = #0:WriteUInt; \/*$/;"	f
-void	fteextensions.qc	/^void(float buf, __uint64 fl) WriteUInt64 = #0:WriteUInt64; \/*$/;"	f
+void	fteextensions.qc	/^void(float buf, __uint64 fl) WriteUInt64 = #655:WriteUInt64; \/*$/;"	f
 void	fteextensions.qc	/^void(float buf, float fl) WriteFloat = #280; \/*$/;"	f
 void	fteextensions.qc	/^void(float buf, int fl) WriteInt = #0:WriteInt; \/*$/;"	f
 void	fteextensions.qc	/^void(float dest) setkeydest = #601;$/;"	f
